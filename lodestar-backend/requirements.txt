@@ -1,0 +1,14 @@
+networkx==2.5.1
+notebook==6.4.0
+jupyter==1.0.0
+numpy==1.16.5
+matplotlib==3.4.2
+pandas==1.2.0
+sklearn2==0.0.13
+scipy==1.6.0
+cython==0.29.7
+PyOpenGL-accelerate==3.1.3b1
+numba==0.53.1
+flask==2.0.1
+shapely==1.7.1
+astropy==4.3.post1
