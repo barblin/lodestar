@@ -137,4 +137,5 @@ node_modules/
 diptest/
 env/
 venv/
+.swp
 
