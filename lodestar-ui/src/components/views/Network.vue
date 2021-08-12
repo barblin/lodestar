@@ -118,7 +118,7 @@ export default {
           .attr("stroke", "grey")
           .attr("cx", width)
           .attr("cy", height)
-          .attr("r", 20);
+          .attr("r", 10);
 
       function dragmove(event, d) {
         d3.select(this).select('circle')
