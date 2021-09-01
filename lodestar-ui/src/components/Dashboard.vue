@@ -2,9 +2,10 @@
   <top-nav></top-nav>
   <side-nav></side-nav>
   <br>
+  <Scatter :plotData="$store.getters.plotData" />
   <Distribution/>
-  <Scatter :plotData="$store.getters.plotData"/>
   <Network :network="$store.getters.network"/>
+  <LevelScatter :plotData="$store.getters.plotData" />
 </template>
 
 <script>
@@ -15,6 +16,7 @@ import Network from "./views/Network.vue"
 import SideNav from "./menu/SideNav.vue";
 import TopNav from "./menu/TopNav.vue";
 import Distribution from "./views/Distribution.vue";
+import LevelScatter from "./views/LevelScatter.vue";
 
 defineProps({
   msg: String
@@ -27,7 +29,8 @@ export default {
     TopNav,
     Scatter,
     Network,
-    SideNav
+    SideNav,
+    LevelScatter
   },
   mounted() {
     updateResources();
@@ -44,8 +47,9 @@ a {
   position: relative;
   float: left;
   width: 600px;
-  height: 470px;
+  height: 460px;
   border: 1px solid darkslategrey;
+  margin-bottom: 10px;
 }
 
 #spinner {

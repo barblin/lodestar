@@ -3,7 +3,7 @@ import App from './App.vue'
 import {store} from './store/cluster-state-store'
 import 'vue-sidebar-menu/dist/vue-sidebar-menu.css'
 import {library} from "@fortawesome/fontawesome-svg-core";
-import {faChartArea, faUser} from "@fortawesome/free-solid-svg-icons";
+import {faChartArea, faUser, faTrash, faLevelDownAlt} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import VueNextSelect from 'vue-next-select';
 import 'vue-next-select/dist/index.min.css';
@@ -11,6 +11,8 @@ import 'vue-next-select/dist/index.min.css';
 
 library.add(faUser);
 library.add(faChartArea);
+library.add(faTrash);
+library.add(faLevelDownAlt);
 
 const app = createApp(App)
 

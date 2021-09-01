@@ -15,7 +15,7 @@ export const store = createStore({
         overallTime: 0,
 
         width: 600,
-        height: 450,
+        height: 440,
     },
     mutations: {
         updateLoadingScatter(state, isLoading) {
