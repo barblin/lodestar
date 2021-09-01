@@ -1,5 +1,5 @@
 export let col_map = {
-    0: '#e31a1c',
+    0: '#a2a2a2',
     1: '#1f78b4',
     2: '#33a02c',
     3: '#ff7f00',

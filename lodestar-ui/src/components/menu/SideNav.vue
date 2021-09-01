@@ -14,18 +14,18 @@ export default {
     return {
       menu: [
         {
-          header: true,
+          header: "Lodestar",
           title: 'Main Navigation',
           hiddenOnCollapse: true
         },
         {
           href: '/',
-          title: 'Dashboard',
+          title: 'Explorer',
           icon: 'fa fa-user'
         },
         {
           href: '/charts',
-          title: 'Charts',
+          title: 'Tutorial',
           icon: 'fa fa-chart-area',
           child: [
             {

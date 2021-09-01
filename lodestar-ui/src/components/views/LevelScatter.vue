@@ -1,7 +1,7 @@
 <template>
-  <div class="scatter-plot">
-    <ViewHeader :title='"Original / Optimal Clustering"'></ViewHeader>
-    <div id="scatter_pane">
+  <div class="simple-plot">
+    <ViewHeader :title='"30 nn density found 7 cluster"'></ViewHeader>
+    <div id="level_scatter_pane">
       <div id="spinner" v-if="$store.getters.loadingScatter">
         <ScaleLoader v-if="$store.getters.loadingScatter"></ScaleLoader>
       </div>
@@ -29,7 +29,7 @@ export default {
           width = this.$store.getters.width - margin.left - margin.right,
           height = this.$store.getters.height - margin.top - margin.bottom;
 
-      const svg = d3.select("#scatter_pane")
+      const svg = d3.select("#level_scatter_pane")
           .append("svg")
           .attr("width", width + margin.left + margin.right)
           .attr("height", height + margin.top + margin.bottom)
@@ -66,19 +66,10 @@ export default {
             return col_map[d[2]];
           })
     }
-
   }
 }
 
 </script>
 
 <style scoped>
-.scatter-plot {
-  position: relative;
-  display: block;
-  width: 600px;
-  height: 460px;
-  border: 1px solid darkslategrey;
-  margin-bottom: 10px;
-}
 </style>

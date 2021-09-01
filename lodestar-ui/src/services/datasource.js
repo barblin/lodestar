@@ -53,6 +53,21 @@ export function updateNetwork(id) {
         })
 }
 
+export function updateLevelScatter(id) {
+    //store.commit('updateLoadingScatter', true)
+    //store.commit('updateErroredScatter', false)
+
+    prepareView("#level_scatter_pane")
+
+    //fetchData("scatters/" + id,
+    //    resp => {
+    //        store.commit('updatePlot', resp.data)
+    //    },
+    //    () => {
+    //        store.commit('updateLoadingScatter', false);
+    //    })
+}
+
 export function prepareView(name) {
     d3.select(name).selectAll("svg").remove();
 }
