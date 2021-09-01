@@ -50,6 +50,7 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+.idea/
 
 # Translations
 *.mo
@@ -131,3 +132,10 @@ dmypy.json
 
 # Ignore notebook folder
 /notebooks
+
+node_modules/
+diptest/
+env/
+venv/
+.swp
+

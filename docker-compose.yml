@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+
+  lodestar-ui:
+    build:
+      context: ./lodestar-ui
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    container_name: lodestar-ui
+    depends_on:
+      - lodestar-backend
+
+  lodestar-backend:
+    build:
+      context: ./lodestar-backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    container_name: lodestar-backend
