@@ -20,17 +20,17 @@ export default {
         },
         {
           href: '/',
-          title: 'Explorer',
+          title: 'Cluster Explorer',
           icon: 'fa fa-user'
         },
         {
           href: '/charts',
-          title: 'Tutorial',
+          title: 'How to use?',
           icon: 'fa fa-chart-area',
           child: [
             {
               href: '/charts/sublink',
-              title: 'Sub Link'
+              title: 'User Guide'
             }
           ]
         }
