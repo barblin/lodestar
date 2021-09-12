@@ -1,5 +1,5 @@
 <template>
-  <vue-select v-model="selection"  :options="$store.getters.resources" class="nav-el"></vue-select>
+  <vue-select v-model="selection" placeholder="Select source file" :options="$store.getters.resources" class="nav-el"></vue-select>
 </template>
 
 <script>

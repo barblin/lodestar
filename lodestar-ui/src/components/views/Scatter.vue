@@ -1,10 +1,8 @@
 <template>
-  <div class="scatter-plot">
-    <ViewHeader :title='"Original / Optimal Clustering"'></ViewHeader>
-    <div id="scatter_pane">
-      <div id="spinner" v-if="$store.getters.loadingScatter">
-        <ScaleLoader v-if="$store.getters.loadingScatter"></ScaleLoader>
-      </div>
+  <ViewHeader :title='"Original / Optimal Clustering"' :parent=parent @maximize="maximize"></ViewHeader>
+  <div id="scatter_pane">
+    <div id="spinner" v-if="$store.getters.loadingScatter">
+      <ScaleLoader v-if="$store.getters.loadingScatter"></ScaleLoader>
     </div>
   </div>
 </template>
@@ -18,16 +16,22 @@ import ViewHeader from "./utils/ViewHeader.vue";
 
 export default {
   name: "Scatter",
-  props: ['plotData'],
+  props: ['plotData', 'parent'],
   components: {
     ScaleLoader,
     ViewHeader
   },
   watch: {
     plotData: function (plotData) {
-      const margin = {top: 10, right: 30, bottom: 40, left: 30},
-          width = this.$store.getters.width - margin.left - margin.right,
-          height = this.$store.getters.height - margin.top - margin.bottom;
+      let parent = document.getElementById(this.parent)
+
+      if(!parent) {
+        parent = document.getElementById('main')
+      }
+
+      const margin = {top: 10, right: 10, bottom: 50, left: 30},
+          width = parent.clientWidth - margin.left - margin.right,
+          height = parent.clientHeight - margin.top - margin.bottom;
 
       const svg = d3.select("#scatter_pane")
           .append("svg")
@@ -67,6 +71,11 @@ export default {
           })
     }
 
+  },
+  methods: {
+    maximize() {
+      this.$emit('maximize')
+    }
   }
 }
 

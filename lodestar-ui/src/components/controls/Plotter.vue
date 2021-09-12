@@ -1,5 +1,5 @@
 <template>
-  <button type="button" @click="click()" class="nav-el">Plot</button>
+  <button type="button" :disabled="$store.getters.loadingAny" @click="click()" class="nav-el">Plot</button>
 </template>
 
 <script>

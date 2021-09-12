@@ -2,6 +2,7 @@ import {createStore} from 'vuex'
 
 export const store = createStore({
     state: {
+        currentViewSelection: null,
         currentResource: "Choose resource file",
 
         loadingScatter: false,
@@ -18,6 +19,9 @@ export const store = createStore({
         height: 440,
     },
     mutations: {
+        updateCurrentViewSelection(state, selection) {
+            state.currentViewSelection = selection
+        },
         updateLoadingScatter(state, isLoading) {
             state.loadingScatter = isLoading
         },
@@ -53,10 +57,14 @@ export const store = createStore({
         },
     },
     getters: {
+        currentViewSelection: state => state.currentViewSelection,
+
         loadingScatter: state => state.loadingScatter,
         erroredScatter: state => state.erroredScatter,
         loadingNetwork: state => state.loadingNetwork,
         erroredNetwork: state => state.erroredNetwork,
+
+        loadingAny: state => state.loadingScatter || state.loadingNetwork,
 
         plotData: state => state.plotData,
         network: state => state.network,

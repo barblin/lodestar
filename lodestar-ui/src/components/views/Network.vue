@@ -1,11 +1,9 @@
 <template>
-  <div class="simple-plot">
-    <ViewHeader :title='"Cluster join tree"' :branch="true" :trash="true" :trash-callback="trashCallback"
-                k></ViewHeader>
-    <div id="network_pane">
-      <div id="spinner" v-if="$store.getters.loadingNetwork">
-        <ScaleLoader v-if="$store.getters.loadingNetwork"></ScaleLoader>
-      </div>
+  <ViewHeader :title='"Cluster join tree"' :branch="true" :trash="true" :trash-callback="trashCallback"
+              :parent=parent @maximize="maximize"></ViewHeader>
+  <div id="network_pane">
+    <div id="spinner" v-if="$store.getters.loadingNetwork">
+      <ScaleLoader v-if="$store.getters.loadingNetwork"></ScaleLoader>
     </div>
   </div>
 </template>
@@ -19,16 +17,22 @@ let rects = []
 let circles = []
 export default {
   name: "Network",
-  props: ['network'],
+  props: ['network', 'parent'],
   components: {
     ScaleLoader,
     ViewHeader
   },
   watch: {
     network: function (network) {
-      const margin = {top: 60, right: 10, bottom: 30, left: 40},
-          width = this.$store.getters.width - margin.left - margin.right,
-          height = this.$store.getters.height - margin.top - margin.bottom;
+      let parent = document.getElementById(this.parent)
+
+      if (!parent) {
+        parent = document.getElementById('main')
+      }
+
+      const margin = {top: 10, right: 10, bottom: 50, left: 20},
+          width = parent.clientWidth - margin.left - margin.right,
+          height = parent.clientHeight - margin.top - margin.bottom;
 
       let rect = {
         opacity: 0.2
@@ -83,7 +87,7 @@ export default {
         rects.push(rect)
 
         circles.forEach(circle => {
-          circle.attr("fill", "steelblue")
+          circle.attr("fill", '#69b3a2')
           rects.forEach(curRect => {
             let circBox = circle.node().getBBox();
             let rectBox = curRect.node().getBBox();
@@ -101,33 +105,60 @@ export default {
         });
       }
 
-      const x = d3.scaleLinear()
-          .domain([0, 1])
-          .range([0, network.max_x]);
+      // create a tooltip
+      var Tooltip = d3.select("#network_pane")
+          .append("div")
+          .style("opacity", 0)
+          .attr("class", "tooltip")
+          .style("background-color", "white")
+          .style("float", "left")
+          .style("position", "relative")
+          .style("border", "solid")
+          .style("border-width", "2px")
+          .style("border-radius", "5px")
 
-
-      const y = d3.scaleLinear()
-          .domain([0, 1])
-          .range([network.max_y, 0]);
+      // Three function that change the tooltip when user hover / move / leave a cell
+      var tmouseover = function (d) {
+        Tooltip
+            .style("opacity", 1)
+        d3.select(this)
+            .style("stroke", "black")
+            .style("opacity", 1)
+      }
+      var tmousemove = function (event, d) {
+        var m = d3.pointer(event);
+        Tooltip
+            .html("Similarity: " + Math.random() * 6)
+            .style("top", m[1] - parent.clientHeight + "px")
+            .style("left", m[0] + "px")
+      }
+      var tmouseleave = function (d) {
+        Tooltip
+            .style("opacity", 0)
+      }
 
 
       for (const [start, end] of Object.entries(network.edges)) {
         let pos1 = network.pos[start]
         let pos2 = network.pos[end]
 
+        let simi = Math.random() * 6
         svg.append('line')
             .style("stroke", "black")
-            .style("stroke-width", 2)
+            .style("stroke-width", simi)
             .attr("x1", pos1[0] + 30)
             .attr("y1", pos1[1] + 30)
             .attr("x2", pos2[0] + 30)
-            .attr("y2", pos2[1] + 30);
+            .attr("y2", pos2[1] + 30)
+            .on("mouseover", tmouseover)
+            .on("mousemove", tmousemove)
+            .on("mouseleave", tmouseleave);
       }
       ;
 
       for (const [node, location] of Object.entries(network.pos)) {
         circles.push(svg.append("circle")
-            .attr("fill", "steelblue")
+            .attr("fill", '#69b3a2')
             .attr("stroke", "none")
             .attr("cx", location[0] + 30)
             .attr("cy", location[1] + 30)
@@ -170,9 +201,12 @@ export default {
         curRect.node().remove();
       })
       circles.forEach(circle => {
-        circle.attr("fill", "steelblue")
+        circle.attr("fill", '#69b3a2')
       })
       rects = []
+    },
+    maximize() {
+      this.$emit('maximize')
     }
   }
 }

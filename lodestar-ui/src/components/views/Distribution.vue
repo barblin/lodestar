@@ -1,6 +1,6 @@
 <template>
-  <div id="distribution_plane" class="simple-plot">
-    <ViewHeader :title='"Noise vs. Cluster Distribution"'></ViewHeader>
+  <div id="distribution_plane">
+    <ViewHeader :title='"Noise vs. Cluster Distribution"' :parent=parent @maximize="maximize"></ViewHeader>
   </div>
 </template>
 
@@ -12,14 +12,21 @@ import jStat from 'jstat'
 
 export default {
   name: "Distribution",
+  props: ['parent'],
   components: {
     ScaleLoader,
     ViewHeader
   },
   mounted() {
-    const margin = {top: 10, right: 10, bottom: 30, left: 20},
-        width = this.$store.getters.width - margin.left - margin.right,
-        height = this.$store.getters.height - margin.top - margin.bottom;
+    let parent = document.getElementById(this.parent)
+
+    if(!parent) {
+      parent = document.getElementById('main')
+    }
+
+    const margin = {top: 10, right: 10, bottom: 50, left: 20},
+        width = parent.clientWidth - margin.left - margin.right,
+        height = parent.clientHeight - margin.top - margin.bottom;
 
     let array1 = this.random_normal_dist(60, 14);
     let array2 = this.random_normal_dist(30, 8);
@@ -28,18 +35,30 @@ export default {
         .rangeRound([0, width]);
 
     //Min q
-    var d1 = d3.min(array1, function (d) { return d.q; });
-    var d2 = d3.min(array2, function (d) { return d.q; });
+    var d1 = d3.min(array1, function (d) {
+      return d.q;
+    });
+    var d2 = d3.min(array2, function (d) {
+      return d.q;
+    });
     var min_d = d3.min([d1, d2]);
 
     //Max q
-    d1 = d3.max(array1, function (d) { return d.q; });
-    d2 = d3.max(array2, function (d) { return d.q; });
+    d1 = d3.max(array1, function (d) {
+      return d.q;
+    });
+    d2 = d3.max(array2, function (d) {
+      return d.q;
+    });
     var max_d = d3.max([d1, d2]);
 
     //Max p
-    d1 = d3.max(array1, function (d) { return d.p; });
-    d2 = d3.max(array2, function (d) { return d.p; });
+    d1 = d3.max(array1, function (d) {
+      return d.p;
+    });
+    d2 = d3.max(array2, function (d) {
+      return d.p;
+    });
     var max_p = d3.max([d1, d2]);
 
     x.domain([min_d, max_d]).nice;
@@ -138,6 +157,9 @@ export default {
       }
       ;
       return data;
+    },
+    maximize() {
+      this.$emit('maximize')
     }
   }
 }
