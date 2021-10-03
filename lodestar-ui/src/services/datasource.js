@@ -53,19 +53,40 @@ export function updateNetwork(id) {
         })
 }
 
-export function updateLevelScatter(id) {
-    //store.commit('updateLoadingScatter', true)
-    //store.commit('updateErroredScatter', false)
+export function updateSpace() {
+    store.commit('updateLoadingSpace', true)
+    store.commit('updateErroredSpace', false)
 
-    prepareView("#level_scatter_pane")
+    prepareView("#space_pane")
 
-    //fetchData("scatters/" + id,
-    //    resp => {
-    //        store.commit('updatePlot', resp.data)
-    //    },
-    //    () => {
-    //        store.commit('updateLoadingScatter', false);
-    //    })
+    d3.csv('https://raw.githubusercontent.com/plotly/datasets/master/alpha_shape.csv').then(function (rows) {
+        store.commit('updateSpace', rows)
+        store.commit('updateLoadingSpace', false);
+    });
+}
+
+export function updateVelocityScatter() {
+    store.commit('updateLoadingVelocity', true)
+    store.commit('updateErroredVelocity', false)
+
+    prepareView("#velocity_pane")
+
+    d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/2_TwoNum.csv").then(function (data) {
+        store.commit('updateVelocityScatter', data)
+        store.commit('updateLoadingVelocity', false);
+    });
+}
+
+export function updateVelocityNet() {
+    store.commit('updateLoadingVelocity', true)
+    store.commit('updateErroredVelocity', false)
+
+    prepareView("#velocity_pane")
+
+    d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/2_TwoNum.csv").then(function (data) {
+        store.commit('updateVelocityNetwork', data)
+        store.commit('updateLoadingVelocity', false);
+    });
 }
 
 export function prepareView(name) {

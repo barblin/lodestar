@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import {updateNetwork, updateScatter, updateLevelScatter} from "../../services/datasource";
+import {updateNetwork, updateScatter, updateSpace, updateVelocityScatter, updateVelocityNet} from "../../services/datasource";
 
 export default {
   name: "Plotter",
@@ -11,7 +11,9 @@ export default {
     click() {
       updateScatter(this.$store.getters.currentResource);
       updateNetwork(this.$store.getters.currentResource);
-      updateLevelScatter(this.$store.getters.currentResource);
+      updateSpace();
+      updateVelocityScatter();
+      updateVelocityNet()
     }
   }
 }

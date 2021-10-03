@@ -1,6 +1,6 @@
 <template>
-  <ViewHeader :title='"Cluster join tree"' :branch="true" :trash="true" :trash-callback="trashCallback"
-              :parent=parent @maximize="maximize"></ViewHeader>
+  <ViewHeader :title='"Navigation of cluster results for increasing density"' :branch="true" :trash="true"
+              :trash-callback="trashCallback" :parent=parent></ViewHeader>
   <div id="network_pane">
     <div id="spinner" v-if="$store.getters.loadingNetwork">
       <ScaleLoader v-if="$store.getters.loadingNetwork"></ScaleLoader>
@@ -12,6 +12,7 @@
 import * as d3 from "d3";
 import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import ViewHeader from "./utils/ViewHeader.vue";
+import {modes} from "../../services/modes"
 
 let rects = []
 let circles = []
@@ -162,7 +163,8 @@ export default {
             .attr("stroke", "none")
             .attr("cx", location[0] + 30)
             .attr("cy", location[1] + 30)
-            .attr("r", 10));
+            .attr("r", 10)
+            .on("click", () => this.selectCluster()));
       }
 
       let drag = d3.drag().on("drag", dragmove);
@@ -196,7 +198,6 @@ export default {
   },
   methods: {
     trashCallback() {
-      console.log("Hello")
       rects.forEach(curRect => {
         curRect.node().remove();
       })
@@ -205,8 +206,9 @@ export default {
       })
       rects = []
     },
-    maximize() {
-      this.$emit('maximize')
+    selectCluster() {
+      console.log("Mode is being updated")
+      this.$store.commit('updateCurrentMode', modes.CLUSTER)
     }
   }
 }
