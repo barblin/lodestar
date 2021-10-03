@@ -1,6 +1,11 @@
 <template>
-  <ViewHeader :title='"Two velocity features clustering"' :parent=parent @maximize="maximize"></ViewHeader>
-  <div id="velocity_pane"></div>
+  <ViewHeader :title='"Two velocity features clustering"' :parent=parent @maximize="maximize"
+              :drawPolygon="true" :disease="true" @updateNet="updateNet" @updateScatter="updateScatter"></ViewHeader>
+  <div id="velocity_pane">
+    <div id="spinner" v-if="$store.getters.loadingVelocity">
+      <ScaleLoader v-if="$store.getters.loadingVelocity"></ScaleLoader>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -10,31 +15,56 @@ import * as d3 from "d3";
 
 export default {
   name: "VelocityPlot",
-  props: ['plotData', 'parent'],
+  props: ['plotData', 'parent', 'drawNet', 'drawScatter', 'netData', 'scatData'],
   components: {
     ScaleLoader,
     ViewHeader
   },
   mounted() {
-    let parent = document.getElementById(this.parent)
-
-    if (!parent) {
-      parent = document.getElementById('main')
+    this.draw(this.$store.getters.velocityScatterData);
+  },
+  watch: {
+    drawNet: function () {
+      this.draw(this.$store.getters.velocityScatterData)
+    },
+    drawScatter: function () {
+      //this.draw(this.$store.getters.velocityScatterData)
+    },
+    netData: function (data) {
+      //this.draw(data)
+    },
+    scatData: function (data) {
+      this.draw(data)
     }
+  },
+  methods: {
+    maximize() {
+      this.$emit('maximize')
+    },
+    updateNet() {
+      this.$store.commit('updateDrawVelocityNet', !this.$store.getters.drawVelocityNet)
+    },
+    updateScatter() {
+      this.$store.commit('updateDrawVelocityScatter', !this.$store.getters.drawVelocityScatter)
+    },
+    draw(data) {
+      let parent = document.getElementById(this.parent)
 
-    const margin = {top: 20, right: 20, bottom: 50, left: 50},
-        width = parent.clientWidth - margin.left - margin.right,
-        height = parent.clientHeight - margin.top - margin.bottom;
+      if (!parent) {
+        parent = document.getElementById('main')
+      }
 
-    const svg = d3.select("#velocity_pane")
-        .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform",
-            "translate(" + margin.left + "," + margin.top + ")");
+      const margin = {top: 20, right: 20, bottom: 50, left: 50},
+          width = parent.clientWidth - margin.left - margin.right,
+          height = parent.clientHeight - margin.top - margin.bottom;
 
-    d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/2_TwoNum.csv").then(function (data) {
+      const svg = d3.select("#velocity_pane")
+          .append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+          .attr("transform",
+              "translate(" + margin.left + "," + margin.top + ")");
 
       // Add X axis
       var x = d3.scaleLinear()
@@ -65,14 +95,6 @@ export default {
           })
           .attr("r", 1.5)
           .style("fill", "#69b3a2")
-
-    })
-
-  }
-  ,
-  methods: {
-    maximize() {
-      this.$emit('maximize')
     }
   }
 }

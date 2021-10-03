@@ -4,10 +4,9 @@ from services.df_service import csv2pandas
 
 def get(filename):
     features, _ = csv2pandas(data_dict()[filename])
-
-    data = []
     max_x = 0
     max_y = 0
+    clusters = {}
     for i in range(0, len(features.f1.keys())):
         x = float(features.f1[i])
         y = float(features.f2[i])
@@ -18,8 +17,13 @@ def get(filename):
         if max_y < y:
             max_y = y
 
-        data.append([x, y, int(features.labels[i])])
+        label = int(features.labels[i])
 
-    features = {'data': data, 'max_x': max_x, 'max_y': max_y}
+        if label not in clusters.keys():
+            clusters[label] = []
+
+        clusters[label].append([x, y, label])
+
+    features = {'clusters': clusters, 'max_x': max_x, 'max_y': max_y}
 
     return features
