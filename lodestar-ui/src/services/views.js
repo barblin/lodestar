@@ -4,4 +4,5 @@ export let views = {
     SPACE: "space",
     VELOCITY: "velocity",
     DISTRIBUTION: "distribution",
+    ALPHA: "alpha",
 }

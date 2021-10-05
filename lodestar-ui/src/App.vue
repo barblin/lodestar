@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard">
-    <Dashboard :key="$store.getters.currentMode" :currentMode="$store.getters.currentMode"/>
+    <Dashboard/>
   </div>
 </template>
 

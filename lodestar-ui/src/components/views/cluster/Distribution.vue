@@ -7,7 +7,7 @@
 <script>
 import * as d3 from "d3";
 import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
-import ViewHeader from "../utils/ViewHeader.vue";
+import ViewHeader from "../../nav/ViewHeader.vue";
 import jStat from 'jstat'
 
 export default {

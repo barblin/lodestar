@@ -11,10 +11,13 @@
 <script>
 import * as d3 from "d3";
 import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
-import ViewHeader from "./utils/ViewHeader.vue";
+import ViewHeader from "../nav/ViewHeader.vue";
 import {modes} from "../../services/modes"
 
 let rects = []
+let rect = {
+  opacity: 0.2
+}
 let circles = []
 export default {
   name: "Network",
@@ -31,13 +34,12 @@ export default {
         parent = document.getElementById('main')
       }
 
-      const margin = {top: 10, right: 10, bottom: 50, left: 20},
+      const margin = {top: 10, right: 10, bottom: 40, left: 0},
           width = parent.clientWidth - margin.left - margin.right,
           height = parent.clientHeight - margin.top - margin.bottom;
 
-      let rect = {
-        opacity: 0.2
-      }
+      let heightFactor = this.percentChange(network.max_y, height);
+      let widthFactor = this.percentChange(network.max_x, width)
 
       const svg = d3.select("#network_pane")
           .append("svg")
@@ -147,10 +149,10 @@ export default {
         svg.append('line')
             .style("stroke", "black")
             .style("stroke-width", simi)
-            .attr("x1", pos1[0] + 30)
-            .attr("y1", pos1[1] + 30)
-            .attr("x2", pos2[0] + 30)
-            .attr("y2", pos2[1] + 30)
+            .attr("x1", (pos1[0] + 30) * widthFactor)
+            .attr("y1", (pos1[1] + 30) * heightFactor)
+            .attr("x2", (pos2[0] + 30) * widthFactor)
+            .attr("y2", (pos2[1] + 30) * heightFactor)
             .on("mouseover", tmouseover)
             .on("mousemove", tmousemove)
             .on("mouseleave", tmouseleave);
@@ -161,9 +163,9 @@ export default {
         circles.push(svg.append("circle")
             .attr("fill", '#69b3a2')
             .attr("stroke", "none")
-            .attr("cx", location[0] + 30)
-            .attr("cy", location[1] + 30)
-            .attr("r", 10)
+            .attr("cx", (location[0] + 30) * widthFactor)
+            .attr("cy", (location[1] + 30) * heightFactor)
+            .attr("r", 8)
             .on("click", () => this.selectCluster()));
       }
 
@@ -183,7 +185,7 @@ export default {
       slider.append("circle")
           .attr("fill", "lightgrey")
           .attr("stroke", "grey")
-          .attr("cx", width + margin.left)
+          .attr("cx", width + margin.left - 15)
           .attr("cy", height + margin.top)
           .attr("r", 10);
 
@@ -209,6 +211,15 @@ export default {
     selectCluster() {
       console.log("Mode is being updated")
       this.$store.commit('updateCurrentMode', modes.CLUSTER)
+    },
+    percentChange(solution, screen) {
+      if(solution < screen){
+        return (screen - solution) / solution
+      } else if (screen < solution) {
+        return screen / solution;
+      }
+
+      return -1
     }
   }
 }

@@ -11,7 +11,7 @@
 import * as d3 from "d3";
 import {col_map} from "../../../services/colors";
 import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
-import ViewHeader from "../utils/ViewHeader.vue";
+import ViewHeader from "../../nav/ViewHeader.vue";
 
 
 export default {
