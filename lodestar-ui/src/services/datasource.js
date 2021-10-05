@@ -1,6 +1,7 @@
 import {store} from '../store/cluster-state-store'
 import axios from "axios";
 import * as d3 from "d3";
+import * as data from './mock-data.json';
 
 export const host = "http://localhost:5000/api/v1/"
 
@@ -44,13 +45,16 @@ export function updateNetwork(id) {
 
     prepareView("#network_pane")
 
-    fetchData("networks/" + id,
+    store.commit('updateNetwork', data)
+    store.commit('updateLoadingNetwork', false);
+
+    /*fetchData("networks/" + id,
         resp => {
             store.commit('updateNetwork', resp.data)
         },
         () => {
             store.commit('updateLoadingNetwork', false);
-        })
+        })*/
 }
 
 export function updateSpace() {
