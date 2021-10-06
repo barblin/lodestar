@@ -1,5 +1,5 @@
 <template>
-  <ViewHeader :title='"Original / Optimal Clustering"' :parent=parent @maximize="maximize"></ViewHeader>
+  <ViewHeader :title='"Cluster Details"' :parent=parent></ViewHeader>
   <div id="scatter_pane">
     <div id="spinner" v-if="$store.getters.loadingScatter">
       <ScaleLoader v-if="$store.getters.loadingScatter"></ScaleLoader>
@@ -15,7 +15,7 @@ import ViewHeader from "../../nav/ViewHeader.vue";
 
 
 export default {
-  name: "Scatter",
+  name: "Cluster Details",
   props: ['plotData', 'parent'],
   components: {
     ScaleLoader,
@@ -34,9 +34,6 @@ export default {
 
   },
   methods: {
-    maximize() {
-      this.$emit('maximize')
-    },
     redraw(plotData) {
       let parent = document.getElementById(this.parent)
 
@@ -126,8 +123,8 @@ export default {
 .scatter-plot {
   position: relative;
   display: block;
-  width: 600px;
-  height: 460px;
+  width: 100%;
+  height: 100%;
   border: 1px solid darkslategrey;
   margin-bottom: 10px;
 }
