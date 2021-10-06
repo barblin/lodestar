@@ -14,6 +14,9 @@
   <div :id="views.NETWORK" class="network">
     <Network :key="updateKeys[views.NETWORK]" :network="$store.getters.network" :parent="views.NETWORK"/>
   </div>
+  <div :id="views.CLUSTER_DETAIL" class="cluster_detail">
+    <ClusterDetails :key="updateKeys[views.CLUSTER_DETAIL]" :network="$store.getters.drawScatter" :parent="views.NETWORK"/>
+  </div>
 </template>
 
 <script>
@@ -21,6 +24,7 @@ import {views} from "../../services/views";
 import Space from "../views/Space.vue";
 import Velocity from "../views/Velocity.vue";
 import Network from "../views/DensityExplorer.vue";
+import ClusterDetails from "../views/cluster/ClusterDetails.vue";
 import {updateResources} from "../../services/datasource";
 
 export default {
@@ -35,6 +39,7 @@ export default {
     Space,
     Velocity,
     Network,
+    ClusterDetails
   },
   mounted() {
     updateResources();
@@ -43,6 +48,7 @@ export default {
     this.updateKeys[views.DISTRIBUTION] = 0;
     this.updateKeys[views.NETWORK] = 0;
     this.updateKeys[views.VELOCITY] = 0;
+    this.updateKeys[views.CLUSTER_DETAIL] = 0;
   },
 }
 </script>
@@ -59,6 +65,10 @@ export default {
 
 #network {
   order: 2;
+}
+
+#cluster_detail {
+  order: 3;
 }
 
 .space {
@@ -83,7 +93,17 @@ export default {
 .network {
   position: relative;
   float: left;
-  width: 10%;
+  width: 28%;
+  height: 300px;
+  border: 1px solid darkslategrey;
+  margin-bottom: 10px;
+  margin-right: 10px;
+}
+
+.cluster_detail {
+  position: relative;
+  float: left;
+  width: 70%;
   height: 300px;
   border: 1px solid darkslategrey;
   margin-bottom: 10px;

@@ -5,4 +5,5 @@ export let views = {
     VELOCITY: "velocity",
     DISTRIBUTION: "distribution",
     ALPHA: "alpha",
+    CLUSTER_DETAIL: "cluster_detail"
 }

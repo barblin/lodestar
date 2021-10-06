@@ -1,5 +1,5 @@
 <template>
-  <ViewHeader :title='"Navigation of cluster results for increasing density"' :branch="true" :trash="true"
+  <ViewHeader :title='"Density Navigation"' :branch="true" :trash="true"
               :trash-callback="trashCallback" :parent=parent></ViewHeader>
   <div id="network_pane">
     <div id="spinner" v-if="$store.getters.loadingNetwork">
@@ -34,7 +34,7 @@ export default {
         parent = document.getElementById('main')
       }
 
-      const margin = {top: 10, right: 10, bottom: 40, left: 0},
+      const margin = {top: 10, right: -200, bottom: 40, left: 0},
           width = parent.clientWidth - margin.left - margin.right,
           height = parent.clientHeight - margin.top - margin.bottom;
 
