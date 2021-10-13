@@ -20,21 +20,36 @@ let rect = {
 }
 let circles = []
 export default {
-  name: "Network",
-  props: ['network', 'parent'],
+  name: "DensityExplorer",
+  props: ['networkData', 'parent'],
   components: {
     ScaleLoader,
     ViewHeader
   },
+  computed: {
+    networkData: function () {
+      this.redraw(this.$store.getters.networkData)
+    }
+  },
   watch: {
-    network: function (network) {
+    networkData: function () {
+      this.redraw(this.$store.getters.networkData)
+    },
+    parent: function () {
+      this.redraw(this.$store.getters.networkData)
+    }
+  },
+  methods: {
+    redraw(network) {
       let parent = document.getElementById(this.parent)
 
       if (!parent) {
         parent = document.getElementById('main')
       }
 
-      const margin = {top: 10, right: -200, bottom: 40, left: 0},
+      console.log("IMBEINGRERENDERED!")
+
+      const margin = {top: 10, right: 0, bottom: 40, left: 0},
           width = parent.clientWidth - margin.left - margin.right,
           height = parent.clientHeight - margin.top - margin.bottom;
 
@@ -196,9 +211,7 @@ export default {
             .attr("y1", Math.min(height + margin.top, Math.max(0, event.y)))
             .attr("y2", Math.min(height + margin.top, Math.max(0, event.y)))
       };
-    }
-  },
-  methods: {
+    },
     trashCallback() {
       rects.forEach(curRect => {
         curRect.node().remove();
@@ -213,8 +226,8 @@ export default {
       this.$store.commit('updateCurrentMode', modes.CLUSTER)
     },
     percentChange(solution, screen) {
-      if(solution < screen){
-        return (screen - solution) / solution
+      if (solution < screen) {
+        return screen / solution
       } else if (screen < solution) {
         return screen / solution;
       }

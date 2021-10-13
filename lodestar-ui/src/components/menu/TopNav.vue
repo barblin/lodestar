@@ -1,17 +1,14 @@
 <template>
-  <ResourceSelector :selection="$store.getters.resources[0]"></ResourceSelector>
-  <Plotter></Plotter>
+  <ControlPanel></ControlPanel>
 </template>
 
 <script>
-import ResourceSelector from '../controls/ResourceSelector.vue'
-import Plotter from "../controls/Plotter.vue";
+import ControlPanel from "../controls/ControlPanel.vue";
 
 export default {
   name: "TopNav",
   components: {
-    ResourceSelector,
-    Plotter
+    ControlPanel
   }
 }
 </script>

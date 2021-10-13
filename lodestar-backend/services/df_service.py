@@ -10,7 +10,16 @@ def csv2pandas(data_info):
     return x, data_info['columns2keep']
 
 
+def get_columns_from_dataframe_cluster(data_info, columns):
+    x = pd.read_csv(data_info['path'])
+    return x
+
+
 def get_dataframe_cluster(data_info):
     x, _ = csv2pandas(data_info)
     cluster_cols = ['f1', 'f2']
     return x, x[cluster_cols]
+
+
+def get_dataframe_headers(data_info):
+    return pd.read_csv(data_info['path']).columns

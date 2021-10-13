@@ -1,7 +1,7 @@
 <template>
   <ViewHeader :title='"Three space features clustering"' :parent=parent :drawPolygon="true" :disease="true"
               @maximize="maximize" @updateNet="updateNet" @updateScatter="updateScatter" @redraw="redraw"></ViewHeader>
-  <div id="space_pane">
+  <div :id="PANE_NAME">
     <div id="spinner" v-if="$store.getters.loadingSpace">
       <ScaleLoader v-if="$store.getters.loadingSpace"></ScaleLoader>
     </div>
@@ -11,6 +11,9 @@
 <script>
 import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import ViewHeader from "../nav/ViewHeader.vue";
+import {modes} from "../../services/modes";
+
+const PANE_NAME = "space_pane"
 
 export default {
   name: "SpacePlot",
@@ -18,6 +21,11 @@ export default {
   components: {
     ScaleLoader,
     ViewHeader
+  },
+  data: function () {
+    return {
+      PANE_NAME: PANE_NAME
+    }
   },
   watch: {
     spaceData: function (spaceData) {
@@ -74,14 +82,14 @@ export default {
             color: 'rgb(23, 190, 207)',
             size: 2
           }
-        }, {
+        }, /*{
           alphahull: 7,
           opacity: 0.1,
           type: 'mesh3d',
           x: dataX,
           y: dataY,
           z: dataZ
-        })
+        }*/)
       }
 
       if (this.drawNet) {
@@ -156,7 +164,15 @@ export default {
         width: width
       };
 
-      Plotly.react('space_pane', data, layout);
+      Plotly.react(PANE_NAME, data, layout);
+
+      let myDiv = document.getElementById(PANE_NAME);
+
+      const store = this.$store
+      myDiv.on('plotly_click', function(data){
+        console.log(data)
+        store.commit('updateCurrentMode', modes.CLUSTER)
+      });
     }
   }
 }
