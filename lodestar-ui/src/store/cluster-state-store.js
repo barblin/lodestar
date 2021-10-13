@@ -5,6 +5,14 @@ export const store = createStore({
     state: {
         currentViewSelection: null,
         currentResource: "Choose resource file",
+        currentColumnSelection: {
+            s1: 0,
+            s2: 1,
+            s3: 2,
+            v1: 3,
+            v2: 4,
+            v3: 5
+        },
         currentMode: modes.DEFAULT,
 
         loadingScatter: false,
@@ -20,8 +28,9 @@ export const store = createStore({
         spaceData: {},
         velocityScatterData: {},
         velocityNetworkData: {},
-        network: 0,
+        networkData: {},
         resources: [],
+        resourceHeaders: [],
         overallTime: 0,
 
         width: 600,
@@ -34,6 +43,8 @@ export const store = createStore({
 
         drawVelocityNet: false,
         drawVelocityScatter: true,
+
+        plotRadial: false,
     },
     mutations: {
         updateCurrentViewSelection(state, selection) {
@@ -41,6 +52,9 @@ export const store = createStore({
         },
         updateCurrentMode(state, mode) {
             state.currentMode = mode
+        },
+        updateCurrentColumnSelection(state, selection) {
+            state.currentColumnSelection = selection
         },
         updateLoadingScatter(state, isLoading) {
             state.loadingScatter = isLoading
@@ -54,11 +68,8 @@ export const store = createStore({
         updateErroredNetwork(state, hadError) {
             state.erroredNetwork = hadError
         },
-        updatePlot(state, data) {
-            state.plotData = data
-        },
-        updateNetwork(state, data) {
-            state.network = data
+        updateNetworkData(state, data) {
+            state.networkData = data
         },
         updateSpace(state, data) {
             state.spaceData = data
@@ -80,6 +91,9 @@ export const store = createStore({
         },
         updateResources(state, data) {
             state.resources = data
+        },
+        updateResourceHeaders(state, data) {
+            state.resourceHeaders = data
         },
         updateCurrentResource(state, data) {
             state.currentResource = data
@@ -108,13 +122,15 @@ export const store = createStore({
         updateErroredVelocity(state, hadError) {
             state.erroredVelocity = hadError
         },
+        updatePlotRadial(state, plotRadial) {
+            state.plotRadial = plotRadial
+        },
     },
     getters: {
         currentViewSelection: state => state.currentViewSelection,
         currentMode: state => state.currentMode,
+        currentColumnSelection: state => state.currentColumnSelection,
 
-        loadingScatter: state => state.loadingScatter,
-        erroredScatter: state => state.erroredScatter,
         loadingNetwork: state => state.loadingNetwork,
         erroredNetwork: state => state.erroredNetwork,
         loadingSpace: state => state.loadingSpace,
@@ -122,10 +138,9 @@ export const store = createStore({
         loadingVelocity: state => state.loadingVelocity,
         erroredVelocity: state => state.erroredVelocity,
 
-        loadingAny: state => state.loadingScatter || state.loadingNetwork,
+        loadingAny: state => state.loadingSpace || state.loadingNetwork || state.loadingVelocity,
 
-        plotData: state => state.plotData,
-        network: state => state.network,
+        networkData: state => state.networkData,
         spaceData: state => state.spaceData,
         velocityNetworkData: state => state.velocityNetworkData,
         velocityScatterData: state => state.velocityScatterData,
@@ -136,6 +151,7 @@ export const store = createStore({
         height: state => state.height,
 
         resources: state => state.resources,
+        resourceHeaders: state => state.resourceHeaders,
         currentResource: state => state.currentResource,
 
         drawSpaceNet: state => state.drawSpaceNet,
@@ -143,5 +159,7 @@ export const store = createStore({
 
         drawVelocityNet: state => state.drawVelocityNet,
         drawVelocityScatter: state => state.drawVelocityScatter,
+
+        plotRadial: state => state.plotRadial,
     }
 })

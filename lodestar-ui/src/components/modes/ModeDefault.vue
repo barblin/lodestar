@@ -1,18 +1,18 @@
 <template>
   <div :id="views.SPACE" class="space">
-    <Space :key="updateKeys[views.SPACE]" :parent="views.SPACE" :drawScatter="$store.getters.drawSpaceScatter"
+    <Space :parent="views.SPACE" :drawScatter="$store.getters.drawSpaceScatter"
            :drawNet="$store.getters.drawSpaceNet"
            :spaceData="$store.getters.spaceData"/>
   </div>
   <div :id="views.VELOCITY" class="velocity">
-    <Velocity :key="updateKeys[views.VELOCITY]" :parent="views.VELOCITY"
+    <Velocity :parent="views.VELOCITY"
               :drawScatter="$store.getters.drawVelocityScatter"
               :drawNet="$store.getters.drawVelocityNet"
               :netData="$store.getters.velocityNetworkData"
               :scatData="$store.getters.velocityScatterData"/>
   </div>
-  <div :id="views.NETWORK" class="network">
-    <Network :key="updateKeys[views.NETWORK]" :network="$store.getters.network" :parent="views.NETWORK"/>
+  <div :id="views.NETWORK" v-if="!$store.getters.loadingNetwork" class="network">
+    <DensityExplorer :networkData="$store.getters.networkData" :parent="views.NETWORK"/>
   </div>
 </template>
 
@@ -20,29 +20,23 @@
 import {views} from "../../services/views";
 import Space from "../views/Space.vue";
 import Velocity from "../views/Velocity.vue";
-import Network from "../views/DensityExplorer.vue";
+import DensityExplorer from "../views/DensityExplorer.vue";
 import {updateResources} from "../../services/datasource";
 
 export default {
   name: "ModeDefault",
   data() {
     return {
-      updateKeys: {},
       views: views,
     };
   },
   components: {
     Space,
     Velocity,
-    Network,
+    DensityExplorer,
   },
   mounted() {
     updateResources();
-    this.updateKeys[views.SCATTER] = 0;
-    this.updateKeys[views.SPACE] = 0;
-    this.updateKeys[views.DISTRIBUTION] = 0;
-    this.updateKeys[views.NETWORK] = 0;
-    this.updateKeys[views.VELOCITY] = 0;
   },
 }
 </script>
