@@ -13,6 +13,10 @@ export const store = createStore({
             v2: 4,
             v3: 5
         },
+        hrdSelection: {
+            x: 0,
+            y: 1
+        },
         currentMode: modes.DEFAULT,
 
         loadingScatter: false,
@@ -23,28 +27,29 @@ export const store = createStore({
         erroredSpace: false,
         loadingVelocity: false,
         erroredVelocity: false,
+        loadingHrd: false,
+        erroredHrd: false,
 
         plotData: {},
         spaceData: {},
         velocityScatterData: {},
         velocityNetworkData: {},
         networkData: {},
+        hrd: {},
+
         resources: [],
         resourceHeaders: [],
         overallTime: 0,
-
         width: 600,
         height: 440,
-
 
         // space controls
         drawSpaceNet: false,
         drawSpaceScatter: true,
-
         drawVelocityNet: false,
         drawVelocityScatter: true,
-
         plotRadial: false,
+        inspectCluster: false
     },
     mutations: {
         updateCurrentViewSelection(state, selection) {
@@ -55,6 +60,9 @@ export const store = createStore({
         },
         updateCurrentColumnSelection(state, selection) {
             state.currentColumnSelection = selection
+        },
+        updateHrdSelection(state, selection) {
+            state.hrdSelection = selection
         },
         updateLoadingScatter(state, isLoading) {
             state.loadingScatter = isLoading
@@ -67,6 +75,12 @@ export const store = createStore({
         },
         updateErroredNetwork(state, hadError) {
             state.erroredNetwork = hadError
+        },
+        updateLoadingHrd(state, isLoading) {
+            state.loadingHrd = isLoading
+        },
+        updateErroredHrd(state, hadError) {
+            state.erroredHrd = hadError
         },
         updateNetworkData(state, data) {
             state.networkData = data
@@ -125,11 +139,18 @@ export const store = createStore({
         updatePlotRadial(state, plotRadial) {
             state.plotRadial = plotRadial
         },
+        updateHrd(state, data) {
+            state.hrd = data
+        },
+        updateInspectCluster(state, data) {
+            state.inspectCluster = data
+        },
     },
     getters: {
         currentViewSelection: state => state.currentViewSelection,
         currentMode: state => state.currentMode,
         currentColumnSelection: state => state.currentColumnSelection,
+        hrdSelection: state => state.hrdSelection,
 
         loadingNetwork: state => state.loadingNetwork,
         erroredNetwork: state => state.erroredNetwork,
@@ -137,6 +158,8 @@ export const store = createStore({
         erroredSpace: state => state.erroredSpace,
         loadingVelocity: state => state.loadingVelocity,
         erroredVelocity: state => state.erroredVelocity,
+        laodingHrd: state => state.loadingHrd,
+        erroredHrd: state => state.erroredHrd,
 
         loadingAny: state => state.loadingSpace || state.loadingNetwork || state.loadingVelocity,
 
@@ -144,6 +167,7 @@ export const store = createStore({
         spaceData: state => state.spaceData,
         velocityNetworkData: state => state.velocityNetworkData,
         velocityScatterData: state => state.velocityScatterData,
+        hrd: state => state.hrd,
 
         overallTime: state => state.overallTime,
 
@@ -161,5 +185,6 @@ export const store = createStore({
         drawVelocityScatter: state => state.drawVelocityScatter,
 
         plotRadial: state => state.plotRadial,
+        inspectCluster: state => state.inspectCluster,
     }
 })

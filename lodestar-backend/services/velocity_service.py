@@ -1,7 +1,6 @@
-import math
-
 from services.data.datasource import data_dict
-from services.df_service import get_columns_from_dataframe_cluster
+from services.data.df_service import get_columns_from_dataframe_cluster
+from services.util.util import clean_num
 
 
 def get_velocity(filename, data):
@@ -27,12 +26,3 @@ def create_entry(row, plot_radial):
             'z': clean_num(row[1][2])}
 
   return {'x': clean_num(row[1][0]), 'y': clean_num(row[1][1])}
-
-
-def clean_num(num):
-  conv = float(num)
-
-  if math.isnan(conv):
-    return float(0)
-
-  return conv

@@ -1,11 +1,11 @@
 import numpy as np
+from sklearn.neighbors import NearestNeighbors
 
 from code.Modality.DensityEstKNN import DensityEstKNN
 from code.Modality.MergeGraph import MergeGraph
 from code.Modality.merge_strategy import MergePaths
 from code.NoiseRemoval.RemoveNoiseTransformed import remove_noise_simple
 from code.ScaleSpace.ScaleSpace import ScaleSpaceTree
-from sklearn.neighbors import NearestNeighbors, KernelDensity
 
 
 def density(df_cluster):

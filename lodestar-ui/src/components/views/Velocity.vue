@@ -19,7 +19,7 @@ const PANE_NAME_3D = "velocity_pane_3D"
 
 export default {
   name: "VelocityPlot",
-  props: ['plotData', 'parent', 'drawNet', 'drawScatter', 'netData', 'scatData'],
+  props: ['parent', 'drawNet', 'drawScatter', 'netData', 'scatData'],
   components: {
     ScaleLoader,
     ViewHeader
@@ -61,7 +61,7 @@ export default {
         parent = document.getElementById('main')
       }
 
-      const margin = {top: 20, right: 20, bottom: 50, left: 50},
+      const margin = {top: 20, right: 0, bottom: 10, left: 0},
           width = parent.clientWidth - margin.left - margin.right,
           height = parent.clientHeight - margin.top - margin.bottom;
 

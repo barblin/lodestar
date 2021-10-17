@@ -2,7 +2,7 @@ import json
 
 from flask import Blueprint
 
-from services import resource_service
+from services.data import resource_service
 
 resource_controller = Blueprint('resource_controller', __name__)
 

@@ -16,9 +16,9 @@
 
 <script>
 import {
+  updateHrd,
   updateNetwork,
   updateSpace,
-  updateVelocityNet,
   updateVelocityScatter
 } from "../../services/datasource";
 import {modes} from "../../services/modes";
@@ -40,19 +40,10 @@ export default {
       updateNetwork(this.$store.getters.currentResource);
       updateSpace(this.$store.getters.currentResource);
       updateVelocityScatter(this.$store.getters.currentResource);
-      //updateVelocityNet()
+      updateHrd(this.$store.getters.currentResource);
     },
     includeSecondVelocityDimension() {
       return includeSecondVelocityDimension()
-    },
-    changeViewCluster() {
-      this.$store.commit('updateCurrentMode', modes.CLUSTER)
-    },
-    changeViewAlpha() {
-      this.$store.commit('updateCurrentMode', modes.ALPHA)
-    },
-    changeViewBack() {
-      this.$store.commit('updateCurrentMode', modes.DEFAULT)
     },
     exitClusterDetails() {
       this.$store.commit('updateCurrentMode', modes.DEFAULT)
