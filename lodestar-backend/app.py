@@ -4,6 +4,7 @@ from controllers.density_network_controller import network_controller
 from controllers.resource_controller import resource_controller
 from controllers.space_controller import space_controller
 from controllers.velocity_controller import velocity_controller
+from controllers.hrd_controller import hrd_controller
 
 app = Flask(__name__)
 
@@ -11,6 +12,7 @@ app.register_blueprint(space_controller)
 app.register_blueprint(velocity_controller)
 app.register_blueprint(resource_controller)
 app.register_blueprint(network_controller)
+app.register_blueprint(hrd_controller)
 
 
 @app.route("/")

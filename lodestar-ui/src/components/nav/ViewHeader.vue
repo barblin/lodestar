@@ -18,6 +18,10 @@
         <font-awesome-icon class="tool" v-if="drawPolygon" v-on:click="updateNet" icon="draw-polygon"/>
         <span class="tooltiptext">Enable/Disable network</span>
       </div>
+      <div class="tooltip">
+        <font-awesome-icon class="tool" v-if="inspect" v-on:click="inspectCluster" icon="search-plus"/>
+        <span class="tooltiptext">Inspect cluster</span>
+      </div>
       <!--
       <div class="tooltip">
         <font-awesome-icon class="tool" v-if="parentSelected()" v-on:click="minimize" icon="compress-arrows-alt"/>
@@ -33,14 +37,19 @@
 
 export default {
   name: "Header",
-  props: ['title', 'trash', 'branch', 'trashCallback', 'selector', 'parent', 'drawPolygon', 'disease'],
+  props: ['title', 'trash', 'branch', 'trashCallback', 'selector', 'parent', 'drawPolygon', 'disease', 'inspect'],
   components: {},
   methods: {
     updateNet() {
       this.$emit('updateNet')
+      this.$store.commit('updateInspectCluster', !this.$store.getters.inspectCluster)
     },
     updateScatter() {
       this.$emit('updateScatter')
+      this.$store.commit('updateInspectCluster', !this.$store.getters.inspectCluster)
+    },
+    inspectCluster(){
+      this.$store.commit('updateInspectCluster', !this.$store.getters.inspectCluster)
     }
   }
 }

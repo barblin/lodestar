@@ -4,7 +4,7 @@ from networkx.drawing.nx_pydot import graphviz_layout
 from api.network_response import NetworkResponse
 from services.data.datasource import data_dict
 from services.density_service import scale_space_dense_components
-from services.df_service import get_dataframe_cluster
+from services.data.df_service import get_dataframe_cluster
 
 
 def get_join_tree(filename):

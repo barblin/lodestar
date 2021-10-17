@@ -96,6 +96,21 @@ export function updateVelocityScatter(id) {
         }, buildVelocityBody())
 }
 
+export function updateHrd(id) {
+    store.commit('updateLoadingHrd', true)
+    store.commit('updateErroredHrd', false)
+
+    prepareView("#hrd")
+
+    postData("hrd/" + id,
+        resp => {
+            store.commit('updateHrd', resp.data)
+        },
+        () => {
+            store.commit('updateLoadingHrd', false);
+        }, store.getters.hrdSelection)
+}
+
 export function updateVelocityNet() {
     store.commit('updateLoadingVelocity', true)
     store.commit('updateErroredVelocity', false)

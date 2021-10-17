@@ -1,7 +1,8 @@
 <template>
   <ViewHeader :title='"Three space features clustering"' :parent=parent :drawPolygon="true" :disease="true"
+              :inspect="true"
               @maximize="maximize" @updateNet="updateNet" @updateScatter="updateScatter" @redraw="redraw"></ViewHeader>
-  <div :id="PANE_NAME">
+  <div :id="PANE_NAME" class="default">
     <div id="spinner" v-if="$store.getters.loadingSpace">
       <ScaleLoader v-if="$store.getters.loadingSpace"></ScaleLoader>
     </div>
@@ -17,7 +18,7 @@ const PANE_NAME = "space_pane"
 
 export default {
   name: "SpacePlot",
-  props: ['spaceData', 'parent', 'drawNet', 'drawScatter'],
+  props: ['spaceData', 'parent', 'drawNet', 'drawScatter', 'magnify'],
   components: {
     ScaleLoader,
     ViewHeader
@@ -36,6 +37,13 @@ export default {
     },
     drawScatter: function () {
       this.redraw(this.$store.getters.spaceData)
+    },
+    magnify: function () {
+      if (this.$store.getters.inspectCluster) {
+        document.getElementById(PANE_NAME).className += ' magnify';
+      } else {
+        document.getElementById(PANE_NAME).className = document.getElementById(PANE_NAME).className.replace('magnify', '');
+      }
     }
   },
   methods: {
@@ -55,7 +63,7 @@ export default {
         parent = document.getElementById('main')
       }
 
-      const margin = {top: 0, right: 10, bottom: 30, left: 0},
+      const margin = {top: 20, right: 0, bottom: 10, left: 0},
           width = parent.clientWidth - margin.left - margin.right,
           height = parent.clientHeight - margin.top - margin.bottom;
 
@@ -169,9 +177,11 @@ export default {
       let myDiv = document.getElementById(PANE_NAME);
 
       const store = this.$store
-      myDiv.on('plotly_click', function(data){
-        console.log(data)
-        store.commit('updateCurrentMode', modes.CLUSTER)
+      myDiv.on('plotly_click', function (data) {
+        if(store.getters.inspectCluster == true) {
+          this.$store.commit('updateInspectCluster', !this.$store.getters.inspectCluster)
+          store.commit('updateCurrentMode', modes.CLUSTER)
+        }
       });
     }
   }
@@ -180,4 +190,10 @@ export default {
 </script>
 
 <style scoped>
+.magnify {
+  cursor: zoom-in;
+}
+
+.default {
+}
 </style>

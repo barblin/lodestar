@@ -11,7 +11,8 @@ import {
     faTrash,
     faUser,
     faDrawPolygon,
-    faDisease
+    faDisease,
+    faSearchPlus
 } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import VueNextSelect from 'vue-next-select';
@@ -26,6 +27,7 @@ library.add(faExpandArrowsAlt);
 library.add(faCompressArrowsAlt);
 library.add(faDrawPolygon);
 library.add(faDisease);
+library.add(faSearchPlus);
 
 const app = createApp(App)
 

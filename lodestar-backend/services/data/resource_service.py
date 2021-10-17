@@ -1,4 +1,4 @@
-from services import df_service
+from services.data import df_service
 from services.data.datasource import data_dict
 
 
