@@ -88,13 +88,13 @@ export default {
       }
 
       this.histogram(dataX, minx, maxx, parent.clientWidth, 5, 30)
-      this.histogram(dataY, miny, maxy, parent.clientWidth, 5, 40)
-      this.histogram(dataZ, minz, maxz, parent.clientWidth, -30, 60)
+      this.histogram(dataY, miny, maxy, parent.clientWidth, 5, 30)
+      this.histogram(dataZ, minz, maxz, parent.clientWidth, 5, 30)
     },
     histogram(data, min, max, parentWidth, marginTop, marginBottom){
       const margin = {top: marginTop, right: 20, bottom: marginBottom, left: 40},
           width = parentWidth - margin.left - margin.right,
-          height = 100 - margin.top - margin.bottom;
+          height = 105 - margin.top - margin.bottom;
 
       const svg = d3.select("#" + PANE_NAME)
           .append("svg")
