@@ -17,6 +17,9 @@
   <div :id="views.CLUSTER_DETAIL" class="cluster_detail">
     <ClusterDetails :networkData="$store.getters.drawScatter" :parent="views.NETWORK"/>
   </div>
+  <div :id="views.HISTOGRAMS" class="histograms">
+    <Histogram :plotData="$store.getters.velocityScatterData" :parent="views.HISTOGRAMS"/>
+  </div>
 </template>
 
 <script>
@@ -25,6 +28,7 @@ import Space from "../views/Space.vue";
 import Velocity from "../views/Velocity.vue";
 import DensityExplorer from "../views/DensityExplorer.vue";
 import ClusterDetails from "../views/cluster/ClusterDetails.vue";
+import Histogram from "../views/detail/Histogram.vue";
 import {updateResources} from "../../services/datasource";
 
 export default {
@@ -39,7 +43,8 @@ export default {
     Space,
     Velocity,
     DensityExplorer,
-    ClusterDetails
+    ClusterDetails,
+    Histogram
   },
   mounted() {
     updateResources();
@@ -64,6 +69,11 @@ export default {
 #cluster_detail {
   order: 3;
 }
+
+#histograms {
+  order: 4;
+}
+
 
 .space {
   position: relative;
@@ -97,9 +107,18 @@ export default {
 .cluster_detail {
   position: relative;
   float: left;
-  width: 70%;
+  width: 40%;
   height: 300px;
   border: 1px solid darkslategrey;
   margin-bottom: 10px;
+  margin-right: 10px;
+}
+
+.histograms {
+  position: relative;
+  float: left;
+  width: 30%;
+  height: 300px;
+  border: 1px solid darkslategrey;
 }
 </style>
