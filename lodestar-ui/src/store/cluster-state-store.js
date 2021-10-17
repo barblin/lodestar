@@ -34,7 +34,7 @@ export const store = createStore({
         spaceData: {},
         velocityScatterData: {},
         velocityNetworkData: {},
-        networkData: {},
+        networkData: null,
         hrd: {},
 
         resources: [],

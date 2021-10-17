@@ -6,5 +6,6 @@ export let views = {
     HRD: "hrd",
     DISTRIBUTION: "distribution",
     ALPHA: "alpha",
-    CLUSTER_DETAIL: "cluster_detail"
+    CLUSTER_DETAIL: "cluster_detail",
+    HISTOGRAMS: "histograms",
 }

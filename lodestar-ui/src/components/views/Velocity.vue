@@ -24,6 +24,11 @@ export default {
     ScaleLoader,
     ViewHeader
   },
+  mounted() {
+    if(this.$store.getters.velocityScatterData) {
+      this.draw(this.$store.getters.velocityScatterData)
+    }
+  },
   data: function () {
     return {
       PANE_NAME: PANE_NAME,
@@ -61,7 +66,7 @@ export default {
         parent = document.getElementById('main')
       }
 
-      const margin = {top: 20, right: 0, bottom: 10, left: 0},
+      const margin = {top: 20, right: 10, bottom: 10, left: 0},
           width = parent.clientWidth - margin.left - margin.right,
           height = parent.clientHeight - margin.top - margin.bottom;
 

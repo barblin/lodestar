@@ -26,6 +26,11 @@ export default {
     ScaleLoader,
     ViewHeader
   },
+  mounted() {
+    if(this.$store.getters.networkData) {
+      this.redraw(this.$store.getters.networkData)
+    }
+  },
   computed: {
     networkData: function () {
       this.redraw(this.$store.getters.networkData)

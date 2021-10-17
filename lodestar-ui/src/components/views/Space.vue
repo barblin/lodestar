@@ -13,6 +13,7 @@
 import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import ViewHeader from "../nav/ViewHeader.vue";
 import {modes} from "../../services/modes";
+import {updateVelocityScatter} from "../../services/datasource";
 
 const PANE_NAME = "space_pane"
 
@@ -22,6 +23,11 @@ export default {
   components: {
     ScaleLoader,
     ViewHeader
+  },
+  mounted() {
+    if(this.$store.getters.spaceData) {
+      this.redraw(this.$store.getters.spaceData)
+    }
   },
   data: function () {
     return {
@@ -63,7 +69,7 @@ export default {
         parent = document.getElementById('main')
       }
 
-      const margin = {top: 20, right: 0, bottom: 10, left: 0},
+      const margin = {top: 20, right: 10, bottom: 10, left: 0},
           width = parent.clientWidth - margin.left - margin.right,
           height = parent.clientHeight - margin.top - margin.bottom;
 
@@ -179,7 +185,7 @@ export default {
       const store = this.$store
       myDiv.on('plotly_click', function (data) {
         if(store.getters.inspectCluster == true) {
-          this.$store.commit('updateInspectCluster', !this.$store.getters.inspectCluster)
+          store.commit('updateInspectCluster', !store.getters.inspectCluster)
           store.commit('updateCurrentMode', modes.CLUSTER)
         }
       });
