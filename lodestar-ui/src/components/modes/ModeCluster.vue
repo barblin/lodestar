@@ -79,7 +79,7 @@ export default {
   position: relative;
   float: left;
   width: 50%;
-  height: 600px;
+  height: 550px;
   border: 1px solid darkslategrey;
   margin-bottom: 10px;
   margin-right: 5px;
@@ -98,7 +98,7 @@ export default {
   position: relative;
   float: left;
   width: 28%;
-  height: 300px;
+  height: 350px;
   border: 1px solid darkslategrey;
   margin-bottom: 10px;
   margin-right: 10px;
@@ -108,7 +108,7 @@ export default {
   position: relative;
   float: left;
   width: 40%;
-  height: 300px;
+  height: 350px;
   border: 1px solid darkslategrey;
   margin-bottom: 10px;
   margin-right: 10px;
@@ -118,7 +118,7 @@ export default {
   position: relative;
   float: left;
   width: 30%;
-  height: 300px;
+  height: 350px;
   border: 1px solid darkslategrey;
 }
 </style>
