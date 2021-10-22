@@ -7,7 +7,7 @@ services:
       context: ./lodestar-ui
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "80:8080"
     container_name: lodestar-ui
     depends_on:
       - lodestar-backend
