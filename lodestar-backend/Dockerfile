@@ -6,7 +6,7 @@ RUN pip3 install --upgrade pip
 RUN pip3 install --upgrade pip setuptools wheel
 RUN apt-get update && echo y | apt-get install gcc git
 COPY requirements.txt requirements.txt
-RUN pip3 install -r requirements.txt
+RUN pip3 install --force-reinstall --ignore-installed -r requirements.txt
 RUN git clone https://github.com/alimuldal/diptest.git
 RUN cd diptest && python setup.py build_ext -i -f && python setup.py install && cd ..
 RUN pip3 install uwsgi
