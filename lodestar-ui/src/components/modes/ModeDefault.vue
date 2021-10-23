@@ -98,7 +98,7 @@ export default {
 .network {
   position: relative;
   float: left;
-  width: 100%;
+  width: 99%;
   height: 300px;
   border: 1px solid darkslategrey;
   margin-bottom: 10px;

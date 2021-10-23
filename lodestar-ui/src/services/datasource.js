@@ -51,8 +51,6 @@ export function updateNetwork(id) {
     store.commit('updateErroredNetwork', false)
     store.commit('updateNetworkData', {id: null})
 
-    prepareView("#network_pane")
-
     store.commit('updateNetworkData', data)
     store.commit('updateLoadingNetwork', false);
 
@@ -69,8 +67,6 @@ export function updateSpace(id) {
     store.commit('updateLoadingSpace', true)
     store.commit('updateErroredSpace', false)
 
-    prepareView("#space_pane")
-
     postData("space/" + id,
         resp => {
             store.commit('updateSpace', resp.data)
@@ -84,7 +80,6 @@ export function updateVelocityScatter(id) {
     store.commit('updateLoadingVelocity', true)
     store.commit('updateErroredVelocity', false)
 
-    prepareView("#velocity_pane")
     d3.select("#velocity_pane").selectAll("div").remove();
 
     postData("velocity/" + id,
@@ -100,8 +95,6 @@ export function updateHrd(id) {
     store.commit('updateLoadingHrd', true)
     store.commit('updateErroredHrd', false)
 
-    prepareView("#hrd")
-
     postData("hrd/" + id,
         resp => {
             store.commit('updateHrd', resp.data)
@@ -115,15 +108,10 @@ export function updateVelocityNet() {
     store.commit('updateLoadingVelocity', true)
     store.commit('updateErroredVelocity', false)
 
-    prepareView("#velocity_pane");
     d3.select("#velocity_pane").selectAll("div").remove();
 
     d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/2_TwoNum.csv").then(function (data) {
         store.commit('updateVelocityNetwork', data)
         store.commit('updateLoadingVelocity', false);
     });
-}
-
-export function prepareView(name) {
-    d3.select(name).selectAll("svg").remove();
 }

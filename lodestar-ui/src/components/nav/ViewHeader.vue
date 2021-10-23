@@ -3,7 +3,15 @@
     <span class="view-header-title">{{ title }}</span>
     <span class="toolbar">
       <div class="tooltip">
-        <font-awesome-icon class="tool tooltip" v-if="trash" v-on:click="trashCallback" icon="trash"/>
+        <div class="tooltip">
+        <font-awesome-icon class="tool select-red" v-if="exclude" v-on:click="exclusiveSelect" icon="vector-square"/>
+        <span class="tooltiptext">Inclusive select clusters</span>
+      </div>
+      <div class="tooltip">
+        <font-awesome-icon class="tool select-green" v-if="include" v-on:click="inclusiveSelect" icon="vector-square"/>
+        <span class="tooltiptext">Exclude select clusters</span>
+      </div>
+        <font-awesome-icon class="tool" v-if="trash" v-on:click="trashCallback" icon="trash"/>
         <span class="tooltiptext">Clear current selection</span>
       </div>
       <div class="tooltip">
@@ -22,6 +30,12 @@
         <font-awesome-icon class="tool" v-if="inspect" v-on:click="inspectCluster" icon="search-plus"/>
         <span class="tooltiptext">Inspect cluster</span>
       </div>
+      <div class="tooltip">
+        <div class="fa-alpha" v-if="alpha" v-on:click="inspectJoins"
+             v-bind:class="{ 'strike-through': isModeAlpha() }"/>
+        <span v-if="!isModeAlpha()" class="tooltiptext">Open change alpha value</span>
+        <span v-else class="tooltiptext">Close change alpha value</span>
+      </div>
       <!--
       <div class="tooltip">
         <font-awesome-icon class="tool" v-if="parentSelected()" v-on:click="minimize" icon="compress-arrows-alt"/>
@@ -35,9 +49,12 @@
 
 <script>
 
+import {modes} from "../../services/modes";
+
 export default {
   name: "Header",
-  props: ['title', 'trash', 'branch', 'trashCallback', 'selector', 'parent', 'drawPolygon', 'disease', 'inspect'],
+  props: ['title', 'trash', 'branch', 'trashCallback', 'selector', 'parent', 'drawPolygon', 'disease', 'inspect', 'alpha',
+    'include', 'exclude'],
   components: {},
   methods: {
     updateNet() {
@@ -48,15 +65,50 @@ export default {
       this.$emit('updateScatter')
       this.$store.commit('updateInspectCluster', !this.$store.getters.inspectCluster)
     },
-    inspectCluster(){
+    inspectCluster() {
       this.$store.commit('updateInspectCluster', !this.$store.getters.inspectCluster)
-    }
+    },
+    inspectJoins() {
+      if (this.isModeAlpha()) {
+        this.$store.commit('updateCurrentMode', modes.DEFAULT)
+      } else {
+        this.$store.commit('updateCurrentMode', modes.ALPHA)
+      }
+    },
+    isModeAlpha() {
+      return this.$store.getters.currentMode == modes.ALPHA;
+    },
+    inclusiveSelect() {
+      this.$store.commit('updateSelectInclude', true)
+    },
+    exclusiveSelect() {
+      this.$store.commit('updateSelectInclude', false)
+    },
   }
 }
 
 </script>
 
 <style scoped>
+
+.fa-alpha:before {
+  font-weight: 900;
+  font-size: 21px;
+  color: black;
+  content: 'α';
+  margin-right: 5px;
+  line-height: 5px;
+  padding-left: 3px;
+  padding-right: 3px;
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.strike-through {
+  text-decoration: line-through;
+}
+
+
 .view-header {
   background-color: #d5e7c9;
 }
@@ -78,6 +130,14 @@ export default {
   border: solid gray 1px;
   cursor: pointer;
   opacity: 0.5;
+}
+
+.select-red {
+  background-color: red;
+}
+
+.select-green {
+  background-color: green;
 }
 
 .tool:active {

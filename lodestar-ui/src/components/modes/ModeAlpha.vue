@@ -87,7 +87,7 @@ export default {
 .network {
   position: relative;
   float: left;
-  width: 100%;
+  width: 99%;
   height: 250px;
   border: 1px solid darkslategrey;
 }
@@ -95,7 +95,7 @@ export default {
 .alpha {
   position: relative;
   float: left;
-  width: 100%;
+  width: 99%;
   height: 200px;
   border-right: 1px solid darkslategrey;
   border-bottom: 1px solid darkslategrey;
