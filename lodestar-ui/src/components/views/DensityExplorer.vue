@@ -1,7 +1,8 @@
 <template>
   <ViewHeader :title='"Density Navigation"' :branch="true" :trash="true"
-              :trash-callback="trashCallback" :parent=parent></ViewHeader>
-  <div id="network_pane">
+              :trash-callback="trashCallback" :alpha="true" :exclude="true" :include="true"
+              :parent=parent></ViewHeader>
+  <div :id="PANE_NAME">
     <div id="spinner" v-if="$store.getters.loadingNetwork">
       <ScaleLoader v-if="$store.getters.loadingNetwork"></ScaleLoader>
     </div>
@@ -14,6 +15,8 @@ import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import ViewHeader from "../nav/ViewHeader.vue";
 import {modes} from "../../services/modes"
 
+const PANE_NAME = "network_pane"
+
 let rects = []
 let rect = {
   opacity: 0.2
@@ -22,12 +25,17 @@ let circles = []
 export default {
   name: "DensityExplorer",
   props: ['networkData', 'parent'],
+  data: function () {
+    return {
+      PANE_NAME: PANE_NAME
+    }
+  },
   components: {
     ScaleLoader,
     ViewHeader
   },
   mounted() {
-    if(this.$store.getters.networkData) {
+    if (this.$store.getters.networkData) {
       this.redraw(this.$store.getters.networkData)
     }
   },
@@ -46,13 +54,13 @@ export default {
   },
   methods: {
     redraw(network) {
+      d3.select("#" + PANE_NAME).selectAll("svg").remove();
+
       let parent = document.getElementById(this.parent)
 
       if (!parent) {
         parent = document.getElementById('main')
       }
-
-      console.log("IMBEINGRERENDERED!")
 
       const margin = {top: 10, right: 0, bottom: 40, left: 0},
           width = parent.clientWidth - margin.left - margin.right,
@@ -61,20 +69,22 @@ export default {
       let heightFactor = this.percentChange(network.max_y, height);
       let widthFactor = this.percentChange(network.max_x, width)
 
-      const svg = d3.select("#network_pane")
+      const svg = d3.select("#" + PANE_NAME)
           .append("svg")
           .attr("width", width + margin.left + margin.right)
           .attr("height", height + margin.top + margin.bottom)
           .on("mousedown", mousedown)
           .on("mouseup", mouseup);
 
+      let store = this.$store;
       function mousedown(event, d) {
         var m = d3.pointer(event);
 
+        let color = store.getters.selectInclude ? "lightgreen" : "red"
         rect = svg.append("rect")
             .attr("x", m[0])
             .attr("y", m[1])
-            .attr("fill", "lightgrey")
+            .attr("fill", color)
             .attr("stroke", "grey")
             .style("opacity", 0.2)
             .attr("height", 0)
@@ -85,16 +95,13 @@ export default {
 
               rects.filter(function (ele) {
                 if (ele != cur) {
-                  console.log("REMOVED ELEMENT")
                 } else {
-                  console.log("DELETED!")
                 }
 
                 return ele != cur;
               })
             });
         ;
-
         svg.on("mousemove", mousemove);
       }
 
@@ -121,15 +128,16 @@ export default {
             let minY = rectBox.y
             let maxY = rectBox.y + rectBox.height
 
+            let color = curRect.attr("fill") == "red" ? "red" : "green"
             if (minX <= circBox.x && circBox.x <= maxX && minY <= circBox.y && circBox.y <= maxY) {
-              circle.attr("fill", "green")
+              circle.attr("fill", color)
             }
           })
         });
       }
 
       // create a tooltip
-      var Tooltip = d3.select("#network_pane")
+      var Tooltip = d3.select("#" + PANE_NAME)
           .append("div")
           .style("opacity", 0)
           .attr("class", "tooltip")
@@ -186,7 +194,14 @@ export default {
             .attr("cx", (location[0] + 30) * widthFactor)
             .attr("cy", (location[1] + 30) * heightFactor)
             .attr("r", 8)
-            .on("click", () => this.selectCluster()));
+            .on("click", () => this.selectCluster())
+            .on("mouseover", function (d) {
+
+              d3.select(this).style("cursor", "pointer").attr("fill", '#ccac00');
+            })
+            .on("mouseout", function (d) {
+              d3.select(this).style("cursor", "default").attr("fill", '#69b3a2');
+            }));
       }
 
       let drag = d3.drag().on("drag", dragmove);
@@ -199,13 +214,13 @@ export default {
           .style("stroke-width", 2)
           .attr("x1", 0 - margin.left)
           .attr("y1", height + margin.top)
-          .attr("x2", width + margin.left)
+          .attr("x2", width - 15)
           .attr("y2", height + margin.top);
 
       slider.append("circle")
           .attr("fill", "lightgrey")
           .attr("stroke", "grey")
-          .attr("cx", width + margin.left - 15)
+          .attr("cx", width + margin.left - 25)
           .attr("cy", height + margin.top)
           .attr("r", 10);
 
@@ -227,7 +242,6 @@ export default {
       rects = []
     },
     selectCluster() {
-      console.log("Mode is being updated")
       this.$store.commit('updateCurrentMode', modes.CLUSTER)
     },
     percentChange(solution, screen) {

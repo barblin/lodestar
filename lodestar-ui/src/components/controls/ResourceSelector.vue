@@ -100,10 +100,7 @@ export default {
     },
     s1: function (sel) {
       let selection = this.getSelection()
-      console.log(sel)
-      console.log(selection)
       selection.s1 = this.getColumnIndex(sel)
-      console.log(selection)
       this.updateSelection(selection)
     },
     s2: function (sel) {

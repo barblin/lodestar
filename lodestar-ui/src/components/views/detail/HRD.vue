@@ -7,8 +7,8 @@
   <select id="selectY">
     <option value="" disabled selected>Spectral Class</option>
   </select>
-  <div id="spinner" v-if="$store.getters.loadingVelocity">
-    <ScaleLoader v-if="$store.getters.loadingVelocity"></ScaleLoader>
+  <div id="spinner" v-if="$store.getters.loadingHrd">
+    <ScaleLoader v-if="$store.getters.loadingHrd"></ScaleLoader>
   </div>
 </template>
 
@@ -16,9 +16,7 @@
 import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import ViewHeader from "../../nav/ViewHeader.vue";
 import * as d3 from "d3";
-import {
-  updateHrd,
-} from "../../../services/datasource";
+import {updateHrd,} from "../../../services/datasource";
 
 const PANE_NAME = "hrd"
 
@@ -38,19 +36,21 @@ export default {
     plotData: function (data) {
       this.draw(data)
     },
-    selections: function (){
+    selections: function () {
       this.draw(this.$store.getters.hrd)
     }
   },
   methods: {
     draw(data) {
+      d3.select("#" + PANE_NAME).selectAll("svg").remove();
+
       let parent = document.getElementById(this.parent)
 
       if (!parent) {
         parent = document.getElementById('main')
       }
 
-      const margin = {top: 10, right: 20, bottom: 75, left: 25},
+      const margin = {top: 10, right: 10, bottom: 75, left: 30},
           width = parent.clientWidth - margin.left - margin.right,
           height = parent.clientHeight - margin.top - margin.bottom;
 
@@ -61,16 +61,24 @@ export default {
           .data(allColumns)
           .enter()
           .append('option')
-          .text(function (d) { return d; }) // text showed in the menu
-          .attr("value", function (d) { return d; }) // corresponding value returned by the button
+          .text(function (d) {
+            return d;
+          }) // text showed in the menu
+          .attr("value", function (d) {
+            return d;
+          }) // corresponding value returned by the button
 
       d3.select("#selectY")
           .selectAll('myOptions')
           .data(allColumns)
           .enter()
           .append('option')
-          .text(function (d) { return d; }) // text showed in the menu
-          .attr("value", function (d) { return d; }) // corresponding value returned by the button
+          .text(function (d) {
+            return d;
+          }) // text showed in the menu
+          .attr("value", function (d) {
+            return d;
+          }) // corresponding value returned by the button
 
       const svg = d3.select("#" + PANE_NAME)
           .append("svg")
@@ -135,13 +143,13 @@ export default {
           .style("fill", "#587e1a")
 
       let self = this;
-      d3.select("#selectX").on("change", function(d){
+      d3.select("#selectX").on("change", function (d) {
         let selection = self.getSelection()
         selection.x = this.value
         self.updateSelection(selection)
       })
 
-      d3.select("#selectY").on("change", function(d){
+      d3.select("#selectY").on("change", function (d) {
         let selection = self.getSelection()
         selection.y = this.value
         self.updateSelection(selection)

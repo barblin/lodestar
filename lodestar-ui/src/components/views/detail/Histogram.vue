@@ -10,7 +10,6 @@
 import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import ViewHeader from "../../nav/ViewHeader.vue";
 import * as d3 from "d3";
-import {updateVelocityScatter} from "../../../services/datasource";
 
 const PANE_NAME = "histogram"
 
@@ -36,7 +35,7 @@ export default {
   },
   methods: {
     draw(data) {
-      console.log(data)
+      d3.select("#" + PANE_NAME).selectAll("svg").remove();
 
       let parent = document.getElementById(this.parent)
 
@@ -91,7 +90,7 @@ export default {
       this.histogram(dataY, miny, maxy, parent.clientWidth, 5, 30)
       this.histogram(dataZ, minz, maxz, parent.clientWidth, 5, 30)
     },
-    histogram(data, min, max, parentWidth, marginTop, marginBottom){
+    histogram(data, min, max, parentWidth, marginTop, marginBottom) {
       const margin = {top: marginTop, right: 20, bottom: marginBottom, left: 40},
           width = parentWidth - margin.left - margin.right,
           height = 105 - margin.top - margin.bottom;

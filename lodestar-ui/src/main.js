@@ -12,12 +12,12 @@ import {
     faUser,
     faDrawPolygon,
     faDisease,
-    faSearchPlus
+    faSearchPlus,
+    faVectorSquare
 } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import VueNextSelect from 'vue-next-select';
 import 'vue-next-select/dist/index.min.css';
-
 
 library.add(faUser);
 library.add(faChartArea);
@@ -28,6 +28,7 @@ library.add(faCompressArrowsAlt);
 library.add(faDrawPolygon);
 library.add(faDisease);
 library.add(faSearchPlus);
+library.add(faVectorSquare);
 
 const app = createApp(App)
 

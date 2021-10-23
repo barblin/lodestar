@@ -13,7 +13,7 @@
 import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import ViewHeader from "../nav/ViewHeader.vue";
 import {modes} from "../../services/modes";
-import {updateVelocityScatter} from "../../services/datasource";
+import * as d3 from "d3";
 
 const PANE_NAME = "space_pane"
 
@@ -63,6 +63,8 @@ export default {
       this.$store.commit('updateDrawSpaceScatter', !this.$store.getters.drawSpaceScatter)
     },
     redraw(spaceData) {
+      d3.select("#" + PANE_NAME).selectAll("svg").remove();
+
       let parent = document.getElementById(this.parent)
 
       if (!parent) {

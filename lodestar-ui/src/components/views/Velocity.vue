@@ -66,11 +66,13 @@ export default {
         parent = document.getElementById('main')
       }
 
-      const margin = {top: 20, right: 10, bottom: 10, left: 0},
-          width = parent.clientWidth - margin.left - margin.right,
-          height = parent.clientHeight - margin.top - margin.bottom;
-
       if (includeThirdVelocityDimension()) {
+        d3.select("#" + PANE_NAME_3D).selectAll("svg").remove();
+
+        const margin = {top: 20, right: 10, bottom: 10, left: 0},
+            width = parent.clientWidth - margin.left - margin.right,
+            height = parent.clientHeight - margin.top - margin.bottom;
+
         let scatterData = []
         let dataX = []
         let dataY = []
@@ -154,6 +156,12 @@ export default {
         Plotly.react(PANE_NAME_3D, scatterData, layout);
 
       } else {
+        d3.select("#" + PANE_NAME).selectAll("svg").remove();
+
+        const margin = {top: 10, right: 10, bottom: 50, left: 35},
+            width = parent.clientWidth - margin.left - margin.right,
+            height = parent.clientHeight - margin.top - margin.bottom;
+
         const svg = d3.select("#" + PANE_NAME)
             .append("svg")
             .attr("width", width + margin.left + margin.right)

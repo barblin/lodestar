@@ -11,6 +11,13 @@ def data_dict():
         'rename_columns': {'V2': 'f1', 'V3': 'f2', 'V4': 'labels'},
         'astype': {'f1': np.float32, 'f2': np.float32, 'labels': np.int32},
       },
+      'GaiaSource_000-020-090': {
+        'path': './resources/GaiaSource_000-020-090.csv',
+        'read_csv_kwargs': {},
+        'columns2keep': ['V2', 'V3', 'V4'],
+        'rename_columns': {'V2': 'f1', 'V3': 'f2', 'V4': 'labels'},
+        'astype': {'f1': np.float32, 'f2': np.float32, 'labels': np.int32},
+      },
       'skinnyDipData_8': {
         'path': './resources/skinnyDipData_8.csv',
         'read_csv_kwargs': {},

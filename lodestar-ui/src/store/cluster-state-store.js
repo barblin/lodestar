@@ -32,7 +32,7 @@ export const store = createStore({
 
         plotData: {},
         spaceData: {},
-        velocityScatterData: {},
+        velocityScatterData: null,
         velocityNetworkData: {},
         networkData: null,
         hrd: {},
@@ -49,7 +49,8 @@ export const store = createStore({
         drawVelocityNet: false,
         drawVelocityScatter: true,
         plotRadial: false,
-        inspectCluster: false
+        inspectCluster: false,
+        selectInclude: true,
     },
     mutations: {
         updateCurrentViewSelection(state, selection) {
@@ -145,6 +146,9 @@ export const store = createStore({
         updateInspectCluster(state, data) {
             state.inspectCluster = data
         },
+        updateSelectInclude(state, data) {
+            state.selectInclude = data
+        },
     },
     getters: {
         currentViewSelection: state => state.currentViewSelection,
@@ -158,7 +162,7 @@ export const store = createStore({
         erroredSpace: state => state.erroredSpace,
         loadingVelocity: state => state.loadingVelocity,
         erroredVelocity: state => state.erroredVelocity,
-        laodingHrd: state => state.loadingHrd,
+        loadingHrd: state => state.loadingHrd,
         erroredHrd: state => state.erroredHrd,
 
         loadingAny: state => state.loadingSpace || state.loadingNetwork || state.loadingVelocity,
@@ -186,5 +190,6 @@ export const store = createStore({
 
         plotRadial: state => state.plotRadial,
         inspectCluster: state => state.inspectCluster,
+        selectInclude: state => state.selectInclude,
     }
 })
