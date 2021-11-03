@@ -2,12 +2,11 @@
   <div v-if="$store.getters.currentMode != modes.CLUSTER">
     <ResourceSelector :selection="$store.getters.currentResource" :headerSelection="$store.getters.resourceHeaders[0]">
     </ResourceSelector>
-    <!--<button type="button" @click="changeViewCluster()" class="nav-el">Change to Cluster</button>
-    <button type="button" @click="changeViewAlpha()" class="nav-el">Change to Alpha</button>
-    <button type="button" @click="changeViewBack()" class="nav-el">Change back</button>-->
-    <button type="button" :disabled="$store.getters.loadingAny || !includeSecondVelocityDimension()" @click="click()"
-            class="nav-el">Plot
-    </button>
+    <div class="calculate">
+      <button type="button" :disabled="$store.getters.loadingAny || !includeSecondVelocityDimension()" @click="click()"
+              class="calculate">Calculate
+      </button>
+    </div>
   </div>
   <div v-else>
     <button type="button" @click="exitClusterDetails()" class="nav-el">Exit cluster details</button>
@@ -15,12 +14,7 @@
 </template>
 
 <script>
-import {
-  updateHrd,
-  updateNetwork,
-  updateSpace,
-  updateVelocityScatter
-} from "../../services/datasource";
+import {updateHrd, updateNetwork, updateSpace, updateVelocityScatter} from "../../services/datasource";
 import {modes} from "../../services/modes";
 import ResourceSelector from "./ResourceSelector.vue";
 import {includeSecondVelocityDimension} from '../../services/dimension-util';
@@ -41,6 +35,7 @@ export default {
       updateSpace(this.$store.getters.currentResource);
       updateVelocityScatter(this.$store.getters.currentResource);
       updateHrd(this.$store.getters.currentResource);
+      this.$store.commit('updateCurrentMode', modes.DEFAULT)
     },
     includeSecondVelocityDimension() {
       return includeSecondVelocityDimension()
@@ -53,4 +48,12 @@ export default {
 </script>
 
 <style scoped>
+
+.calculate {
+  font-size: large;
+  position: absolute;
+  width: 97%;
+  height: 50px;
+  top: 87%;
+}
 </style>

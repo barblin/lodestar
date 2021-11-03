@@ -62,7 +62,7 @@ export default {
         parent = document.getElementById('main')
       }
 
-      const margin = {top: 10, right: 0, bottom: 40, left: 0},
+      const margin = {top: 10, right: 20, bottom: 30, left: 10},
           width = parent.clientWidth - margin.left - margin.right,
           height = parent.clientHeight - margin.top - margin.bottom;
 
@@ -77,6 +77,7 @@ export default {
           .on("mouseup", mouseup);
 
       let store = this.$store;
+
       function mousedown(event, d) {
         var m = d3.pointer(event);
 
@@ -168,7 +169,6 @@ export default {
             .style("opacity", 0)
       }
 
-
       for (const [start, end] of Object.entries(network.edges)) {
         let pos1 = network.pos[start]
         let pos2 = network.pos[end]
@@ -177,22 +177,25 @@ export default {
         svg.append('line')
             .style("stroke", "black")
             .style("stroke-width", simi)
-            .attr("x1", (pos1[0] + 30) * widthFactor)
-            .attr("y1", (pos1[1] + 30) * heightFactor)
-            .attr("x2", (pos2[0] + 30) * widthFactor)
-            .attr("y2", (pos2[1] + 30) * heightFactor)
+            .attr("x1", (pos1[0] + 5) * widthFactor)
+            .attr("y1", (pos1[1] + 10) * heightFactor)
+            .attr("x2", (pos2[0] + 5) * widthFactor)
+            .attr("y2", (pos2[1] + 10) * heightFactor)
             .on("mouseover", tmouseover)
             .on("mousemove", tmousemove)
             .on("mouseleave", tmouseleave);
       }
       ;
 
+      let heights = new Set();
       for (const [node, location] of Object.entries(network.pos)) {
+        heights.add(location[1])
+
         circles.push(svg.append("circle")
             .attr("fill", '#69b3a2')
             .attr("stroke", "none")
-            .attr("cx", (location[0] + 30) * widthFactor)
-            .attr("cy", (location[1] + 30) * heightFactor)
+            .attr("cx", (location[0] + 5) * widthFactor)
+            .attr("cy", (location[1] + 10) * heightFactor)
             .attr("r", 8)
             .on("click", () => this.selectCluster())
             .on("mouseover", function (d) {
@@ -204,32 +207,71 @@ export default {
             }));
       }
 
+      let level = 0;
+      for (let curHeight of heights) {
+        svg.append('line')
+            .style("stroke-dasharray", ("3, 3"))
+            .style("stroke", "grey")
+            .style("stroke-width", 1)
+            .attr("x1", 0)
+            .attr("y1", (curHeight - 25) * heightFactor)
+            .attr("x2", parent.clientWidth)
+            .attr("y2", (curHeight - 25) * heightFactor)
+
+        svg.append("text")
+            .attr("x", 2)
+            .attr("y", (curHeight + 10) * heightFactor)
+            .attr("dy", ".35em")
+            .text(function (d) {
+              return level;
+            });
+
+        ;
+
+        level += 1
+      }
+
       let drag = d3.drag().on("drag", dragmove);
 
       let slider = svg.append('g').call(drag);
 
       slider.append('line')
-          .style("stroke-dasharray", ("3, 3"))
+          .style("stroke", ("3, 3"))
           .style("stroke", "grey")
           .style("stroke-width", 2)
           .attr("x1", 0 - margin.left)
-          .attr("y1", height + margin.top)
-          .attr("x2", width - 15)
+          .attr("y1", height)
+          .attr("x2", parent.clientWidth)
+          .attr("y2", height);
+
+      svg.append('g').append('line')
+          .style("stroke", ("3, 3"))
+          .style("stroke", "grey")
+          .style("stroke-width", 2)
+          .attr("x1", 15)
+          .attr("y1", 0)
+          .attr("x2", 15)
           .attr("y2", height + margin.top);
 
       slider.append("circle")
           .attr("fill", "lightgrey")
           .attr("stroke", "grey")
-          .attr("cx", width + margin.left - 25)
-          .attr("cy", height + margin.top)
-          .attr("r", 10);
+          .attr("cx", parent.clientWidth - 10)
+          .attr("cy", height)
+          .attr("r", 10)
+          .on("mouseover", function (d) {
+            d3.select(this).style("cursor", "pointer").attr("fill", '#ccac00');
+          })
+          .on("mouseout", function (d) {
+            d3.select(this).style("cursor", "default").attr("fill", '#69b3a2');
+          });
 
       function dragmove(event, d) {
         d3.select(this).select('circle')
-            .attr("cy", Math.min(height + margin.top, Math.max(0, event.y)))
+            .attr("cy", Math.min(height, Math.max(10, event.y)))
         d3.select(this).select('line')
-            .attr("y1", Math.min(height + margin.top, Math.max(0, event.y)))
-            .attr("y2", Math.min(height + margin.top, Math.max(0, event.y)))
+            .attr("y1", Math.min(height, Math.max(10, event.y)))
+            .attr("y2", Math.min(height, Math.max(10, event.y)))
       };
     },
     trashCallback() {

@@ -26,7 +26,7 @@ import Space from "../views/Space.vue";
 import Velocity from "../views/Velocity.vue";
 import HRD from "../views/detail/HRD.vue";
 import DensityExplorer from "../views/DensityExplorer.vue";
-import {updateResources} from "../../services/datasource";
+import {updateResourceHeaders, updateResources} from "../../services/datasource";
 
 export default {
   name: "ModeDefault",
@@ -42,8 +42,8 @@ export default {
     HRD
   },
   mounted() {
-    updateResources();
-  },
+    updateResourceHeaders(this.$store.getters.currentResource)
+  }
 }
 </script>
 
@@ -98,7 +98,7 @@ export default {
 .network {
   position: relative;
   float: left;
-  width: 99%;
+  width: 98%;
   height: 300px;
   border: 1px solid darkslategrey;
   margin-bottom: 10px;
