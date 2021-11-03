@@ -1,41 +1,61 @@
 <template>
-  <vue-select v-model="selection" placeholder="Select source file" :options="$store.getters.resources"
+  <label class="feature-label">Select from available resources</label>
+  <vue-select v-model="selection" placeholder="Select source file"
+              :closeOnSelect="true"
+              :searchable="true"
+              :options="$store.getters.resources"
               class="nav-el"></vue-select>
+  <br><br><br>
   <input class="radial" type="checkbox" id="checkbox" v-model="plotRadial">
-  <label class="radial rad-label" for="checkbox">With Radial </label>
+  <label class="radial rad-label" for="checkbox">Include radial velocity</label>
+  <br>
+  <br>
+  <br>
   <span v-if="includeFirstSpaceDimension()">
-    <label class="feature-label">S1</label>
+    <label class="feature-label">First space feature</label>
     <vue-select v-model="s1"
+                :searchable="true"
+                :closeOnSelect="true"
                 :placeholder="$store.getters.resourceHeaders[s1]"
                 :options="$store.getters.resourceHeaders" class="nav-el"></vue-select>
   </span>
   <span v-if="includeSecondSpaceDimension()">
-    <label class="feature-label">S2</label>
+    <label class="feature-label">Second space feature</label>
     <vue-select v-model="s2"
+                :closeOnSelect="true"
+                :searchable="true"
                 :placeholder="$store.getters.resourceHeaders[s2]"
                 :options="$store.getters.resourceHeaders" class="nav-el"></vue-select>
   </span>
   <span v-if="includeThirdSpaceDimension()">
-    <label class="feature-label">S3</label>
+    <label class="feature-label">Third space feature</label>
     <vue-select v-model="s3"
+                :closeOnSelect="true"
+                :searchable="true"
                 :placeholder="$store.getters.resourceHeaders[s3]"
                 :options="$store.getters.resourceHeaders" class="nav-el"></vue-select>
   </span>
   <span v-if="includeFirstVelocityDimension()">
-    <label class="feature-label">V1</label>
+    <label class="feature-label">First velocity feature</label>
     <vue-select v-model="v1"
+                :closeOnSelect="true"
+                :searchable="true"
                 :placeholder="$store.getters.resourceHeaders[v1]"
                 :options="$store.getters.resourceHeaders" class="nav-el"></vue-select>
   </span>
   <span v-if="includeSecondVelocityDimension()">
-    <label class="feature-label">V2</label>
+    <label class="feature-label">Second velocity feature</label>
     <vue-select v-model="v2"
+                :closeOnSelect="true"
+                :searchable="true"
                 :placeholder="$store.getters.resourceHeaders[v2]"
                 :options="$store.getters.resourceHeaders" class="nav-el"></vue-select>
   </span>
   <span v-if="includeThirdVelocityDimension()">
-      <label class="feature-label">V3</label>
+      <label class="feature-label">Radial velocity feature</label>
     <vue-select v-model="v3"
+                :closeOnSelect="true"
+                :searchable="true"
                 :placeholder="$store.getters.resourceHeaders[v3]"
                 :options="$store.getters.resourceHeaders" class="nav-el"></vue-select>
   </span>
@@ -169,7 +189,7 @@ export default {
 
 .feature-label {
   font-size: 0.9rem;
-  margin-top: 3px;
+  margin-top: 30px;
   margin-right: 2px;
   float: left;
 }
@@ -179,7 +199,12 @@ input {
 }
 
 .radial {
-  margin-top: 3px;
+  margin-top: 30px;
   float: left;
+}
+
+.nav-el {
+  float: left;
+  width: 100%;
 }
 </style>

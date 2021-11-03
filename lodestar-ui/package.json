@@ -18,7 +18,7 @@
     "sass": "^1.37.5",
     "spin.js": "2.0.1",
     "vue": "^3.0.5",
-    "vue-next-select": "^2.9.0",
+    "vue-next-select": "^2.10.1",
     "vue-sidebar-menu": "^5.0.1",
     "vue-spinner": "^1.0.4",
     "vuex": "^4.0.2"

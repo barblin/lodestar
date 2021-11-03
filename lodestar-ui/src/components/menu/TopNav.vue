@@ -14,8 +14,4 @@ export default {
 </script>
 
 <style>
-.nav-el {
-  float: left;
-  margin-right: 5px;
-}
 </style>
