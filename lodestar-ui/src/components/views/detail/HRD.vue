@@ -34,14 +34,14 @@ export default {
   },
   watch: {
     plotData: function (data) {
-      this.draw(data)
+      this.draw(data, this.$store.getters.resourceHeaders)
     },
     selections: function () {
-      this.draw(this.$store.getters.hrd)
+      this.draw(this.$store.getters.hrd, this.$store.getters.resourceHeaders)
     }
   },
   methods: {
-    draw(data) {
+    draw(data, allColumns) {
       d3.select("#" + PANE_NAME).selectAll("svg").remove();
 
       let parent = document.getElementById(this.parent)
@@ -53,8 +53,6 @@ export default {
       const margin = {top: 10, right: 10, bottom: 75, left: 30},
           width = parent.clientWidth - margin.left - margin.right,
           height = parent.clientHeight - margin.top - margin.bottom;
-
-      let allColumns = this.$store.getters.resourceHeaders;
 
       d3.select("#selectX")
           .selectAll('myOptions')

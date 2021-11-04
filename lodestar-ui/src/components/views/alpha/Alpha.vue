@@ -4,6 +4,25 @@
       <ScaleLoader v-if="$store.getters.loadingNetwork"></ScaleLoader>
     </div>
   </div>
+  <table>
+    <tbody>
+    <tr>
+      <td>&lt;td></td>
+      <td>&lt;td></td>
+      <td>&lt;td></td>
+    </tr>
+    <tr>
+      <td>&lt;td></td>
+      <td>&lt;td></td>
+      <td>&lt;td></td>
+    </tr>
+    <tr>
+      <td>&lt;td></td>
+      <td>&lt;td></td>
+      <td>&lt;td></td>
+    </tr>
+    </tbody>
+  </table>
 </template>
 
 <script>
@@ -23,4 +42,8 @@ export default {
 </script>
 
 <style scoped>
+table {
+  width: 100%;
+  height: 100%;
+}
 </style>

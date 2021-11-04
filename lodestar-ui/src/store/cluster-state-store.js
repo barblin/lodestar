@@ -17,7 +17,7 @@ export const store = createStore({
             x: 0,
             y: 1
         },
-        currentMode: modes.DEFAULT,
+        currentMode: modes.INPUT,
 
         loadingScatter: false,
         erroredScatter: false,
