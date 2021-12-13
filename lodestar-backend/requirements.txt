@@ -12,3 +12,5 @@ numba==0.53.1
 flask==2.0.1
 shapely==1.7.1
 astropy==4.3.post1
+plotly==1.16.0
+nglpy==1.1.2

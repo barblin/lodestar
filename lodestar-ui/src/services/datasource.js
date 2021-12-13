@@ -2,7 +2,9 @@ import {store} from '../store/cluster-state-store'
 import axios from "axios";
 import * as d3 from "d3";
 import * as data from './mock-data.json';
-import {buildSpaceBody, buildVelocityBody} from "./dimension-util";
+import {buildAll, buildSpaceBody, buildVelocityBody} from "./dimension-util";
+import {modes} from "./modes";
+import {computeColorLabels, createColorMap} from "./colors";
 
 export const host = "http://localhost:5000/api/v1/"
 
@@ -37,10 +39,17 @@ export function updateResources() {
         })
 }
 
+export function updateDensityLevels() {
+    fetchData("density-levels",
+        resp => {
+            store.commit('updateDensityLevels', resp.data)
+        }, () => {
+        })
+}
+
 export function updateResourceHeaders(filename) {
     fetchData("resources/" + filename + "/headers",
         resp => {
-            console.log(resp.data)
             store.commit('updateResourceHeaders', resp.data)
         }, () => {
         })
@@ -52,18 +61,22 @@ export function updateNetwork(id) {
     store.commit('updateNetworkData', {id: null})
 
     store.commit('updateNetworkData', data)
+    store.commit('updateColorMap', createColorMap(data.node_level_clusters))
     store.commit('updateLoadingNetwork', false);
+    store.commit('updateCurrentMode', modes.DEFAULT)
 
-    /*fetchData("networks/" + id,
+    /*postData("networks/" + id,
         resp => {
-            store.commit('updateNetwork', resp.data)
+            store.commit('updateNetworkData', resp.data)
+            store.commit('updateCurrentMode', modes.DEFAULT)
+            store.commit('updateColorMap', createColorMap(resp.data.node_level_clusters))
         },
         () => {
             store.commit('updateLoadingNetwork', false);
-        })*/
+        }, buildAll())*/
 }
 
-export function updateSpace(id) {
+export function updateSpace(id, current_cluster = null) {
     store.commit('updateLoadingSpace', true)
     store.commit('updateErroredSpace', false)
 
@@ -73,10 +86,10 @@ export function updateSpace(id) {
         },
         () => {
             store.commit('updateLoadingSpace', false);
-        }, buildSpaceBody())
+        }, buildSpaceBody(current_cluster))
 }
 
-export function updateVelocityScatter(id) {
+export function updateVelocity(id) {
     store.commit('updateLoadingVelocity', true)
     store.commit('updateErroredVelocity', false)
 
@@ -89,6 +102,39 @@ export function updateVelocityScatter(id) {
         () => {
             store.commit('updateLoadingVelocity', false);
         }, buildVelocityBody())
+}
+
+export function updateCurrentLabels(id, coords) {
+    store.commit('updateLoadingSpace', true)
+    store.commit('updateErroredSpace', false)
+    store.commit('updateLoadingVelocity', true)
+    store.commit('updateErroredVelocity', false)
+
+    postData("labels/" + id,
+        resp => {
+            let data = Array.from(resp.data)
+            store.commit('updateLabels', data)
+            store.commit('updateColorLabels', computeColorLabels(resp.data,
+                store.getters.colorMap, store.getters.noise))
+            let cache = store.getters.levelCache
+            cache[coords] = data
+            store.commit('updateLevelCache', cache);
+        },
+        () => {
+            store.commit('updateLoadingVelocity', false);
+            store.commit('updateLoadingSpace', false);
+        }, coords)
+}
+
+export function updateLabels(id, level) {
+    postData("labels/" + id,
+        resp => {
+            let cache = store.getters.levelCache
+            cache[level] = Array.from(resp.data)
+            store.commit('updateLevelCache', cache);
+        },
+        () => {
+        }, level)
 }
 
 export function updateHrd(id) {

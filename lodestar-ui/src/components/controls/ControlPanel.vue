@@ -2,27 +2,30 @@
   <div v-if="$store.getters.currentMode != modes.CLUSTER">
     <ResourceSelector :selection="$store.getters.currentResource" :headerSelection="$store.getters.resourceHeaders[0]">
     </ResourceSelector>
+    <div v-if="$store.getters.loadingNetwork" class="center">
+      <RingLoader :size="'200px'" v-if="$store.getters.loadingNetwork"></RingLoader>
+    </div>
     <div class="calculate">
       <button type="button" :disabled="$store.getters.loadingAny || !includeSecondVelocityDimension()" @click="click()"
-              class="calculate">Calculate
+              class="calculate">
+        Calculate (May take up to 20 min)
       </button>
     </div>
-  </div>
-  <div v-else>
-    <button type="button" @click="exitClusterDetails()" class="nav-el">Exit cluster details</button>
   </div>
 </template>
 
 <script>
-import {updateHrd, updateNetwork, updateSpace, updateVelocityScatter} from "../../services/datasource";
+import {updateHrd, updateNetwork, updateSpace, updateVelocity} from "../../services/datasource";
 import {modes} from "../../services/modes";
 import ResourceSelector from "./ResourceSelector.vue";
 import {includeSecondVelocityDimension} from '../../services/dimension-util';
+import RingLoader from 'vue-spinner/src/RingLoader.vue'
 
 export default {
   name: "Plotter",
   components: {
-    ResourceSelector: ResourceSelector
+    ResourceSelector: ResourceSelector,
+    RingLoader
   },
   data: function () {
     return {
@@ -33,16 +36,12 @@ export default {
     click() {
       updateNetwork(this.$store.getters.currentResource);
       updateSpace(this.$store.getters.currentResource);
-      updateVelocityScatter(this.$store.getters.currentResource);
+      updateVelocity(this.$store.getters.currentResource);
       updateHrd(this.$store.getters.currentResource);
-      this.$store.commit('updateCurrentMode', modes.DEFAULT)
     },
     includeSecondVelocityDimension() {
       return includeSecondVelocityDimension()
     },
-    exitClusterDetails() {
-      this.$store.commit('updateCurrentMode', modes.DEFAULT)
-    }
   }
 }
 </script>
@@ -55,5 +54,10 @@ export default {
   width: 97%;
   height: 50px;
   top: 87%;
+}
+
+.center {
+  margin: auto;
+  width: 20%;
 }
 </style>

@@ -31,5 +31,12 @@ def data_dict():
         'columns2keep': ['f1', 'f2', 'labels'],
         'rename_columns': {},
         'astype': {'f1': np.float32, 'f2': np.float32, 'labels': np.int32}
+      },
+      'cluster_data_uppersco_extravel_covmtx': {
+        'path': './resources/cluster_data_uppersco_extravel_covmtx.csv',
+        'read_csv_kwargs': dict(header=None, names=['f1', 'f2', 'labels']),
+        'columns2keep': ['f1', 'f2', 'labels'],
+        'rename_columns': {},
+        'astype': {'f1': np.float32, 'f2': np.float32, 'labels': np.int32}
       }
     }

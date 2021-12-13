@@ -6,7 +6,7 @@ from services.util.util import clean_num
 def get_hrd(filename, data):
   columns = [data["x"], data["y"]]
 
-  x = get_columns_from_dataframe_cluster(data_dict()[filename], columns)
+  x = get_columns_from_dataframe_cluster(data_dict()[filename])
   x = x[columns]
   x.dropna()
 

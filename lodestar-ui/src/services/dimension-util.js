@@ -24,8 +24,23 @@ export function includeThirdVelocityDimension() {
     return store.getters.resourceHeaders.length > 5 && store.getters.plotRadial;
 }
 
-export function buildSpaceBody() {
-    let spaceBody = {s1: null, s2: null, s3: null}
+export function buildAll() {
+    let space = buildSpaceBody()
+    let velocity = buildVelocityBody()
+
+    return {
+        s1: space.s1,
+        s2: space.s2,
+        s3: space.s3,
+        v1: velocity.v1,
+        v2: velocity.v2,
+        v3: velocity.v3,
+        level: store.getters.level
+    }
+}
+
+export function buildSpaceBody(current_cluster) {
+    let spaceBody = {s1: null, s2: null, s3: null, current_cluster: current_cluster, level: store.getters.level}
 
     if (includeFirstSpaceDimension()) {
         spaceBody.s1 = store.getters.resourceHeaders[store.getters.currentColumnSelection.s1]

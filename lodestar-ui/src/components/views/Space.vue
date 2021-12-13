@@ -1,6 +1,6 @@
 <template>
   <ViewHeader :title='"Three space features clustering"' :parent=parent :drawPolygon="true" :disease="true"
-              :inspect="true"
+              :inspect="true" :noise="true"
               @maximize="maximize" @updateNet="updateNet" @updateScatter="updateScatter" @redraw="redraw"></ViewHeader>
   <div :id="PANE_NAME" class="default">
     <div id="spinner" v-if="$store.getters.loadingSpace">
@@ -13,25 +13,27 @@
 import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import ViewHeader from "../nav/ViewHeader.vue";
 import {modes} from "../../services/modes";
+import {col_map} from "../../services/colors";
 import * as d3 from "d3";
 
 const PANE_NAME = "space_pane"
 
 export default {
   name: "SpacePlot",
-  props: ['spaceData', 'parent', 'drawNet', 'drawScatter', 'magnify'],
+  props: ['spaceData', 'parent', 'drawNet', 'drawScatter', 'magnify', 'colorLabels'],
   components: {
     ScaleLoader,
     ViewHeader
   },
   mounted() {
-    if(this.$store.getters.spaceData) {
+    if (this.$store.getters.spaceData) {
       this.redraw(this.$store.getters.spaceData)
     }
   },
   data: function () {
     return {
-      PANE_NAME: PANE_NAME
+      PANE_NAME: PANE_NAME,
+      colors: col_map
     }
   },
   watch: {
@@ -42,6 +44,9 @@ export default {
       this.redraw(this.$store.getters.spaceData)
     },
     drawScatter: function () {
+      this.redraw(this.$store.getters.spaceData)
+    },
+    colorLabels: function () {
       this.redraw(this.$store.getters.spaceData)
     },
     magnify: function () {
@@ -95,7 +100,7 @@ export default {
           mode: 'markers',
           type: 'scatter3d',
           marker: {
-            color: 'rgb(23, 190, 207)',
+            color: this.colorLabels,
             size: 2
           }
         }, /*{
@@ -186,7 +191,7 @@ export default {
 
       const store = this.$store
       myDiv.on('plotly_click', function (data) {
-        if(store.getters.inspectCluster == true) {
+        if (store.getters.inspectCluster == true) {
           store.commit('updateInspectCluster', !store.getters.inspectCluster)
           store.commit('updateCurrentMode', modes.CLUSTER)
         }

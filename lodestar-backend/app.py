@@ -1,6 +1,7 @@
 from flask import Flask
 
 from controllers.density_network_controller import network_controller
+from controllers.label_service import label_controller
 from controllers.resource_controller import resource_controller
 from controllers.space_controller import space_controller
 from controllers.velocity_controller import velocity_controller
@@ -10,6 +11,7 @@ app = Flask(__name__)
 
 app.register_blueprint(space_controller)
 app.register_blueprint(velocity_controller)
+app.register_blueprint(label_controller)
 app.register_blueprint(resource_controller)
 app.register_blueprint(network_controller)
 app.register_blueprint(hrd_controller)
@@ -30,4 +32,4 @@ def after_request(response):
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', threaded=True)
