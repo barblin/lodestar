@@ -3,14 +3,16 @@
     <Space :parent="views.SPACE" :drawScatter="$store.getters.drawSpaceScatter"
            :drawNet="$store.getters.drawSpaceNet"
            :magnify="$store.getters.inspectCluster"
-           :spaceData="$store.getters.spaceData"/>
+           :spaceData="$store.getters.spaceData"
+           :colorLabels="$store.getters.colorLabels"/>
   </div>
   <div :id="views.VELOCITY" class="velocity">
     <Velocity :parent="views.VELOCITY"
               :drawScatter="$store.getters.drawVelocityScatter"
               :drawNet="$store.getters.drawVelocityNet"
               :netData="$store.getters.velocityNetworkData"
-              :scatData="$store.getters.velocityScatterData"/>
+              :scatData="$store.getters.velocityScatterData"
+              :colorLabels="$store.getters.colorLabels"/>
   </div>
   <div :id="views.HRD" class="hrd">
     <HRD :parent="views.HRD" :plotData="$store.getters.hrd" :selections="$store.getters.resourceHeaders"/>
@@ -69,7 +71,7 @@ export default {
   position: relative;
   float: left;
   width: 50%;
-  height: 600px;
+  height: 480px;
   border: 1px solid darkslategrey;
   margin-bottom: 10px;
   margin-right: 5px;
@@ -80,7 +82,7 @@ export default {
   margin-right: 5px;
   float: left;
   width: 30%;
-  height: 500px;
+  height: 480px;
   border: 1px solid darkslategrey;
   margin-bottom: 10px;
 }
@@ -89,8 +91,8 @@ export default {
 .hrd {
   position: relative;
   float: left;
-  width: 18%;
-  height: 500px;
+  width: 17%;
+  height: 480px;
   border: 1px solid darkslategrey;
   margin-bottom: 10px;
 }
@@ -99,7 +101,7 @@ export default {
   position: relative;
   float: left;
   width: 98%;
-  height: 300px;
+  height: 430px;
   border: 1px solid darkslategrey;
   margin-bottom: 10px;
 }

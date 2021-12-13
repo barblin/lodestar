@@ -14,10 +14,18 @@ export const store = createStore({
             v3: 5
         },
         hrdSelection: {
-            x: 0,
-            y: 1
+            x: "ra",
+            y: "dec"
         },
+        level: 0,
+        maxLevel: 0,
+        levelCache: {},
+        noise: false,
+        labels: [],
+        colorLabels: [],
+        colorMap: {},
         currentMode: modes.INPUT,
+        currentCluster: {level: null, label: null, user_label: null, name: null, size: 0},
 
         loadingScatter: false,
         erroredScatter: false,
@@ -50,7 +58,7 @@ export const store = createStore({
         drawVelocityScatter: true,
         plotRadial: false,
         inspectCluster: false,
-        selectInclude: true,
+        selectExclude: false,
     },
     mutations: {
         updateCurrentViewSelection(state, selection) {
@@ -88,6 +96,42 @@ export const store = createStore({
         },
         updateSpace(state, data) {
             state.spaceData = data
+        },
+        updateLevel(state, level) {
+            state.level = level
+        },
+        updateMaxLevel(state, max) {
+            state.maxLevel = max
+        },
+        updateNoise(state, noise) {
+            state.noise = noise
+        },
+        updateLabels(state, labels) {
+            state.labels = labels
+        },
+        updateColorMap(state, map) {
+            state.colorMap = map
+        },
+        updateLevelCache(state, cache) {
+            state.levelCache = cache
+        },
+        updateColorLabels(state, colorLabels) {
+            state.colorLabels = colorLabels
+        },
+        updateCurrentClusterLevel(state, level) {
+            state.currentCluster.level = level
+        },
+        updateCurrentClusterLabel(state, label) {
+            state.currentCluster.label = label
+        },
+        updateCurrentClusterUserLabel(state, label) {
+            state.currentCluster.user_label = label
+        },
+        updateCurrentClusterName(state, name) {
+            state.currentCluster.name = name
+        },
+        updateCurrentClusterSize(state, size){
+            state.currentCluster.size = size
         },
         updateVelocityScatter(state, data) {
             state.velocityScatterData = data
@@ -146,8 +190,8 @@ export const store = createStore({
         updateInspectCluster(state, data) {
             state.inspectCluster = data
         },
-        updateSelectInclude(state, data) {
-            state.selectInclude = data
+        updateSelectExclude(state, data) {
+            state.selectExclude = data
         },
     },
     getters: {
@@ -177,6 +221,16 @@ export const store = createStore({
 
         width: state => state.width,
         height: state => state.height,
+        level: state => state.level,
+        maxLevel: state => state.maxLevel,
+        noise: state => state.noise,
+        labels: state => state.labels,
+        levelCache: (state) => (level) => {
+            return state.levelCache[level]
+        },
+        colorLabels: state => state.colorLabels,
+        colorMap: state => state.colorMap,
+        currentCluster: state => state.currentCluster,
 
         resources: state => state.resources,
         resourceHeaders: state => state.resourceHeaders,
@@ -190,6 +244,6 @@ export const store = createStore({
 
         plotRadial: state => state.plotRadial,
         inspectCluster: state => state.inspectCluster,
-        selectInclude: state => state.selectInclude,
+        selectExclude: state => state.selectExclude,
     }
 })

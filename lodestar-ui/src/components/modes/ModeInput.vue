@@ -5,7 +5,7 @@
 <script>
 import {modes} from "../../services/modes";
 import TopNav from "../menu/TopNav.vue";
-import {updateResources} from "../../services/datasource";
+import {updateDensityLevels, updateResources} from "../../services/datasource";
 
 export default {
   name: "ModeInput",
@@ -15,10 +15,11 @@ export default {
     };
   },
   components: {
-    TopNav,
+    TopNav
   },
   mounted() {
     updateResources();
+    updateDensityLevels();
   },
 }
 </script>

@@ -2,14 +2,17 @@
   <div :id="views.SPACE" class="space">
     <Space :parent="views.SPACE" :drawScatter="$store.getters.drawSpaceScatter"
            :drawNet="$store.getters.drawSpaceNet"
-           :spaceData="$store.getters.spaceData"/>
+           :magnify="$store.getters.inspectCluster"
+           :spaceData="$store.getters.spaceData"
+           :colorLabels="$store.getters.colorLabels"/>
   </div>
   <div :id="views.VELOCITY" class="velocity">
     <Velocity :parent="views.VELOCITY"
               :drawScatter="$store.getters.drawVelocityScatter"
               :drawNet="$store.getters.drawVelocityNet"
               :netData="$store.getters.velocityNetworkData"
-              :scatData="$store.getters.velocityScatterData"/>
+              :scatData="$store.getters.velocityScatterData"
+              :colorLabels="$store.getters.colorLabels"/>
   </div>
   <div :id="views.NETWORK" class="network">
     <DensityExplorer :networkData="$store.getters.networkData" :parent="views.NETWORK"/>
@@ -69,7 +72,7 @@ export default {
   position: relative;
   float: left;
   width: 50%;
-  height: 460px;
+  height: 300px;
   border: 1px solid darkslategrey;
   margin-bottom: 10px;
   margin-right: 5px;
@@ -79,7 +82,7 @@ export default {
   position: relative;
   float: left;
   width: 49%;
-  height: 460px;
+  height: 300px;
   border: 1px solid darkslategrey;
   margin-bottom: 10px;
 }
@@ -88,7 +91,7 @@ export default {
   position: relative;
   float: left;
   width: 98%;
-  height: 250px;
+  height: 450px;
   border: 1px solid darkslategrey;
 }
 
@@ -96,7 +99,7 @@ export default {
   position: relative;
   float: left;
   width: 98%;
-  height: 200px;
+  height: 180px;
   border-right: 1px solid darkslategrey;
   border-bottom: 1px solid darkslategrey;
   border-left: 1px solid darkslategrey;

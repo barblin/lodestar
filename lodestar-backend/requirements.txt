@@ -1,7 +1,7 @@
 networkx==2.5.1
 notebook==6.4.0
 jupyter==1.0.0
-numpy==1.16.5
+numpy==1.17
 matplotlib==3.4.2
 pandas==1.2.0
 sklearn2==0.0.13
@@ -12,3 +12,5 @@ numba==0.53.1
 flask==2.0.1
 shapely==1.7.1
 astropy==4.3.post1
+plotly==1.16.0
+nglpy==1.1.2

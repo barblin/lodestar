@@ -13,7 +13,9 @@ import {
     faDrawPolygon,
     faDisease,
     faSearchPlus,
-    faVectorSquare
+    faVectorSquare,
+    faBraille,
+    faDownload
 } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import VueNextSelect from 'vue-next-select';
@@ -29,6 +31,8 @@ library.add(faDrawPolygon);
 library.add(faDisease);
 library.add(faSearchPlus);
 library.add(faVectorSquare);
+library.add(faBraille);
+library.add(faDownload);
 
 const app = createApp(App)
 

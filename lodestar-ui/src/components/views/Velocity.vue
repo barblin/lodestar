@@ -1,6 +1,7 @@
 <template>
   <ViewHeader :title='"Two velocity features clustering"' :parent=parent
-              :drawPolygon="true" :disease="true" @updateNet="updateNet" @updateScatter="updateScatter"></ViewHeader>
+              :drawPolygon="true" :disease="true" :noise="true" @updateNet="updateNet"
+              @updateScatter="updateScatter"></ViewHeader>
   <div :id="PANE_NAME" v-if="!includeThirdVelocityDimension()"></div>
   <div :id="PANE_NAME_3D" v-else></div>
   <div id="spinner" v-if="$store.getters.loadingVelocity">
@@ -13,19 +14,20 @@ import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import ViewHeader from "../nav/ViewHeader.vue";
 import * as d3 from "d3";
 import {includeThirdVelocityDimension} from "../../services/dimension-util";
+import {col_map} from "../../services/colors";
 
 const PANE_NAME = "velocity_pane"
 const PANE_NAME_3D = "velocity_pane_3D"
 
 export default {
   name: "VelocityPlot",
-  props: ['parent', 'drawNet', 'drawScatter', 'netData', 'scatData'],
+  props: ['parent', 'drawNet', 'drawScatter', 'netData', 'scatData', 'colorLabels'],
   components: {
     ScaleLoader,
     ViewHeader
   },
   mounted() {
-    if(this.$store.getters.velocityScatterData) {
+    if (this.$store.getters.velocityScatterData) {
       this.draw(this.$store.getters.velocityScatterData)
     }
   },
@@ -40,6 +42,9 @@ export default {
       this.draw(this.$store.getters.velocityScatterData)
     },
     drawScatter: function () {
+      this.draw(this.$store.getters.velocityScatterData)
+    },
+    colorLabels: function () {
       this.draw(this.$store.getters.velocityScatterData)
     },
     netData: function (data) {
@@ -176,6 +181,14 @@ export default {
         let maxy = 0;
 
         for (let i = 0; i < data.length; i++) {
+          if (this.colorLabels.length <= i) {
+            data[i].label = col_map[0]
+          } else {
+            data[i].label = this.colorLabels[i]
+          }
+        }
+
+        for (let i = 0; i < data.length; i++) {
           let row = data[i];
           if (row.x < minx) {
             minx = row.x
@@ -222,7 +235,9 @@ export default {
               return y(d.y);
             })
             .attr("r", 1.5)
-            .style("fill", "#69b3a2")
+            .style("fill", function (d) {
+              return d.label;
+            })
       }
     }
   }

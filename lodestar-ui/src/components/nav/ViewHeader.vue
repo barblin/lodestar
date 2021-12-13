@@ -3,14 +3,14 @@
     <span class="view-header-title">{{ title }}</span>
     <span class="toolbar">
       <div class="tooltip">
-        <div class="tooltip">
         <font-awesome-icon class="tool select-red" v-if="exclude" v-on:click="exclusiveSelect" icon="vector-square"/>
-        <span class="tooltiptext">Inclusive select clusters</span>
-      </div>
-      <div class="tooltip">
-        <font-awesome-icon class="tool select-green" v-if="include" v-on:click="inclusiveSelect" icon="vector-square"/>
         <span class="tooltiptext">Exclude select clusters</span>
       </div>
+      <!--<div class="tooltip">
+        <font-awesome-icon class="tool select-green" v-if="include" v-on:click="inclusiveSelect" icon="vector-square"/>
+        <span class="tooltiptext">Exclude select clusters</span>
+      </div>-->
+      <div class="tooltip">
         <font-awesome-icon class="tool" v-if="trash" v-on:click="trashCallback" icon="trash"/>
         <span class="tooltiptext">Clear current selection</span>
       </div>
@@ -36,6 +36,18 @@
         <span v-if="!isModeAlpha()" class="tooltiptext">Open change alpha value</span>
         <span v-else class="tooltiptext">Close change alpha value</span>
       </div>
+      <div class="tooltip">
+        <font-awesome-icon class="tool" v-if="noise" v-on:click="toggleNoise" icon="braille"/>
+        <span class="tooltiptext">Toogle noise</span>
+      </div>
+      <div class="tooltip" v-if="$store.getters.level != null">
+        <a :href="'http://localhost:5000/api/v1/exports/' + $store.getters.currentResource + '?level=' + $store.getters.level"
+           :download="$store.getters.currentResource + '_labeled.csv'"
+        >
+          <font-awesome-icon class="tool" icon="download"/>
+        </a>
+        <span class="tooltiptext">Export current state</span>
+      </div>
       <!--
       <div class="tooltip">
         <font-awesome-icon class="tool" v-if="parentSelected()" v-on:click="minimize" icon="compress-arrows-alt"/>
@@ -50,11 +62,12 @@
 <script>
 
 import {modes} from "../../services/modes";
+import {computeColorLabels} from "../../services/colors";
 
 export default {
   name: "Header",
   props: ['title', 'trash', 'branch', 'trashCallback', 'selector', 'parent', 'drawPolygon', 'disease', 'inspect', 'alpha',
-    'include', 'exclude'],
+    'include', 'exclude', 'noise', 'fileExport'],
   components: {},
   methods: {
     updateNet() {
@@ -78,11 +91,20 @@ export default {
     isModeAlpha() {
       return this.$store.getters.currentMode == modes.ALPHA;
     },
-    inclusiveSelect() {
+    /*inclusiveSelect() {
       this.$store.commit('updateSelectInclude', true)
-    },
+    },*/
     exclusiveSelect() {
-      this.$store.commit('updateSelectInclude', false)
+      this.$store.commit('updateSelectExclude', false)
+    },
+    toggleNoise() {
+      this.$store.commit('updateNoise', !this.$store.getters.noise)
+      this.$store.commit('updateColorLabels', computeColorLabels(this.$store.getters.labels,
+          this.$store.getters.colorMap,
+          this.$store.getters.noise))
+    },
+    executeFileExport() {
+
     },
   }
 }
