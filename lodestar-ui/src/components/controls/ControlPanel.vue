@@ -2,9 +2,6 @@
   <div v-if="$store.getters.currentMode != modes.CLUSTER">
     <ResourceSelector :selection="$store.getters.currentResource" :headerSelection="$store.getters.resourceHeaders[0]">
     </ResourceSelector>
-    <div v-if="$store.getters.loadingNetwork" class="center">
-      <RingLoader :size="'200px'" v-if="$store.getters.loadingNetwork"></RingLoader>
-    </div>
     <div class="calculate">
       <button type="button" :disabled="$store.getters.loadingAny || !includeSecondVelocityDimension()" @click="click()"
               class="calculate">
@@ -15,17 +12,15 @@
 </template>
 
 <script>
-import {updateHrd, updateNetwork, updateSpace, updateVelocity} from "../../services/datasource";
+import {getCurrentTree, updateHrd, updateNetwork, updateSpace, updateVelocity} from "../../services/datasource";
 import {modes} from "../../services/modes";
 import ResourceSelector from "./ResourceSelector.vue";
 import {includeSecondVelocityDimension} from '../../services/dimension-util';
-import RingLoader from 'vue-spinner/src/RingLoader.vue'
 
 export default {
   name: "Plotter",
   components: {
-    ResourceSelector: ResourceSelector,
-    RingLoader
+    ResourceSelector: ResourceSelector
   },
   data: function () {
     return {
@@ -54,10 +49,5 @@ export default {
   width: 97%;
   height: 50px;
   top: 87%;
-}
-
-.center {
-  margin: auto;
-  width: 20%;
 }
 </style>

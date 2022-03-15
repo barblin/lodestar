@@ -21,8 +21,13 @@ export function includeSecondVelocityDimension() {
 }
 
 export function includeThirdVelocityDimension() {
-    return store.getters.resourceHeaders.length > 5 && store.getters.plotRadial;
+    return store.getters.resourceHeaders.length > 5;
 }
+
+export function includeThirdVelocityDimensionForBody() {
+    return store.getters.resourceHeaders.length > 5;
+}
+
 
 export function buildAll() {
     let space = buildSpaceBody()
@@ -35,7 +40,9 @@ export function buildAll() {
         v1: velocity.v1,
         v2: velocity.v2,
         v3: velocity.v3,
-        level: store.getters.level
+        rad_error: store.getters.resourceHeaders[store.getters.currentColumnSelection.rad_error],
+        level: store.getters.level,
+        alpha: store.getters.alpha
     }
 }
 
@@ -68,7 +75,7 @@ export function buildVelocityBody() {
         velocityBody.v2 = store.getters.resourceHeaders[store.getters.currentColumnSelection.v2]
     }
 
-    if (includeThirdVelocityDimension()) {
+    if (includeThirdVelocityDimensionForBody()) {
         velocityBody.v3 = store.getters.resourceHeaders[store.getters.currentColumnSelection.v3]
     }
 

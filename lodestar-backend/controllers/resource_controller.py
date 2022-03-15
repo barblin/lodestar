@@ -4,7 +4,7 @@ from flask import Blueprint
 from flask import request
 from flask import send_file
 
-from config.config import knn_densities_ssp
+from config.config import knn_densities_ssp, alpha_values
 from services.data import resource_service
 from services.export_service import export_file
 
@@ -16,9 +16,14 @@ def resources():
     return json.dumps(resource_service.list_content())
 
 
+@resource_controller.route('/api/v1/alphas')
+def alpha_levels():
+    return json.dumps(alpha_values)
+
+
 @resource_controller.route('/api/v1/density-levels')
 def density_levels():
-    return knn_densities_ssp
+    return json.dumps(knn_densities_ssp)
 
 
 @resource_controller.route('/api/v1/resources/<filename>/headers')

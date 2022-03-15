@@ -15,10 +15,12 @@
               :colorLabels="$store.getters.colorLabels"/>
   </div>
   <div :id="views.NETWORK" class="network">
-    <DensityExplorer :networkData="$store.getters.networkData" :parent="views.NETWORK"/>
+    <DensityExplorer :networkData="$store.getters.networkData" :parent="views.NETWORK"
+      :colorLabels="$store.getters.colorLabels"/>
   </div>
   <div :id="views.ALPHA" class="alpha">
-    <Alpha :parent="views.ALPHA"/>
+    <Alpha :parent="views.ALPHA" :significantRoots="$store.getters.significantRoots"
+           :max-x="$store.getters.networkData.max_x"/>
   </div>
 </template>
 
@@ -28,7 +30,7 @@ import Space from "../views/Space.vue";
 import Velocity from "../views/Velocity.vue";
 import DensityExplorer from "../views/DensityExplorer.vue";
 import Alpha from "../views/alpha/Alpha.vue";
-import {updateResources} from "../../services/datasource";
+import {getSignificantRoots, updateResources} from "../../services/datasource";
 
 export default {
   name: "ModeDefault",
@@ -46,6 +48,7 @@ export default {
   },
   mounted() {
     updateResources();
+    getSignificantRoots();
   },
 }
 </script>
@@ -99,7 +102,8 @@ export default {
   position: relative;
   float: left;
   width: 98%;
-  height: 180px;
+  height: 150px;
+  border-top: 10px solid darkgrey;
   border-right: 1px solid darkslategrey;
   border-bottom: 1px solid darkslategrey;
   border-left: 1px solid darkslategrey;

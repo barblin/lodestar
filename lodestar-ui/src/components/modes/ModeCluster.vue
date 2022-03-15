@@ -1,6 +1,8 @@
 <template>
-  <span class="details">Cluster: {{ label }}, Name: {{ name }}, Size: {{ size }}, Level: {{ level }}
-    <button type="button" class="save-exit" @click="exitClusterDetails()">Exit cluster details</button>
+  <span class="details">
+    <button type="button" class="save-exit" @click="exitClusterDetails()">Exit & Save Cluster</button>
+    Name: <input v-model="cluster_name"
+                 :placeholder="$store.getters.currentCluster.name">
   </span>
   <div :id="views.SPACE" class="space">
     <Space :parent="views.SPACE" :drawScatter="$store.getters.drawSpaceScatter"
@@ -17,14 +19,17 @@
               :scatData="$store.getters.velocityScatterData"
               :colorLabels="$store.getters.colorLabels"/>
   </div>
-  <div :id="views.NETWORK" v-if="!$store.getters.loadingNetwork" class="network">
+  <div :id="views.NETWORK" v-if="!$store.getters.loadingMain" class="network">
     <DensityExplorer :networkData="$store.getters.networkData" :parent="views.NETWORK"/>
   </div>
   <div :id="views.CLUSTER_DETAIL" class="cluster_detail">
-    <ClusterDetails :networkData="$store.getters.drawScatter" :parent="views.NETWORK"/>
+    <ClusterDetails :plotData="$store.getters.hrd" :selections="$store.getters.resourceHeaders"
+                    :parent="views.CLUSTER_DETAIL"
+                    :colorLabels="$store.getters.colorLabels"/>
   </div>
   <div :id="views.HISTOGRAMS" class="histograms">
-    <Histogram :plotData="$store.getters.velocityScatterData" :parent="views.HISTOGRAMS"/>
+    <Histogram :plotData="$store.getters.velocityScatterData" :parent="views.HISTOGRAMS"
+               :labels="$store.getters.colorLabels"/>
   </div>
 </template>
 
@@ -35,19 +40,17 @@ import Velocity from "../views/Velocity.vue";
 import DensityExplorer from "../views/DensityExplorer.vue";
 import ClusterDetails from "../views/cluster/ClusterDetails.vue";
 import Histogram from "../views/detail/Histogram.vue";
-import {updateCurrentLabels, updateResources} from "../../services/datasource";
+import {updateCurrentCluster, updateResources} from "../../services/datasource";
 import {modes} from "../../services/modes";
+import {store} from "../../store/cluster-state-store";
 
 export default {
   name: "ModeCluster",
   data() {
     return {
       updateKeys: {},
-      label: this.$store.getters.currentCluster.label,
-      name: this.$store.getters.currentCluster.name,
-      size: this.$store.getters.currentCluster.size,
-      level: this.$store.getters.currentCluster.level,
-      views: views
+      views: views,
+      cluster_name: ""
     };
   },
   components: {
@@ -57,14 +60,29 @@ export default {
     ClusterDetails,
     Histogram
   },
+  beforeUnmount() {
+    let cluster = this.$store.getters.levelSet[this.$store.getters.currentCluster.level]
+        [this.$store.getters.currentCluster.label]
+    cluster.name = this.cluster_name
+    this.$store.commit("addNode", cluster)
+    this.$store.commit('updateCurrentClusterName', this.cluster_name)
+    this.cluster_name = ""
+  },
   methods: {
     exitClusterDetails() {
+      let cluster = this.$store.getters.levelSet[this.$store.getters.currentCluster.level]
+          [this.$store.getters.currentCluster.label]
+      cluster.name = this.cluster_name
+      this.$store.commit("addNode", cluster)
+      this.$store.commit('updateCurrentClusterName', this.cluster_name)
       this.$store.commit('updateCurrentMode', modes.DEFAULT)
-      updateCurrentLabels(this.$store.getters.currentResource, {level: this.$store.getters.level})
+      updateCurrentCluster()
     }
   },
+
   mounted() {
     updateResources();
+    store.commit('updateLoadingMain', false)
   },
 }
 </script>

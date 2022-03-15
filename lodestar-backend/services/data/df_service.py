@@ -10,6 +10,7 @@ def prepare_columns(data_axes):
 
     if plot_radial:
         columns.append(data_axes["v3"])
+        columns.append(data_axes["rad_error"])
 
     return columns
 
@@ -17,7 +18,10 @@ def prepare_columns(data_axes):
 def select_dataframe(data, columns):
     df_cluster = data
     df_cluster = df_cluster[columns]
-    df_cluster.dropna()
+
+    for column in columns:
+        df_cluster[column] = df_cluster[column].fillna(
+            df_cluster[column].mean())
 
     return scale_dataframe_features(df_cluster, columns)
 
@@ -25,6 +29,8 @@ def select_dataframe(data, columns):
 def scale_dataframe_features(df_cluster, columns):
     df_cluster[columns[3:]] *= v_scaling
     df_cluster[columns[:3]] *= p_scaling
+
+    print(df_cluster)
 
     return df_cluster
 

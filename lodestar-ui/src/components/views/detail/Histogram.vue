@@ -10,12 +10,13 @@
 import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import ViewHeader from "../../nav/ViewHeader.vue";
 import * as d3 from "d3";
+import {col_map} from "../../../services/colors";
 
 const PANE_NAME = "histogram"
 
 export default {
   name: "Histogram",
-  props: ['plotData', 'parent'],
+  props: ['plotData', 'parent', 'labels'],
   components: {
     ScaleLoader,
     ViewHeader
@@ -31,6 +32,9 @@ export default {
   watch: {
     plotData: function (data) {
       this.draw(data)
+    },
+    labels: function (){
+      this.draw(this.$store.getters.velocityScatterData)
     }
   },
   methods: {
@@ -54,8 +58,13 @@ export default {
       let dataY = []
       let dataZ = []
 
+      console.log("rerender")
       for (let i = 0; i < data.length; i++) {
         let row = data[i];
+
+        if(this.labels[i] == 'rgba(162,162,162,0)'){
+          continue
+        }
 
         if (row.x < minx) {
           minx = row.x
@@ -86,14 +95,14 @@ export default {
         dataZ.push(row.z)
       }
 
-      this.histogram(dataX, minx, maxx, parent.clientWidth, 5, 30)
-      this.histogram(dataY, miny, maxy, parent.clientWidth, 5, 30)
-      this.histogram(dataZ, minz, maxz, parent.clientWidth, 5, 30)
+      this.histogram(dataX, minx, maxx, parent.clientWidth, 10, 15, 'v_alpha')
+      this.histogram(dataY, miny, maxy, parent.clientWidth, 10, 15, 'v_delta')
+      this.histogram(dataZ, minz, maxz, parent.clientWidth, 10, 25, 'radial')
     },
-    histogram(data, min, max, parentWidth, marginTop, marginBottom) {
+    histogram(data, min, max, parentWidth, marginTop, marginBottom, label) {
       const margin = {top: marginTop, right: 20, bottom: marginBottom, left: 40},
           width = parentWidth - margin.left - margin.right,
-          height = 105 - margin.top - margin.bottom;
+          height = 130 - margin.top - margin.bottom;
 
       const svg = d3.select("#" + PANE_NAME)
           .append("svg")
@@ -102,6 +111,14 @@ export default {
           .append("g")
           .attr("transform",
               "translate(" + margin.left + "," + margin.top + ")");
+
+      svg.append("text")
+          .attr("class", "x label")
+          .attr("text-anchor", "end")
+          .attr("font-size", 11)
+          .attr("x", width)
+          .attr("y", 10)
+          .text(label)
 
       var x = d3.scaleLinear()
           .domain([min, max])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
@@ -127,10 +144,14 @@ export default {
       y.domain([0, d3.max(bins, function (d) {
         return d.length;
       })]);   // d3.hist has to be called before the Y axis obviously
+
+      let leftAxis = d3.axisLeft(y).ticks(5, "f")
       svg.append("g")
-          .call(d3.axisLeft(y));
+          .call(leftAxis);
 
       // append the bar rectangles to the svg element
+      let color = this.$store.getters.levelSet[this.$store.getters.currentCluster.level]
+          [this.$store.getters.currentCluster.label].color
       svg.selectAll("rect")
           .data(bins)
           .enter()
@@ -145,7 +166,7 @@ export default {
           .attr("height", function (d) {
             return height - y(d.length);
           })
-          .style("fill", "#69b3a2")
+          .style("fill", color)
     }
   }
 }

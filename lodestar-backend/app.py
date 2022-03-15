@@ -1,5 +1,6 @@
 from flask import Flask
 
+from controllers.cluster_controller import cluster_controller
 from controllers.density_network_controller import network_controller
 from controllers.label_service import label_controller
 from controllers.resource_controller import resource_controller
@@ -15,6 +16,7 @@ app.register_blueprint(label_controller)
 app.register_blueprint(resource_controller)
 app.register_blueprint(network_controller)
 app.register_blueprint(hrd_controller)
+app.register_blueprint(cluster_controller)
 
 
 @app.route("/")
