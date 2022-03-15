@@ -13,6 +13,22 @@ export let col_map = {
     9: '#af0000',
 }
 
+
+export function createAlphaColorMap(alphasProxy, alphaNodes){
+    let alphas = Array.from(alphasProxy)
+
+    console.log(alphas)
+    console.log(alphaNodes)
+    let alphaColorMap = {}
+
+    for(let i = 0; i < alphas.length; i++){
+        alphaColorMap[alphas[i]] = createColorMap(alphaNodes[alphas[i]])
+    }
+
+    console.log(alphaColorMap)
+    return alphaColorMap
+}
+
 export function createColorMap(nodes){
     let frequencies = frequencyFromNodes(nodes)
 

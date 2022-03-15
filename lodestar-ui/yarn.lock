@@ -694,6 +694,11 @@ lodash.camelcase@^4.3.0:
   resolved "https://registry.yarnpkg.com/lodash.camelcase/-/lodash.camelcase-4.3.0.tgz#b28aa6288a2b9fc651035c7711f65ab6190331a6"
   integrity sha1-soqmKIorn8ZRA1x3EfZathkDMaY=
 
+lodash@^4.17.21:
+  version "4.17.21"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
+  integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
+
 lru-cache@^5.1.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-5.1.1.tgz#1da27e6710271947695daf6848e847f01d84b920"
@@ -729,6 +734,11 @@ normalize-path@^3.0.0, normalize-path@~3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/normalize-path/-/normalize-path-3.0.0.tgz#0dcd69ff23a1c9b11fd0978316644a0388216a65"
   integrity sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==
+
+numeral@>=2:
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/numeral/-/numeral-2.0.6.tgz#4ad080936d443c2561aed9f2197efffe25f4e506"
+  integrity sha1-StCAk21EPCVhrtnyGX7//iX05QY=
 
 path-parse@^1.0.6:
   version "1.0.7"
@@ -906,6 +916,11 @@ vue-next-select@^2.10.1:
   version "2.10.1"
   resolved "https://registry.yarnpkg.com/vue-next-select/-/vue-next-select-2.10.1.tgz#5f1a7fad1b542c249bb33a14b9eec867e964c407"
   integrity sha512-qyAij4Skz8eWzYiDScrIuz+xChnUsCNomxSdp3yogRB/IWS4uJ5z9SIvbn1uclVdYlQrFEf3f0vu/VYI1FRRIQ==
+
+vue-numerals@^4.0.6:
+  version "4.0.6"
+  resolved "https://registry.yarnpkg.com/vue-numerals/-/vue-numerals-4.0.6.tgz#1775b9539509829eb579d44971080a6e390fd66b"
+  integrity sha512-MT/Qi2vPrN6xhYrQoEct7blDxZ1+BIHhuDq2GuFvCNgegj6dsc7mrtgaet+h70CLYqJffONsgdOcmJC1Lrsx5Q==
 
 vue-sidebar-menu@^5.0.1:
   version "5.0.1"

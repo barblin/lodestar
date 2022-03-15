@@ -1,13 +1,12 @@
 import {store} from '../store/cluster-state-store'
 import axios from "axios";
 import * as d3 from "d3";
-import * as data from './mock-data.json';
 import {buildAll, buildSpaceBody, buildVelocityBody} from "./dimension-util";
 import {modes} from "./modes";
-import {computeColorLabels, createColorMap} from "./colors";
+import {computeColorLabels, createAlphaColorMap, createColorMap} from "./colors";
+import {cloneDeep} from "lodash/lang";
 
 export const host = "http://localhost:5000/api/v1/"
-
 
 function fetchData(endpoint, callback, onFinally) {
     axios.get(host + endpoint)
@@ -39,6 +38,23 @@ export function updateResources() {
         })
 }
 
+export function updateAlphas() {
+    fetchData("alphas",
+        resp => {
+            store.commit('updateAlphas', resp.data)
+        }, () => {
+        })
+}
+
+export function getSignificantRoots() {
+    fetchData("trees/significant/roots",
+        resp => {
+            console.log(resp)
+            store.commit('updateSignificantRoots', resp.data)
+        }, () => {
+        })
+}
+
 export function updateDensityLevels() {
     fetchData("density-levels",
         resp => {
@@ -48,32 +64,58 @@ export function updateDensityLevels() {
 }
 
 export function updateResourceHeaders(filename) {
-    fetchData("resources/" + filename + "/headers",
-        resp => {
-            store.commit('updateResourceHeaders', resp.data)
-        }, () => {
-        })
+    fetchData("resources/" + filename + "/headers", resp => {
+        store.commit('updateResourceHeaders', resp.data)
+    }, () => {
+    })
 }
 
+export function getCurrentTree() {
+    postData("trees/current", resp => {
+        let response = cloneDeep(resp.data)
+        let cluster_level_info = response.node_level_clusters
+        let allPositions = response.pos
+
+        store.commit('updateColorMap',
+            createColorMap(cluster_level_info))
+
+        for (const [key, value] of Object.entries(allPositions)) {
+            let node = cluster_level_info[key]
+            store.commit("addNode", {
+                level: node[0],
+                label: node[2],
+                color: store.getters.colorMap[node[2]],
+                name: node[2],
+                size: node[1]
+            })
+        }
+
+        store.commit('updateNetworkData', response)
+    }, () => {
+        store.commit('updateLoadingMain', false);
+    }, buildAll())
+}
+
+export function getAllTrees() {
+    fetchData("trees", resp => {
+        let response = cloneDeep(resp.data)
+
+        store.commit('updateAlphaColorMap',
+            createAlphaColorMap(store.getters.alphas, response))
+    }, () => {})
+}
+
+
 export function updateNetwork(id) {
-    store.commit('updateLoadingNetwork', true)
-    store.commit('updateErroredNetwork', false)
+    store.commit('updateLoadingMain', true)
+    store.commit('updateErroredMain', false)
     store.commit('updateNetworkData', {id: null})
 
-    store.commit('updateNetworkData', data)
-    store.commit('updateColorMap', createColorMap(data.node_level_clusters))
-    store.commit('updateLoadingNetwork', false);
-    store.commit('updateCurrentMode', modes.DEFAULT)
-
-    /*postData("networks/" + id,
-        resp => {
-            store.commit('updateNetworkData', resp.data)
-            store.commit('updateCurrentMode', modes.DEFAULT)
-            store.commit('updateColorMap', createColorMap(resp.data.node_level_clusters))
-        },
-        () => {
-            store.commit('updateLoadingNetwork', false);
-        }, buildAll())*/
+    postData("trees/" + id, resp => {
+        store.commit('updateCurrentMode', modes.DEFAULT)
+    }, () => {
+        getCurrentTree();
+    }, buildAll())
 }
 
 export function updateSpace(id, current_cluster = null) {
@@ -104,37 +146,44 @@ export function updateVelocity(id) {
         }, buildVelocityBody())
 }
 
-export function updateCurrentLabels(id, coords) {
+export function updateCurrentLabels(params) {
     store.commit('updateLoadingSpace', true)
     store.commit('updateErroredSpace', false)
     store.commit('updateLoadingVelocity', true)
     store.commit('updateErroredVelocity', false)
 
-    postData("labels/" + id,
-        resp => {
-            let data = Array.from(resp.data)
-            store.commit('updateLabels', data)
-            store.commit('updateColorLabels', computeColorLabels(resp.data,
-                store.getters.colorMap, store.getters.noise))
-            let cache = store.getters.levelCache
-            cache[coords] = data
-            store.commit('updateLevelCache', cache);
-        },
-        () => {
-            store.commit('updateLoadingVelocity', false);
-            store.commit('updateLoadingSpace', false);
-        }, coords)
+    postData("labels", resp => {
+        let data = Array.from(resp.data)
+        store.commit('updateLabels', data)
+        store.commit('updateColorLabels',
+            computeColorLabels(resp.data, store.getters.colorMap,
+                store.getters.noise))
+    }, () => {
+        store.commit('updateLoadingVelocity', false);
+        store.commit('updateLoadingSpace', false);
+    }, params)
 }
 
-export function updateLabels(id, level) {
-    postData("labels/" + id,
-        resp => {
-            let cache = store.getters.levelCache
-            cache[level] = Array.from(resp.data)
-            store.commit('updateLevelCache', cache);
-        },
-        () => {
-        }, level)
+export function updateCurrentCluster() {
+    store.commit('updateLoadingSpace', true)
+    store.commit('updateErroredSpace', false)
+    store.commit('updateLoadingVelocity', true)
+    store.commit('updateErroredVelocity', false)
+
+    postData("levels/" + store.getters.level + "/cluster/"
+        + store.getters.currentCluster.label, resp => {
+        let data = Array.from(resp.data)
+        store.commit('updateLabels', data)
+        store.commit('updateColorLabels',
+            computeColorLabels(resp.data, store.getters.colorMap,
+                store.getters.noise))
+    }, () => {
+        store.commit('updateLoadingVelocity', false);
+        store.commit('updateLoadingSpace', false);
+    }, {
+        custom_label: store.getters.currentCluster.label,
+        custom_label_name: store.getters.currentCluster.name
+    })
 }
 
 export function updateHrd(id) {

@@ -9,3 +9,13 @@ export let views = {
     CLUSTER_DETAIL: "cluster_detail",
     HISTOGRAMS: "histograms",
 }
+
+export function percentChange(solution, screen) {
+    if (solution < screen) {
+        return screen / solution
+    } else if (screen < solution) {
+        return screen / solution;
+    }
+
+    return -1
+}

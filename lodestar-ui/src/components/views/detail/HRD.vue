@@ -7,8 +7,8 @@
   <select id="selectY">
     <option value="" disabled selected>Spectral Class</option>
   </select>
-  <div id="spinner" v-if="$store.getters.loadingHrd">
-    <ScaleLoader v-if="$store.getters.loadingHrd"></ScaleLoader>
+  <div id="spinner" v-if="$store.getters.loadingAny">
+    <ScaleLoader v-if="$store.getters.loadingAny"></ScaleLoader>
   </div>
 </template>
 
@@ -17,12 +17,13 @@ import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import ViewHeader from "../../nav/ViewHeader.vue";
 import * as d3 from "d3";
 import {updateHrd,} from "../../../services/datasource";
+import {col_map} from "../../../services/colors";
 
 const PANE_NAME = "hrd"
 
 export default {
   name: "HRD",
-  props: ['plotData', 'parent', 'selections'],
+  props: ['plotData', 'parent', 'selections', 'colorLabels'],
   components: {
     ScaleLoader,
     ViewHeader
@@ -108,6 +109,12 @@ export default {
         if (maxy < row.y) {
           maxy = row.y
         }
+
+        if (this.colorLabels.length <= i) {
+          data[i].label = col_map[0]
+        } else {
+          data[i].label = this.colorLabels[i]
+        }
       }
 
       // Add X axis
@@ -121,7 +128,7 @@ export default {
       // Add Y axis
       var y = d3.scaleLinear()
           .domain([miny, maxy])
-          .range([height, 0]);
+          .range([0, height]);
       svg.append("g")
           .call(d3.axisLeft(y));
 
@@ -138,7 +145,9 @@ export default {
             return y(d.y);
           })
           .attr("r", 1.5)
-          .style("fill", "#587e1a")
+          .style("fill", function (d) {
+            return d.label;
+          })
 
       let self = this;
       d3.select("#selectX").on("change", function (d) {

@@ -15,9 +15,10 @@
               :colorLabels="$store.getters.colorLabels"/>
   </div>
   <div :id="views.HRD" class="hrd">
-    <HRD :parent="views.HRD" :plotData="$store.getters.hrd" :selections="$store.getters.resourceHeaders"/>
+    <HRD :parent="views.HRD" :plotData="$store.getters.hrd" :selections="$store.getters.resourceHeaders"
+         :color-labels="$store.getters.colorLabels"/>
   </div>
-  <div :id="views.NETWORK" v-if="!$store.getters.loadingNetwork" class="network">
+  <div :id="views.NETWORK" v-if="!$store.getters.loadingMain" class="network">
     <DensityExplorer :networkData="$store.getters.networkData" :parent="views.NETWORK"/>
   </div>
 </template>
@@ -28,7 +29,7 @@ import Space from "../views/Space.vue";
 import Velocity from "../views/Velocity.vue";
 import HRD from "../views/detail/HRD.vue";
 import DensityExplorer from "../views/DensityExplorer.vue";
-import {updateResourceHeaders, updateResources} from "../../services/datasource";
+import {getAllTrees, updateResourceHeaders} from "../../services/datasource";
 
 export default {
   name: "ModeDefault",
@@ -45,6 +46,7 @@ export default {
   },
   mounted() {
     updateResourceHeaders(this.$store.getters.currentResource)
+    getAllTrees()
   }
 }
 </script>

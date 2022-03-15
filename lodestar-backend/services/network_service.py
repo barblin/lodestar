@@ -1,33 +1,56 @@
+import json
+
 import networkx as nx
 from networkx.drawing.nx_pydot import graphviz_layout
 
 from api.network_response import NetworkResponse
+from config.config import get_alpha_array, alpha_values
 from services.data.datasource import data_dict
 from services.data.df_service import prepare_columns, select_dataframe, \
     get_columns_from_dataframe_cluster
+from services.data.tree_source import store_for_alpha, get_tree
 from services.density_service import scale_space_dense_components
-from services.graph.tomato_ext_service import create_graph
+from services.significant_roots_service import collect_roots
 
 
-def get_cached_level(level):
-    return NetworkResponse()
+def get_current_tree(data):
+    alpha = data["alpha"]
+    return get_tree(str(alpha))
 
 
-def get_join_tree(filename, data_axes):
-    level = data_axes["level"]
+def get_trees():
+    trees = {}
 
-    if level is not None:
-        return recalculate_levels(filename, data_axes)
+    for alpha in alpha_values:
+        tree = json.loads(get_tree(str(alpha)))
+        trees[alpha] = tree["node_level_clusters"]
 
-    return recalculate_levels(filename, data_axes)
+    return trees
 
 
-def recalculate_levels(filename, data_axes):
+def get_significant_roots():
+    unique_roots = set(())
+
+    for alpha in alpha_values:
+        tree = json.loads(get_tree(str(alpha)))
+        roots = collect_roots(tree["node_level_clusters"])
+        unique_roots.update(roots)
+
+    return unique_roots
+
+
+def produce_join_trees(filename, data_axes):
+    for alpha in get_alpha_array():
+        response = recalculate_levels(filename, data_axes, alpha)
+        json = response.jsonify()
+        store_for_alpha(json, alpha)
+
+
+def recalculate_levels(filename, data_axes, alpha):
     columns = prepare_columns(data_axes)
     data = get_columns_from_dataframe_cluster(data_dict()[filename])
-    df_cluster = select_dataframe(data, columns)
-    res, te = create_graph(df_cluster)
-    sst = scale_space_dense_components(data, te, columns, df_cluster)
+    df_cluster = select_dataframe(data, columns[:5])
+    sst = scale_space_dense_components(data, columns, df_cluster, alpha)
 
     ssp_clusters = sst.scale_space_clusters
     g_ssp = nx.Graph()

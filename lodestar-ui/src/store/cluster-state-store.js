@@ -6,31 +6,37 @@ export const store = createStore({
         currentViewSelection: null,
         currentResource: "Choose resource file",
         currentColumnSelection: {
-            s1: 0,
-            s2: 1,
-            s3: 2,
-            v1: 3,
-            v2: 4,
-            v3: 5
+            s1: 5,
+            s2: 7,
+            s3: 9,
+            v1: 12,
+            v2: 14,
+            v3: 66,
+            rad_error: 67
         },
         hrdSelection: {
             x: "ra",
             y: "dec"
         },
         level: 0,
+        alpha: 0.05,
         maxLevel: 0,
-        levelCache: {},
         noise: false,
         labels: [],
         colorLabels: [],
         colorMap: {},
+        alphaColorMap: {},
         currentMode: modes.INPUT,
         currentCluster: {level: null, label: null, user_label: null, name: null, size: 0},
+        levelSet: {},
+        densityLevels: [],
+        alphas: [],
+        significantRoots: [],
 
         loadingScatter: false,
         erroredScatter: false,
-        loadingNetwork: false,
-        erroredNetwork: false,
+        loadingMain: false,
+        erroredMain: false,
         loadingSpace: false,
         erroredSpace: false,
         loadingVelocity: false,
@@ -79,11 +85,11 @@ export const store = createStore({
         updateErroredScatter(state, hadError) {
             state.erroredScatter = hadError
         },
-        updateLoadingNetwork(state, isLoading) {
-            state.loadingNetwork = isLoading
+        updateLoadingMain(state, isLoading) {
+            state.loadingMain = isLoading
         },
-        updateErroredNetwork(state, hadError) {
-            state.erroredNetwork = hadError
+        updateErroredMain(state, hadError) {
+            state.erroredMain = hadError
         },
         updateLoadingHrd(state, isLoading) {
             state.loadingHrd = isLoading
@@ -112,8 +118,8 @@ export const store = createStore({
         updateColorMap(state, map) {
             state.colorMap = map
         },
-        updateLevelCache(state, cache) {
-            state.levelCache = cache
+        updateAlphaColorMap(state, map) {
+            state.alphaColorMap = map
         },
         updateColorLabels(state, colorLabels) {
             state.colorLabels = colorLabels
@@ -130,7 +136,7 @@ export const store = createStore({
         updateCurrentClusterName(state, name) {
             state.currentCluster.name = name
         },
-        updateCurrentClusterSize(state, size){
+        updateCurrentClusterSize(state, size) {
             state.currentCluster.size = size
         },
         updateVelocityScatter(state, data) {
@@ -193,6 +199,27 @@ export const store = createStore({
         updateSelectExclude(state, data) {
             state.selectExclude = data
         },
+        addNode(state, node) {
+            if (!(node.level in state.levelSet)) {
+                state.levelSet[node.level] = {}
+            }
+            state.levelSet[node.level][node.label] = node
+        },
+        updateName(state, node) {
+            state.levelSet[node.level][node.label].name = node.name
+        },
+        updateDensityLevels(state, data) {
+            state.densityLevels = data
+        },
+        updateAlpha(state, data) {
+            state.alpha = data
+        },
+        updateAlphas(state, data) {
+            state.alphas = data
+        },
+        updateSignificantRoots(state, data) {
+            state.significantRoots = data
+        }
     },
     getters: {
         currentViewSelection: state => state.currentViewSelection,
@@ -200,8 +227,8 @@ export const store = createStore({
         currentColumnSelection: state => state.currentColumnSelection,
         hrdSelection: state => state.hrdSelection,
 
-        loadingNetwork: state => state.loadingNetwork,
-        erroredNetwork: state => state.erroredNetwork,
+        loadingMain: state => state.loadingMain,
+        erroredMain: state => state.erroredMain,
         loadingSpace: state => state.loadingSpace,
         erroredSpace: state => state.erroredSpace,
         loadingVelocity: state => state.loadingVelocity,
@@ -209,7 +236,7 @@ export const store = createStore({
         loadingHrd: state => state.loadingHrd,
         erroredHrd: state => state.erroredHrd,
 
-        loadingAny: state => state.loadingSpace || state.loadingNetwork || state.loadingVelocity,
+        loadingAny: state => state.loadingSpace || state.loadingMain || state.loadingVelocity || state.loadingHrd,
 
         networkData: state => state.networkData,
         spaceData: state => state.spaceData,
@@ -222,14 +249,14 @@ export const store = createStore({
         width: state => state.width,
         height: state => state.height,
         level: state => state.level,
+        alpha: state => state.alpha,
+        alphas: state => state.alphas,
         maxLevel: state => state.maxLevel,
         noise: state => state.noise,
         labels: state => state.labels,
-        levelCache: (state) => (level) => {
-            return state.levelCache[level]
-        },
         colorLabels: state => state.colorLabels,
         colorMap: state => state.colorMap,
+        alphaColorMap: state => state.alphaColorMap,
         currentCluster: state => state.currentCluster,
 
         resources: state => state.resources,
@@ -245,5 +272,7 @@ export const store = createStore({
         plotRadial: state => state.plotRadial,
         inspectCluster: state => state.inspectCluster,
         selectExclude: state => state.selectExclude,
+        levelSet: state => state.levelSet,
+        significantRoots: state => state.significantRoots
     }
 })
