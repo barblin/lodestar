@@ -16,16 +16,11 @@ export let col_map = {
 
 export function createAlphaColorMap(alphasProxy, alphaNodes){
     let alphas = Array.from(alphasProxy)
-
-    console.log(alphas)
-    console.log(alphaNodes)
     let alphaColorMap = {}
 
     for(let i = 0; i < alphas.length; i++){
         alphaColorMap[alphas[i]] = createColorMap(alphaNodes[alphas[i]])
     }
-
-    console.log(alphaColorMap)
     return alphaColorMap
 }
 
@@ -43,7 +38,7 @@ export function createColorMap(nodes){
             colorMap[labels[i]] = col_map[index]
             index += 1
         } else {
-            colorMap[labels[i]] = 'rgba(0,0,0,0.5)'
+            colorMap[labels[i]] = 'rgb(0,0,0)'
         }
     }
 
@@ -52,6 +47,7 @@ export function createColorMap(nodes){
 
 export function computeColorLabels(labels, colorMap, includeNoise) {
     labels = Array.from(labels)
+
 
     let colorLabels = []
     for (let i = 0; i < labels.length; i++) {

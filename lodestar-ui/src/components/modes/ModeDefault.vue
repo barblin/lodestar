@@ -1,4 +1,7 @@
 <template>
+  <ViewHeader class="header" :title='"Density Navigation - Use zooming and panning to navigate"' :branch="true" :trash="true"
+              :trash-callback="trashCallback" :alpha="true" :exclude="true" :include="true" :noise="true"
+              :inspect="true" :disease="true" :draw-polygon="true"></ViewHeader>
   <div :id="views.SPACE" class="space">
     <Space :parent="views.SPACE" :drawScatter="$store.getters.drawSpaceScatter"
            :drawNet="$store.getters.drawSpaceNet"
@@ -19,7 +22,8 @@
          :color-labels="$store.getters.colorLabels"/>
   </div>
   <div :id="views.NETWORK" v-if="!$store.getters.loadingMain" class="network">
-    <DensityExplorer :networkData="$store.getters.networkData" :parent="views.NETWORK"/>
+    <DensityExplorer :networkData="$store.getters.networkData" :parent="views.NETWORK"
+                     :labels="$store.getters.labels"/>
   </div>
 </template>
 
@@ -27,6 +31,7 @@
 import {views} from "../../services/views";
 import Space from "../views/Space.vue";
 import Velocity from "../views/Velocity.vue";
+import ViewHeader from "../nav/ViewHeader.vue";
 import HRD from "../views/detail/HRD.vue";
 import DensityExplorer from "../views/DensityExplorer.vue";
 import {getAllTrees, updateResourceHeaders} from "../../services/datasource";
@@ -42,7 +47,8 @@ export default {
     Space,
     Velocity,
     DensityExplorer,
-    HRD
+    HRD,
+    ViewHeader,
   },
   mounted() {
     updateResourceHeaders(this.$store.getters.currentResource)
@@ -53,6 +59,10 @@ export default {
 
 
 <style lang="css" scoped>
+#header {
+  order: -1
+}
+
 #space {
   order: 0
 }
@@ -75,7 +85,7 @@ export default {
   width: 50%;
   height: 480px;
   border: 1px solid darkslategrey;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   margin-right: 5px;
 }
 
@@ -86,7 +96,7 @@ export default {
   width: 30%;
   height: 480px;
   border: 1px solid darkslategrey;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 
@@ -96,7 +106,7 @@ export default {
   width: 17%;
   height: 480px;
   border: 1px solid darkslategrey;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 .network {
@@ -105,7 +115,7 @@ export default {
   width: 98%;
   height: 430px;
   border: 1px solid darkslategrey;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 </style>

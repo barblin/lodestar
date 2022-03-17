@@ -49,7 +49,6 @@ export function updateAlphas() {
 export function getSignificantRoots() {
     fetchData("trees/significant/roots",
         resp => {
-            console.log(resp)
             store.commit('updateSignificantRoots', resp.data)
         }, () => {
         })
@@ -182,7 +181,8 @@ export function updateCurrentCluster() {
         store.commit('updateLoadingSpace', false);
     }, {
         custom_label: store.getters.currentCluster.label,
-        custom_label_name: store.getters.currentCluster.name
+        custom_label_name: store.getters.currentCluster.name,
+        alpha: store.getters.alpha
     })
 }
 

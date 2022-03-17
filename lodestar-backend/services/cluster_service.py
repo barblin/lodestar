@@ -6,10 +6,11 @@ from services.data.session_source import get_session, get_session_name, \
 def update_cluster(lid, cid, data):
   custom_label = data["custom_label"]
   custom_label_name = data["custom_label_name"]
+  alpha = data["alpha"]
 
   print(custom_label_name)
 
-  x = get_session(lid)
+  x = get_session(lid, alpha)
 
   index = x.index
   cluster_index = index[x[COL_LABEL] == float(cid)]

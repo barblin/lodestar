@@ -1,7 +1,4 @@
 <template>
-  <ViewHeader :title='"Two velocity features clustering"' :parent=parent
-              :drawPolygon="true" :disease="true" :noise="true" @updateNet="updateNet"
-              @updateScatter="updateScatter"></ViewHeader>
   <div :id="PANE_NAME" v-if="true"></div>
   <div :id="PANE_NAME_3D" v-else></div>
   <div id="spinner" v-if="$store.getters.loadingVelocity">
@@ -77,7 +74,7 @@ export default {
 
       d3.select("#" + PANE_NAME).selectAll("svg").remove();
 
-      const margin = {top: 10, right: 10, bottom: 50, left: 35},
+      const margin = {top: 10, right: 10, bottom: 20, left: 35},
           width = parent.clientWidth - margin.left - margin.right,
           height = parent.clientHeight - margin.top - margin.bottom;
 

@@ -18,7 +18,6 @@ body {
   font-size: 18px;
   line-height: 1.5;
   font-weight: 400;
-  margin-top: 20px;
 }
 
 .dashboard {

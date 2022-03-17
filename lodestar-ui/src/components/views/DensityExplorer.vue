@@ -1,7 +1,4 @@
 <template>
-  <ViewHeader :title='"Density Navigation - Use zooming and panning to navigate"' :branch="true" :trash="true"
-              :trash-callback="trashCallback" :alpha="true" :exclude="true" :include="true"
-              :parent=parent></ViewHeader>
   <div :id="PANE_NAME">
     <div id="spinner" v-if="$store.getters.loadingMain">
       <ScaleLoader v-if="$store.getters.loadingMain"></ScaleLoader>
@@ -16,6 +13,7 @@ import ViewHeader from "../nav/ViewHeader.vue";
 import {modes} from "../../services/modes"
 import {updateCurrentLabels} from "../../services/datasource";
 import {percentChange} from "../../services/views";
+import {createLevelLabels} from "../../services/d3-tools";
 
 const PANE_NAME = "network_pane"
 
@@ -26,7 +24,7 @@ let rect = {
 
 export default {
   name: "DensityExplorer",
-  props: ['networkData', 'parent'],
+  props: ['networkData', 'parent', 'filterForCluster'],
   data: function () {
     return {
       PANE_NAME: PANE_NAME,
@@ -65,7 +63,7 @@ export default {
 
       let parent = document.getElementById(this.parent)
 
-      const margin = {top: 10, right: 20, bottom: 30, left: 10},
+      const margin = {top: 10, right: 20, bottom: 0, left: 10},
           width = parent.clientWidth - margin.left - margin.right,
           height = parent.clientHeight - margin.top - margin.bottom;
 
@@ -81,9 +79,30 @@ export default {
           .on("mousedown", this.mousedown)
           .on("mouseup", this.mouseup);
 
+
       let heights = new Set();
+      let remainingEdges = []
+      let remainingNodes = []
+
       for (const [node, location] of Object.entries(network.pos)) {
         heights.add(location[1])
+      }
+
+      for (const [node, node_level_clusters] of Object.entries(network.node_level_clusters)) {
+        if (this.filterForCluster) {
+          if (node_level_clusters[2] === this.$store.getters.currentCluster.label) {
+            if (network.edges[node] !== undefined) {
+              remainingEdges.push([parseInt(node), network.edges[node]])
+            }
+            remainingNodes.push([parseInt(node), network.pos[node]])
+          }
+
+        } else {
+          if (network.edges[node] !== undefined) {
+            remainingEdges.push([parseInt(node), network.edges[node]])
+          }
+          remainingNodes.push([parseInt(node), network.pos[node]])
+        }
       }
 
       let level = 0;
@@ -93,12 +112,12 @@ export default {
         level += 1
       }
 
-      let edges = this.createEdges(network);
+      let edges = this.createEdges(network, remainingEdges);
       this.tooltip = this.createTooltip();
-      let circles = this.createNodes(network, this.$store, this.tooltip);
+      let circles = this.createNodes(remainingNodes, network, this.$store, this.tooltip);
       let levelLines = this.createLevelLines(parent, heightDict)
       let levelButton = this.createLevelButtons(heightDict, this.$store)
-      let levelLabels = this.createLevelLabels(heightDict)
+      let levelLabels = createLevelLabels(this.svg, Object.entries(heightDict), -13)
       let heightFactor = this.heightFactor;
 
       let store = this.$store;
@@ -107,49 +126,16 @@ export default {
       this.svg.call(zoom)
 
     },
-    trashCallback() {
-      rects.forEach(curRect => {
-        curRect.node().remove();
-      })
-      circles.forEach(circle => {
-        circle.attr("fill", '#69b3a2')
-      })
-      rects = []
-    },
-    selectCluster(node) {
-      this.$store.commit('updateLoadingMain', true)
-      this.$store.commit('updateErroredMain', false)
+    createNodes(nodes, network, store, tooltip) {
+      console.log(nodes)
+      console.log(network)
 
-      let level = node[0], label = node[2]
-      let cluster = this.$store.getters.levelSet[level][label]
-
-      this.$store.commit('updateCurrentMode', modes.CLUSTER)
-      this.$store.commit('updateCurrentClusterLabel', cluster.label)
-      this.$store.commit('updateCurrentClusterName', cluster.name != null ? cluster.name : cluster.label)
-      this.$store.commit('updateCurrentClusterSize', cluster.size)
-      this.$store.commit('updateCurrentClusterLevel', cluster.level)
-      this.$store.commit('updateLevel', cluster.level)
-
-      updateCurrentLabels({
-        level: this.$store.getters.level,
-        current_cluster: this.$store.getters.currentCluster.label,
-        alpha: this.$store.getters.alpha
-      })
-    },
-    correctedWidth(width) {
-      return (width) * this.widthFactor + 20
-    },
-    correctedHeight(height) {
-      return (height) * this.heightFactor + 10
-    },
-    createNodes(network, store, tooltip) {
       let transformed_network = Object.entries(network)
       let cluster_level_info = Object.entries(transformed_network[2][1])
-      let allPositions = Object.entries(network.pos)
 
       return this.svg.append("g")
           .selectAll("circle")
-          .data(allPositions)
+          .data(nodes)
           .enter()
           .append("circle")
           .attr("fill", (d) => {
@@ -168,6 +154,7 @@ export default {
             let node = Array.from(cluster_level_info[d.target.__data__[0]][1])
             let level = node[0], label = node[2]
 
+            store.commit('updateCurrentClusterLabel', label)
             let name = store.getters.levelSet[level][label].name
 
             tooltip
@@ -186,10 +173,10 @@ export default {
             tooltip.style("opacity", 0)
           })
     },
-    createEdges(network) {
+    createEdges(network, edges) {
       return this.svg.append('g')
           .selectAll("line")
-          .data(Object.entries(network.edges))
+          .data(edges)
           .enter()
           .append('line')
           .style("stroke", "black")
@@ -219,6 +206,7 @@ export default {
           .data(Object.entries(heights))
           .enter()
           .append("line")
+          .attr("class", "levelButtons")
           .style("stroke", ("3, 3"))
           .style("stroke", "rgba(105,179,162,0.80)")
           .style("stroke-width", 15)
@@ -248,9 +236,10 @@ export default {
             let currentLevel = String(d.target.__data__[1])
 
             if (storedLevel == currentLevel) {
-              store.commit('updateLevel', null)
               d3.select(this).style("stroke", "rgba(105,179,162,0.80)");
             } else {
+              d3.selectAll('.levelButtons').style("stroke", "rgba(105,179,162,0.80)")
+
               store.commit('updateLevel', currentLevel)
               updateCurrentLabels({
                 level: store.getters.level,
@@ -258,20 +247,6 @@ export default {
               })
               d3.select(this).style("stroke", "rgba(0,255,0,0.67)");
             }
-          })
-    },
-    createLevelLabels(heights) {
-      return this.svg.append('g')
-          .selectAll("text")
-          .data(Object.entries(heights))
-          .enter()
-          .append("text")
-          .attr("x", 1)
-          .attr("y", (d) => (parseInt(d[0]) + 13) * this.heightFactor)
-          .attr("dy", ".45em")
-          .attr("font-size", "11px")
-          .text(function (d) {
-            return d[1]
           })
     },
     mousemove(event, d) {
@@ -283,59 +258,6 @@ export default {
     mouseup(event) {
       this.svg.on("mousemove", null);
       rects.push(rect)
-
-      /*circles.forEach(circle => {
-        circle.attr("fill", '#69b3a2')
-        rects.forEach(curRect => {
-          let circBox = circle.node().getBBox();
-          let rectBox = curRect.node().getBBox();
-
-          let minX = rectBox.x
-          let maxX = rectBox.x + rectBox.width
-
-          let minY = rectBox.y
-          let maxY = rectBox.y + rectBox.height
-
-          let color = curRect.attr("fill") == "red" ? "red" : "green"
-          if (minX <= circBox.x && circBox.x <= maxX && minY <= circBox.y && circBox.y <= maxY) {
-            circle.attr("fill", color)
-          }
-        })
-      });*/
-    },
-    dragmove(event, d) {
-      d3.select(this).select('circle')
-          .attr("cy", Math.min(height, Math.max(0, event.y)))
-      d3.select(this).select('line')
-          .attr("y1", Math.min(height, Math.max(0, event.y)))
-          .attr("y2", Math.min(height, Math.max(0, event.y)))
-    },
-    mousedown(event, d) {
-      /*var m = d3.pointer(event);
-
-      let color = store.getters.selectInclude ? "lightgreen" : "red"
-      rect = this.svg.append("rect")
-          .attr("x", m[0])
-          .attr("y", m[1])
-          .attr("fill", color)
-          .attr("stroke", "grey")
-          .style("opacity", 0.2)
-          .attr("height", 0)
-          .attr("width", 0)
-          .on("contextmenu", function (event, d) {
-            event.preventDefault();
-            let cur = d3.select(this).remove()
-
-            rects.filter(function (ele) {
-              if (ele != cur) {
-              } else {
-              }
-
-              return ele != cur;
-            })
-          });
-      ;
-      this.svg.on("mousemove", mousemove);*/
     },
     createTooltip() {
       return d3.select("#" + PANE_NAME)
@@ -383,7 +305,43 @@ export default {
               });
             }
           });
-    }
+    },
+    trashCallback() {
+      rects.forEach(curRect => {
+        curRect.node().remove();
+      })
+      circles.forEach(circle => {
+        circle.attr("fill", '#69b3a2')
+      })
+      rects = []
+    },
+    selectCluster(node) {
+      console.log(node)
+
+      this.$store.commit('updateErroredMain', false)
+
+      let level = node[0], label = node[2]
+      let cluster = this.$store.getters.levelSet[level][label]
+
+      this.$store.commit('updateCurrentMode', modes.CLUSTER)
+      this.$store.commit('updateCurrentClusterLabel', cluster.label)
+      this.$store.commit('updateCurrentClusterName', cluster.name != null ? cluster.name : cluster.label)
+      this.$store.commit('updateCurrentClusterSize', cluster.size)
+      this.$store.commit('updateCurrentClusterLevel', cluster.level)
+      this.$store.commit('updateLevel', cluster.level)
+
+      updateCurrentLabels({
+        level: cluster.level,
+        current_cluster: cluster.label,
+        alpha: this.$store.getters.alpha
+      })
+    },
+    correctedWidth(width) {
+      return (width) * this.widthFactor + 20
+    },
+    correctedHeight(height) {
+      return (height) * this.heightFactor + 10
+    },
   }
 }
 
