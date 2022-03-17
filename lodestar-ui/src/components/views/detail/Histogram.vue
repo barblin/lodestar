@@ -1,5 +1,4 @@
 <template>
-  <ViewHeader :title='"3D Velocities"' :parent=parent></ViewHeader>
   <div :id="PANE_NAME"></div>
   <div id="spinner" v-if="$store.getters.loadingVelocity">
     <ScaleLoader v-if="$store.getters.loadingVelocity"></ScaleLoader>
@@ -32,13 +31,14 @@ export default {
   watch: {
     plotData: function (data) {
       this.draw(data)
-    },
-    labels: function (){
-      this.draw(this.$store.getters.velocityScatterData)
     }
   },
   methods: {
     draw(data) {
+      if(data === undefined || data === null){
+        return
+      }
+
       d3.select("#" + PANE_NAME).selectAll("svg").remove();
 
       let parent = document.getElementById(this.parent)
@@ -58,11 +58,10 @@ export default {
       let dataY = []
       let dataZ = []
 
-      console.log("rerender")
       for (let i = 0; i < data.length; i++) {
         let row = data[i];
 
-        if(this.labels[i] == 'rgba(162,162,162,0)'){
+        if (this.labels[i] == 'rgba(162,162,162,0)') {
           continue
         }
 
@@ -150,8 +149,12 @@ export default {
           .call(leftAxis);
 
       // append the bar rectangles to the svg element
-      let color = this.$store.getters.levelSet[this.$store.getters.currentCluster.level]
-          [this.$store.getters.currentCluster.label].color
+      let color = col_map[0]
+      if (this.$store.getters.levelSet[this.$store.getters.currentCluster.level]
+          [this.$store.getters.currentCluster.label] !== undefined) {
+        color = this.$store.getters.levelSet[this.$store.getters.currentCluster.level]
+            [this.$store.getters.currentCluster.label].color
+      }
       svg.selectAll("rect")
           .data(bins)
           .enter()

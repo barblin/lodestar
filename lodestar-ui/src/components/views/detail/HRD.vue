@@ -1,5 +1,4 @@
 <template>
-  <ViewHeader :title='"Hertzsprung-Russel Diagram"' :parent=parent></ViewHeader>
   <div :id="PANE_NAME"></div>
   <select id="selectX">
     <option value="" disabled selected>Magnitude</option>
@@ -51,7 +50,7 @@ export default {
         parent = document.getElementById('main')
       }
 
-      const margin = {top: 10, right: 10, bottom: 75, left: 30},
+      const margin = {top: 10, right: 10, bottom: 48, left: 30},
           width = parent.clientWidth - margin.left - margin.right,
           height = parent.clientHeight - margin.top - margin.bottom;
 

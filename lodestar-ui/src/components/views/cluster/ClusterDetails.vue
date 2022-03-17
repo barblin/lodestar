@@ -1,5 +1,4 @@
 <template>
-  <ViewHeader :title='"Cluster Details"' :parent=parent></ViewHeader>
   <span class="cluster-details">ID: {{ numeralFormat($store.getters.currentCluster.label) }}
     | Size: {{ numeralFormat($store.getters.currentCluster.size) }} | Level:
   {{ numeralFormat($store.getters.currentCluster.level) }}</span>

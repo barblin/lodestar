@@ -133,6 +133,10 @@ export default {
 
 .view-header {
   background-color: #d5e7c9;
+  width: 115%;
+  margin-left: -14px;
+  margin-top: -8px;
+  margin-bottom: 5px;
 }
 
 .view-header-title {

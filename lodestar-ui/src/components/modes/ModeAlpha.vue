@@ -1,4 +1,7 @@
 <template>
+  <ViewHeader id="header" class="header" :title='"Density Navigation - Use zooming and panning to navigate"' :branch="true" :trash="true"
+              :trash-callback="trashCallback" :alpha="true" :exclude="true" :include="true" :noise="true"
+              :inspect="true" :disease="true" :draw-polygon="true"></ViewHeader>
   <div :id="views.SPACE" class="space">
     <Space :parent="views.SPACE" :drawScatter="$store.getters.drawSpaceScatter"
            :drawNet="$store.getters.drawSpaceNet"
@@ -20,7 +23,7 @@
   </div>
   <div :id="views.ALPHA" class="alpha">
     <Alpha :parent="views.ALPHA" :significantRoots="$store.getters.significantRoots"
-           :max-x="$store.getters.networkData.max_x"/>
+           :max-x="$store.getters.networkData.max_x" :clusterLabel="$store.getters.currentCluster.label"/>
   </div>
 </template>
 
@@ -29,6 +32,7 @@ import {views} from "../../services/views";
 import Space from "../views/Space.vue";
 import Velocity from "../views/Velocity.vue";
 import DensityExplorer from "../views/DensityExplorer.vue";
+import ViewHeader from "../nav/ViewHeader.vue";
 import Alpha from "../views/alpha/Alpha.vue";
 import {getSignificantRoots, updateResources} from "../../services/datasource";
 
@@ -45,6 +49,7 @@ export default {
     Velocity,
     DensityExplorer,
     Alpha,
+    ViewHeader
   },
   mounted() {
     updateResources();
@@ -55,20 +60,24 @@ export default {
 
 
 <style lang="css" scoped>
-#space {
+#header {
   order: 0
 }
 
-#velocity {
-  order: 1;
+#space {
+  order: 1
 }
 
-#network {
+#velocity {
   order: 2;
 }
 
-#alpha {
+#network {
   order: 3;
+}
+
+#alpha {
+  order: 4;
 }
 
 .space {
@@ -77,7 +86,7 @@ export default {
   width: 50%;
   height: 300px;
   border: 1px solid darkslategrey;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   margin-right: 5px;
 }
 
@@ -87,7 +96,7 @@ export default {
   width: 49%;
   height: 300px;
   border: 1px solid darkslategrey;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 .network {

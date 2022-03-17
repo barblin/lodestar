@@ -5,11 +5,9 @@
               :searchable="true"
               :options="$store.getters.resources"
               class="nav-el"></vue-select>
-  <br><br><br>
+  <br><br>
   <!--<input class="radial" type="checkbox" id="checkbox" v-model="plotRadial">
   <label class="radial rad-label" for="checkbox">Include radial velocity</label>-->
-  <br>
-  <br>
   <br>
   <span>
     <label class="feature-label">Select alpha value</label>

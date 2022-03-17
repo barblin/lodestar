@@ -1,8 +1,5 @@
 <template>
-  <ViewHeader :title='"Three space features clustering"' :parent=parent :drawPolygon="true" :disease="true"
-              :inspect="true" :noise="true"
-              @maximize="maximize" @updateNet="updateNet" @updateScatter="updateScatter" @redraw="redraw"></ViewHeader>
-  <div :id="PANE_NAME" class="default">
+   <div :id="PANE_NAME" class="default">
     <div id="spinner" v-if="$store.getters.loadingSpace">
       <ScaleLoader v-if="$store.getters.loadingSpace"></ScaleLoader>
     </div>
@@ -76,7 +73,7 @@ export default {
         parent = document.getElementById('main')
       }
 
-      const margin = {top: 20, right: 10, bottom: 10, left: 0},
+      const margin = {top: 20, right: 10, bottom: -20, left: 0},
           width = parent.clientWidth - margin.left - margin.right,
           height = parent.clientHeight - margin.top - margin.bottom;
 

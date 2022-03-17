@@ -1,4 +1,7 @@
 <template>
+  <ViewHeader class="header" :title='"Density Navigation - Use zooming and panning to navigate"' :branch="true" :trash="true"
+              :trash-callback="trashCallback" :alpha="true" :exclude="true" :include="true" :noise="true"
+              :inspect="true" :disease="true" :draw-polygon="true"></ViewHeader>
   <span class="details">
     <button type="button" class="save-exit" @click="exitClusterDetails()">Exit & Save Cluster</button>
     Name: <input v-model="cluster_name"
@@ -20,8 +23,8 @@
               :colorLabels="$store.getters.colorLabels"/>
   </div>
   <div :id="views.NETWORK" v-if="!$store.getters.loadingMain" class="network">
-    <DensityExplorer :networkData="$store.getters.networkData" :parent="views.NETWORK"/>
-  </div>
+    <DensityExplorer :networkData="$store.getters.networkData" :parent="views.NETWORK"
+                     :labels="$store.getters.labels" :filter-for-cluster="true"/>  </div>
   <div :id="views.CLUSTER_DETAIL" class="cluster_detail">
     <ClusterDetails :plotData="$store.getters.hrd" :selections="$store.getters.resourceHeaders"
                     :parent="views.CLUSTER_DETAIL"
@@ -40,6 +43,7 @@ import Velocity from "../views/Velocity.vue";
 import DensityExplorer from "../views/DensityExplorer.vue";
 import ClusterDetails from "../views/cluster/ClusterDetails.vue";
 import Histogram from "../views/detail/Histogram.vue";
+import ViewHeader from "../nav/ViewHeader.vue";
 import {updateCurrentCluster, updateResources} from "../../services/datasource";
 import {modes} from "../../services/modes";
 import {store} from "../../store/cluster-state-store";
@@ -58,7 +62,8 @@ export default {
     Velocity,
     DensityExplorer,
     ClusterDetails,
-    Histogram
+    Histogram,
+    ViewHeader
   },
   beforeUnmount() {
     let cluster = this.$store.getters.levelSet[this.$store.getters.currentCluster.level]
@@ -89,6 +94,10 @@ export default {
 
 
 <style lang="css" scoped>
+#header {
+  order: -1
+}
+
 #space {
   order: 0
 }
@@ -121,7 +130,7 @@ export default {
   width: 50%;
   height: 460px;
   border: 1px solid darkslategrey;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   margin-right: 5px;
 }
 
@@ -131,7 +140,7 @@ export default {
   width: 40%;
   height: 460px;
   border: 1px solid darkslategrey;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 .network {
@@ -140,7 +149,7 @@ export default {
   width: 32%;
   height: 430px;
   border: 1px solid darkslategrey;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   margin-right: 10px;
 }
 
@@ -150,7 +159,7 @@ export default {
   width: 35%;
   height: 430px;
   border: 1px solid darkslategrey;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   margin-right: 10px;
 }
 
@@ -163,6 +172,7 @@ export default {
 }
 
 .save-exit {
-  margin-bottom: 5px;
+  margin-bottom: 0px;
+  margin-top: 5px;
 }
 </style>
