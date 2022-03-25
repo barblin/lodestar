@@ -27,7 +27,10 @@ class DensityEstKNN:
     def knn_density(self, k_neighbors: int):
         if self.max_neighbors < k_neighbors:
             raise ValueError('Given k_neighbors is larger than max_neighbors')
-        return 1 / np.sqrt(np.mean(np.square(self.distances[:, :k_neighbors]), axis=1))
+        return 1 / np.sqrt(np.mean(np.square(self.distances[:, :k_neighbors-1]), axis=1))
+
+    def k_distance(self, k: int):
+        return self.distances[:, k-1]
 
     def save(self, fname):
         np.savez(fname, X=self.data, distances=self.distances, )
