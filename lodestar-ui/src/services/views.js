@@ -8,6 +8,8 @@ export let views = {
     ALPHA: "alpha",
     CLUSTER_DETAIL: "cluster_detail",
     HISTOGRAMS: "histograms",
+    HEAT_MAP: "heat_map",
+    STABILITY: "stability",
 }
 
 export function percentChange(solution, screen) {

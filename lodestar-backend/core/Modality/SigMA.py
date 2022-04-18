@@ -1,10 +1,11 @@
 import numpy as np
 import pandas as pd
 from scipy.stats import norm
-from Graph.GraphKdTreeBase import ClusterPreparation
-from Modality.DensityEstKNN import DensityEstKNN
 from sklearn.preprocessing import LabelEncoder
 from collections import defaultdict
+
+from core.Graph.GraphKdTreeBase import ClusterPreparation
+from core.Modality.DensityEstKNN import DensityEstKNN
 
 
 def uf_find(i, parents):

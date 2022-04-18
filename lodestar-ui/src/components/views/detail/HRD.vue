@@ -38,6 +38,9 @@ export default {
     },
     selections: function () {
       this.draw(this.$store.getters.hrd, this.$store.getters.resourceHeaders)
+    },
+    colorLabels: function () {
+      this.draw(this.$store.getters.hrd, this.$store.getters.resourceHeaders)
     }
   },
   methods: {

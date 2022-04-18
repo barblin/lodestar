@@ -3,8 +3,8 @@
     <ResourceSelector :selection="$store.getters.currentResource" :headerSelection="$store.getters.resourceHeaders[0]">
     </ResourceSelector>
     <div class="calculate">
-      <button type="button" :disabled="$store.getters.loadingAny || !includeSecondVelocityDimension()" @click="click()"
-              class="calculate">
+      <button type="button" class="calculate" :disabled="$store.getters.loadingAny || !includeSecondVelocityDimension()"
+              @click="click()">
         Calculate (May take up to 20 min)
       </button>
     </div>
@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import {getCurrentTree, updateHrd, updateNetwork, updateSpace, updateVelocity} from "../../services/datasource";
+import {updateHrd, updateNetwork, updateSpace, updateVelocity} from "../../services/datasource";
 import {modes} from "../../services/modes";
 import ResourceSelector from "./ResourceSelector.vue";
 import {includeSecondVelocityDimension} from '../../services/dimension-util';

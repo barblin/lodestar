@@ -30,23 +30,15 @@
         <font-awesome-icon class="tool" v-if="inspect" v-on:click="inspectCluster" icon="search-plus"/>
         <span class="tooltiptext">Inspect cluster</span>
       </div>
-      <div class="tooltip">
+      <!--<div class="tooltip">
         <div class="fa-alpha" v-if="alpha" v-on:click="inspectJoins"
              v-bind:class="{ 'strike-through': isModeAlpha() }"/>
         <span v-if="!isModeAlpha()" class="tooltiptext">Open change alpha value</span>
         <span v-else class="tooltiptext">Close change alpha value</span>
-      </div>
+      </div>-->
       <div class="tooltip">
         <font-awesome-icon class="tool" v-if="noise" v-on:click="toggleNoise" icon="braille"/>
         <span class="tooltiptext">Toogle noise</span>
-      </div>
-      <div class="tooltip" v-if="$store.getters.level != null">
-        <a :href="'http://localhost:5000/api/v1/exports/' + $store.getters.currentResource + '?level=' + $store.getters.level"
-           :download="$store.getters.currentResource + '_labeled.csv'"
-        >
-          <font-awesome-icon class="tool" icon="download"/>
-        </a>
-        <span class="tooltiptext">Export current state</span>
       </div>
       <!--
       <div class="tooltip">
@@ -56,6 +48,31 @@
       </div>
       -->
     </span>
+    <span class="nav-bar">
+      <div class="tooltip-nav-bar">
+        <font-awesome-icon class="back" v-if="isModeLevelSet() || isModeCluster()" v-on:click="goBack" icon="backward"/>
+        <span class="tooltiptext">Go back</span>
+      </div>
+            <div class="tooltip-nav-bar" v-if="$store.getters.level != null">
+        <a :href="'http://localhost:5000/api/v1/exports/' + $store.getters.currentResource + '?level='
+        + $store.getters.level + '&alpha=' + $store.getters.alpha"
+           :download="$store.getters.currentResource + '_labeled.csv'"
+        >
+          <font-awesome-icon class="export" icon="file-export"/>
+        </a>
+        <span class="tooltiptext">Export current state</span>
+      </div>
+      <div class="tooltip-nav-bar">
+        <font-awesome-icon class="check" v-if="isModeAlpha()"
+                           v-on:click="continueWithSelection" icon="check-square"/>
+        <span class="tooltiptext">Continue with selection</span>
+      </div>
+      <div class="tooltip-nav-bar">
+        <font-awesome-icon class="check" v-if="isModeCluster()"
+                           v-on:click="exitAndSaveClusterDetails" icon="floppy-disk"/>
+        <span class="tooltiptext">Save cluster and Exit</span>
+      </div>
+    </span>
   </div>
 </template>
 
@@ -63,12 +80,12 @@
 
 import {modes} from "../../services/modes";
 import {computeColorLabels} from "../../services/colors";
+import {updateCurrentCluster} from "../../services/datasource";
 
 export default {
   name: "Header",
   props: ['title', 'trash', 'branch', 'trashCallback', 'selector', 'parent', 'drawPolygon', 'disease', 'inspect', 'alpha',
     'include', 'exclude', 'noise', 'fileExport'],
-  components: {},
   methods: {
     updateNet() {
       this.$emit('updateNet')
@@ -83,13 +100,19 @@ export default {
     },
     inspectJoins() {
       if (this.isModeAlpha()) {
-        this.$store.commit('updateCurrentMode', modes.DEFAULT)
+        this.$store.commit('updateCurrentMode', modes.LEVEL_SET)
       } else {
         this.$store.commit('updateCurrentMode', modes.ALPHA)
       }
     },
     isModeAlpha() {
       return this.$store.getters.currentMode == modes.ALPHA;
+    },
+    isModeLevelSet() {
+      return this.$store.getters.currentMode == modes.LEVEL_SET;
+    },
+    isModeCluster() {
+      return this.$store.getters.currentMode == modes.CLUSTER;
     },
     /*inclusiveSelect() {
       this.$store.commit('updateSelectInclude', true)
@@ -103,9 +126,29 @@ export default {
           this.$store.getters.colorMap,
           this.$store.getters.noise))
     },
-    executeFileExport() {
-
+    continueWithSelection() {
+      if (this.isModeAlpha()) {
+        this.$store.commit('updateCurrentMode', modes.LEVEL_SET)
+      } else if (this.isModeLevelSet()) {
+        this.$store.commit('updateCurrentMode', modes.CLUSTER)
+      }
     },
+    goBack() {
+      if (this.isModeLevelSet()) {
+        this.$store.commit('updateCurrentMode', modes.ALPHA)
+      } else if (this.isModeCluster()) {
+        this.$store.commit('updateCurrentMode', modes.LEVEL_SET)
+      }
+    },
+    exitAndSaveClusterDetails() {
+      let cluster = this.$store.getters.levelSet[this.$store.getters.currentCluster.level]
+          [this.$store.getters.currentCluster.label]
+      cluster.name = this.$store.getters.temporaryClusterName
+      this.$store.commit("addNode", cluster)
+      this.$store.commit('updateCurrentClusterName', this.$store.getters.temporaryClusterName)
+      this.$store.commit('updateCurrentMode', modes.LEVEL_SET)
+      updateCurrentCluster()
+    }
   }
 }
 
@@ -141,13 +184,17 @@ export default {
 
 .view-header-title {
   font-size: 12px;
-  margin-left: 5px;
+  margin-left: 5%;
 }
 
 .toolbar {
+  margin-left: 20px;
+  float: left;
+}
+
+.nav-bar {
+  margin-right: 10px;
   float: right;
-  opacity: 1;
-  color: black;
 }
 
 .tool {
@@ -156,7 +203,46 @@ export default {
   border: solid gray 1px;
   cursor: pointer;
   opacity: 0.5;
+  height: 20px;
+  width: 20px;
 }
+
+.check {
+  margin-right: 5px;
+  margin-top: 4px;
+  margin-bottom: -3px;
+  cursor: pointer;
+  opacity: 1;
+  color: green;
+  height: 25px;
+  width: 25px;
+  float: right;
+}
+
+.back {
+  margin-right: 15px;
+  margin-top: 4px;
+  margin-bottom: -3px;
+  cursor: pointer;
+  opacity: 1;
+  color: chocolate;
+  height: 25px;
+  width: 25px;
+  float: right;
+}
+
+.export {
+  margin-right: 10px;
+  margin-top: 4px;
+  margin-bottom: -3px;
+  cursor: pointer;
+  opacity: 1;
+  color: cornflowerblue;
+  height: 25px;
+  width: 25px;
+  float: right;
+}
+
 
 .select-red {
   background-color: red;
@@ -176,10 +262,15 @@ export default {
   display: inline-block;
 }
 
+.tooltip-nav-bar {
+  position: relative;
+  display: inline-block;
+}
+
 /* Tooltip text */
 .tooltip .tooltiptext {
-  bottom: 30px;
-  right: 0px;
+  bottom: -30px;
+  left: 10px;
   visibility: hidden;
   width: 200px;
   background-color: gray;
@@ -196,6 +287,30 @@ export default {
 
 /* Show the tooltip text when you mouse over the tooltip container */
 .tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
+
+/* Tooltip text */
+.tooltip-nav-bar .tooltiptext {
+  bottom: -30px;
+  right: 10px;
+  visibility: hidden;
+  width: 200px;
+  background-color: gray;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  font-size: 12px;
+
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip-nav-bar:hover .tooltiptext {
   visibility: visible;
 }
 </style>

@@ -1,6 +1,6 @@
 export let modes = {
     ALPHA: "alpha",
     CLUSTER: "cluster",
-    DEFAULT: "default",
+    LEVEL_SET: "level_set",
     INPUT: "input"
 }

@@ -17,7 +17,7 @@ def update_cluster(lid, cid, data):
   x.loc[cluster_index.tolist(), 'custom_label'] = custom_label
   x.loc[cluster_index.tolist(), 'custom_label_name'] = custom_label_name
 
-  store_for_level(x, get_session_name(lid))
+  store_for_level(x, get_session_name(lid), alpha)
 
   x = x[COL_LABEL]
   return x.astype(str).values.tolist()

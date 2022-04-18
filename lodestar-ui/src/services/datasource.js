@@ -3,10 +3,21 @@ import axios from "axios";
 import * as d3 from "d3";
 import {buildAll, buildSpaceBody, buildVelocityBody} from "./dimension-util";
 import {modes} from "./modes";
-import {computeColorLabels, createAlphaColorMap, createColorMap} from "./colors";
+import {computeColorLabels, createAllLabelsMap, createAlphaColorMap, createColorMap} from "./colors";
 import {cloneDeep} from "lodash/lang";
 
 export const host = "http://localhost:5000/api/v1/"
+
+export function updateBatch(){
+    getCurrentTree();
+    getSignificantRoots(store.getters.level);
+    updateAllLabels();
+    updateCurrentLabels({
+        level: store.getters.level,
+        alpha: store.getters.alpha
+    })
+}
+
 
 function fetchData(endpoint, callback, onFinally) {
     axios.get(host + endpoint)
@@ -38,6 +49,16 @@ export function updateResources() {
         })
 }
 
+export function updateHeatmap() {
+    fetchData("heatmap",
+        resp => {
+            store.commit('updateHeatmap', cloneDeep(resp.data))
+        }, () => {
+            getSignificantRoots(store.getters.level);
+        })
+}
+
+
 export function updateAlphas() {
     fetchData("alphas",
         resp => {
@@ -46,12 +67,13 @@ export function updateAlphas() {
         })
 }
 
-export function getSignificantRoots() {
-    fetchData("trees/significant/roots",
+export function getSignificantRoots(level) {
+    postData("trees/significant/roots",
         resp => {
             store.commit('updateSignificantRoots', resp.data)
         }, () => {
-        })
+            updateAllLabels()
+        }, {level: level})
 }
 
 export function updateDensityLevels() {
@@ -91,7 +113,6 @@ export function getCurrentTree() {
 
         store.commit('updateNetworkData', response)
     }, () => {
-        store.commit('updateLoadingMain', false);
     }, buildAll())
 }
 
@@ -101,19 +122,33 @@ export function getAllTrees() {
 
         store.commit('updateAlphaColorMap',
             createAlphaColorMap(store.getters.alphas, response))
-    }, () => {})
+    }, () => {
+        updateHeatmap();
+    })
 }
 
+export function updateAllLabels() {
+    postData("labels/all", resp => {
+            let response = cloneDeep(resp.data)
+            store.commit('updateAllLabels',
+                createAllLabelsMap(store.getters.alphas, response))
+        }, () => {
+            store.commit('updateLoadingMain', false);
+            store.commit('updateCurrentMode', modes.ALPHA)
+        },
+        {
+            level: store.getters.level
+        })
+}
 
 export function updateNetwork(id) {
     store.commit('updateLoadingMain', true)
     store.commit('updateErroredMain', false)
     store.commit('updateNetworkData', {id: null})
 
-    postData("trees/" + id, resp => {
-        store.commit('updateCurrentMode', modes.DEFAULT)
-    }, () => {
+    postData("trees/" + id, resp => {}, () => {
         getCurrentTree();
+        getAllTrees()
     }, buildAll())
 }
 
@@ -199,14 +234,12 @@ export function updateHrd(id) {
         }, store.getters.hrdSelection)
 }
 
-export function updateVelocityNet() {
-    store.commit('updateLoadingVelocity', true)
-    store.commit('updateErroredVelocity', false)
+export function downloadResource(url) {
+    store.commit('updateLoadingMain', true)
+    store.commit('updateErroredMain', false)
 
-    d3.select("#velocity_pane").selectAll("div").remove();
-
-    d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/2_TwoNum.csv").then(function (data) {
-        store.commit('updateVelocityNetwork', data)
-        store.commit('updateLoadingVelocity', false);
-    });
+    postData("downloads", resp => {
+    }, () => {
+        store.commit('updateLoadingMain', false)
+    }, {"url": url})
 }

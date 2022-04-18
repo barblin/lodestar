@@ -2,11 +2,6 @@
   <ViewHeader class="header" :title='"Density Navigation - Use zooming and panning to navigate"' :branch="true" :trash="true"
               :trash-callback="trashCallback" :alpha="true" :exclude="true" :include="true" :noise="true"
               :inspect="true" :disease="true" :draw-polygon="true"></ViewHeader>
-  <span class="details">
-    <button type="button" class="save-exit" @click="exitClusterDetails()">Exit & Save Cluster</button>
-    Name: <input v-model="cluster_name"
-                 :placeholder="$store.getters.currentCluster.name">
-  </span>
   <div :id="views.SPACE" class="space">
     <Space :parent="views.SPACE" :drawScatter="$store.getters.drawSpaceScatter"
            :drawNet="$store.getters.drawSpaceNet"
@@ -44,8 +39,7 @@ import DensityExplorer from "../views/DensityExplorer.vue";
 import ClusterDetails from "../views/cluster/ClusterDetails.vue";
 import Histogram from "../views/detail/Histogram.vue";
 import ViewHeader from "../nav/ViewHeader.vue";
-import {updateCurrentCluster, updateResources} from "../../services/datasource";
-import {modes} from "../../services/modes";
+import {updateResources} from "../../services/datasource";
 import {store} from "../../store/cluster-state-store";
 
 export default {
@@ -54,7 +48,6 @@ export default {
     return {
       updateKeys: {},
       views: views,
-      cluster_name: ""
     };
   },
   components: {
@@ -65,24 +58,7 @@ export default {
     Histogram,
     ViewHeader
   },
-  beforeUnmount() {
-    let cluster = this.$store.getters.levelSet[this.$store.getters.currentCluster.level]
-        [this.$store.getters.currentCluster.label]
-    cluster.name = this.cluster_name
-    this.$store.commit("addNode", cluster)
-    this.$store.commit('updateCurrentClusterName', this.cluster_name)
-    this.cluster_name = ""
-  },
   methods: {
-    exitClusterDetails() {
-      let cluster = this.$store.getters.levelSet[this.$store.getters.currentCluster.level]
-          [this.$store.getters.currentCluster.label]
-      cluster.name = this.cluster_name
-      this.$store.commit("addNode", cluster)
-      this.$store.commit('updateCurrentClusterName', this.cluster_name)
-      this.$store.commit('updateCurrentMode', modes.DEFAULT)
-      updateCurrentCluster()
-    }
   },
 
   mounted() {
@@ -118,12 +94,6 @@ export default {
   order: 4;
 }
 
-.details {
-  margin-top: -10px;
-  display: block;
-  width: 100%;
-}
-
 .space {
   position: relative;
   float: left;
@@ -146,7 +116,7 @@ export default {
 .network {
   position: relative;
   float: left;
-  width: 32%;
+  width: 20%;
   height: 430px;
   border: 1px solid darkslategrey;
   margin-bottom: 5px;
@@ -156,7 +126,7 @@ export default {
 .cluster_detail {
   position: relative;
   float: left;
-  width: 35%;
+  width: 38%;
   height: 430px;
   border: 1px solid darkslategrey;
   margin-bottom: 5px;
@@ -166,7 +136,7 @@ export default {
 .histograms {
   position: relative;
   float: left;
-  width: 30%;
+  width: 38%;
   height: 430px;
   border: 1px solid darkslategrey;
 }

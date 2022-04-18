@@ -4,9 +4,9 @@ from services.data.export_source import get_export_path
 from services.data.session_source import get_session
 
 
-def export_file(filename, level):
+def export_file(filename, level, alpha):
   x = get_columns_from_dataframe_cluster(data_dict()[filename])
-  session = get_session(level)
+  session = get_session(level, alpha)
   export = x.join(session)
 
   return get_export_path(export, filename)

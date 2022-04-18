@@ -65,6 +65,8 @@ export default {
       this.$store.commit('updateDrawSpaceScatter', !this.$store.getters.drawSpaceScatter)
     },
     redraw(spaceData) {
+      Plotly.purge(PANE_NAME);
+
       d3.select("#" + PANE_NAME).selectAll("svg").remove();
 
       let parent = document.getElementById(this.parent)

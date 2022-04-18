@@ -1,5 +1,10 @@
 <template>
-  <span class="cluster-details">ID: {{ numeralFormat($store.getters.currentCluster.label) }}
+  <span class="cluster-details">
+      <span class="details">
+    Name: <input v-model="cluster_name"
+                 :placeholder="$store.getters.currentCluster.name">
+  </span>
+    ID: {{ numeralFormat($store.getters.currentCluster.label) }}
     | Size: {{ numeralFormat($store.getters.currentCluster.size) }} | Level:
   {{ numeralFormat($store.getters.currentCluster.level) }}</span>
   <select id="selectXDetail">
@@ -32,8 +37,12 @@ export default {
   },
   data: function () {
     return {
-      PANE_NAME: PANE_NAME
+      PANE_NAME: PANE_NAME,
+      cluster_name: ""
     }
+  },
+  mounted() {
+    this.$store.commit('updateTemporaryClusterName', this.$store.getters.currentCluster.name)
   },
   watch: {
     plotData: function (data) {
@@ -44,7 +53,10 @@ export default {
     },
     colorLabels: function () {
       this.draw(this.$store.getters.hrd, this.$store.getters.resourceHeaders)
-    }
+    },
+    cluster_name: function (data) {
+      this.$store.commit('updateTemporaryClusterName', data)
+    },
   },
   methods: {
     draw(full, allColumns) {
@@ -184,6 +196,10 @@ export default {
 </script>
 
 <style scoped>
+input {
+  width: 100px;
+}
+
 select {
   width: 46%;
   margin-right: 10px;
