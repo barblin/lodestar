@@ -5,7 +5,7 @@
       <RingLoader :size="'200px'" v-if="$store.getters.loadingMain"></RingLoader>
     </span>
     <ModeInput v-if="$store.getters.currentMode == modes.INPUT"></ModeInput>
-    <ModeDefault v-if="$store.getters.currentMode == modes.DEFAULT"></ModeDefault>
+    <ModeLevelSet v-if="$store.getters.currentMode == modes.LEVEL_SET"></ModeLevelSet>
     <ModeCluster v-if="$store.getters.currentMode == modes.CLUSTER"></ModeCluster>
     <ModeAlpha v-if="$store.getters.currentMode == modes.ALPHA"></ModeAlpha>
   </div>
@@ -13,7 +13,7 @@
 
 <script>
 import SideNav from "./menu/SideNav.vue";
-import ModeDefault from "./modes/ModeDefault.vue";
+import ModeLevelSet from "./modes/ModeLevelSet.vue";
 import ModeCluster from "./modes/ModeCluster.vue";
 import ModeAlpha from "./modes/ModeAlpha.vue";
 import ModeInput from "./modes/ModeInput.vue";
@@ -29,7 +29,7 @@ export default {
   },
   components: {
     SideNav,
-    ModeDefault,
+    ModeLevelSet,
     ModeCluster,
     ModeAlpha,
     ModeInput,

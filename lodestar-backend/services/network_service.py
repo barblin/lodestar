@@ -28,15 +28,18 @@ def get_trees():
     return trees
 
 
-def get_significant_roots():
+def get_significant_roots(data):
+    level = int(data["level"])
     unique_roots = set(())
+    alpha_nodes = {}
 
     for alpha in alpha_values:
         tree = json.loads(get_tree(str(alpha)))
-        roots = collect_roots(tree["node_level_clusters"])
+        roots = collect_roots(tree["node_level_clusters"], level)
         unique_roots.update(roots)
+        alpha_nodes[alpha] = roots
 
-    return unique_roots
+    return {"unique_nodes": list(unique_roots), "alpha_nodes": alpha_nodes}
 
 
 def produce_join_trees(filename, data_axes):

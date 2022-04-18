@@ -11,8 +11,20 @@ export let col_map = {
     7: '#fb9a99',
     8: '#a6cee3',
     9: '#af0000',
+    10: '#000080',
+    11: '#ff2424',
+    12: 'rgba(162,162,162,0)'
 }
 
+export function createAllLabelsMap(alphasProxy, labels){
+    let alphas = Array.from(alphasProxy)
+    let allLabels = {}
+
+    for(let i = 0; i < alphas.length; i++){
+        allLabels[alphas[i]] = labels[alphas[i]]
+    }
+    return allLabels
+}
 
 export function createAlphaColorMap(alphasProxy, alphaNodes){
     let alphas = Array.from(alphasProxy)
@@ -48,21 +60,20 @@ export function createColorMap(nodes){
 export function computeColorLabels(labels, colorMap, includeNoise) {
     labels = Array.from(labels)
 
-
     let colorLabels = []
     for (let i = 0; i < labels.length; i++) {
         if (!includeNoise) {
-            if (parseInt(labels[i]) == -1) {
-                colorLabels.push('rgba(162,162,162,0)')
+            if (labels[i] == -1) {
+                colorLabels.push(col_map[12])
                 continue
             }
         }
 
-        if (parseInt(labels[i]) == -1) {
+        if (labels[i] == -1) {
             colorLabels.push('rgba(84,84,84,0.5)')
             continue
         } else {
-            colorLabels.push(colorMap[parseInt(labels[i])])
+            colorLabels.push(colorMap[labels[i]])
         }
     }
 

@@ -1,4 +1,5 @@
 import {createApp} from 'vue'
+import router from './router'
 import App from './App.vue'
 import {store} from './store/cluster-state-store'
 import 'vue-sidebar-menu/dist/vue-sidebar-menu.css'
@@ -8,14 +9,18 @@ import {
     faChartArea,
     faCompressArrowsAlt,
     faDisease,
-    faDownload,
+    faFileExport,
     faDrawPolygon,
     faExpandArrowsAlt,
     faLevelDownAlt,
     faSearchPlus,
     faTrash,
     faUser,
-    faVectorSquare
+    faVectorSquare,
+    faCheckSquare,
+    faBackward,
+    faFloppyDisk,
+    faArrowsUpDown
 } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import VueNextSelect from 'vue-next-select';
@@ -33,11 +38,16 @@ library.add(faDisease);
 library.add(faSearchPlus);
 library.add(faVectorSquare);
 library.add(faBraille);
-library.add(faDownload);
+library.add(faFileExport);
+library.add(faCheckSquare);
+library.add(faBackward);
+library.add(faFloppyDisk);
+library.add(faArrowsUpDown);
 
 const app = createApp(App)
 
 app.use(store)
+app.use(router)
 app.use(VueNumerals, {
     locale: 'en'
 });

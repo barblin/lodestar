@@ -86,9 +86,9 @@ export default {
           .attr("transform",
               "translate(" + margin.left + "," + margin.top + ")");
 
-      let minx = 0;
+      let minx = 10000000;
       let maxx = 0;
-      let miny = 0;
+      let miny = 10000000;
       let maxy = 0;
 
       for (let i = 0; i < data.length; i++) {
@@ -97,25 +97,25 @@ export default {
         } else {
           data[i].label = this.colorLabels[i]
         }
-      }
 
-      for (let i = 0; i < data.length; i++) {
-        let row = data[i];
+        if(data[i].label !== col_map[12]) {
+          let row = data[i];
 
-        if (row.x < minx) {
-          minx = row.x
-        }
+          if (row.x < minx) {
+            minx = row.x
+          }
 
-        if (maxx < row.x) {
-          maxx = row.x
-        }
+          if (maxx < row.x) {
+            maxx = row.x
+          }
 
-        if (row.y < miny) {
-          miny = row.y
-        }
+          if (row.y < miny) {
+            miny = row.y
+          }
 
-        if (maxy < row.y) {
-          maxy = row.y
+          if (maxy < row.y) {
+            maxy = row.y
+          }
         }
       }
 

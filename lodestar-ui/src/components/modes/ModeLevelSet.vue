@@ -34,10 +34,9 @@ import Velocity from "../views/Velocity.vue";
 import ViewHeader from "../nav/ViewHeader.vue";
 import HRD from "../views/detail/HRD.vue";
 import DensityExplorer from "../views/DensityExplorer.vue";
-import {getAllTrees, updateResourceHeaders} from "../../services/datasource";
 
 export default {
-  name: "ModeDefault",
+  name: "ModeLevelSet",
   data() {
     return {
       views: views,
@@ -51,8 +50,13 @@ export default {
     ViewHeader,
   },
   mounted() {
-    updateResourceHeaders(this.$store.getters.currentResource)
-    getAllTrees()
+    //updateResourceHeaders(this.$store.getters.currentResource)
+    //getAllTrees()
+    //updateAllLabels()
+    //updateCurrentLabels({
+    //  level: this.$store.getters.level,
+    //  alpha: this.$store.getters.alpha
+    //})
   }
 }
 </script>

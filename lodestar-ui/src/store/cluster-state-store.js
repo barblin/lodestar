@@ -18,7 +18,7 @@ export const store = createStore({
             x: "ra",
             y: "dec"
         },
-        level: 0,
+        level: 44,
         alpha: 0.05,
         maxLevel: 0,
         noise: false,
@@ -26,8 +26,10 @@ export const store = createStore({
         colorLabels: [],
         colorMap: {},
         alphaColorMap: {},
+        allLabels: {},
         currentMode: modes.INPUT,
         currentCluster: {level: null, label: null, user_label: null, name: null, size: 0},
+        temporaryClusterName: null,
         levelSet: {},
         densityLevels: [],
         alphas: [],
@@ -65,6 +67,7 @@ export const store = createStore({
         plotRadial: false,
         inspectCluster: false,
         selectExclude: false,
+        heatmap: []
     },
     mutations: {
         updateCurrentViewSelection(state, selection) {
@@ -120,6 +123,9 @@ export const store = createStore({
         },
         updateAlphaColorMap(state, map) {
             state.alphaColorMap = map
+        },
+        updateAllLabels(state, map) {
+            state.allLabels = map
         },
         updateColorLabels(state, colorLabels) {
             state.colorLabels = colorLabels
@@ -219,7 +225,13 @@ export const store = createStore({
         },
         updateSignificantRoots(state, data) {
             state.significantRoots = data
-        }
+        },
+        updateTemporaryClusterName(state, data) {
+            state.temporaryClusterName = data
+        },
+        updateHeatmap(state, data) {
+            state.heatmap = data
+        },
     },
     getters: {
         currentViewSelection: state => state.currentViewSelection,
@@ -257,6 +269,7 @@ export const store = createStore({
         colorLabels: state => state.colorLabels,
         colorMap: state => state.colorMap,
         alphaColorMap: state => state.alphaColorMap,
+        allLabels: state => state.allLabels,
         currentCluster: state => state.currentCluster,
 
         resources: state => state.resources,
@@ -273,6 +286,8 @@ export const store = createStore({
         inspectCluster: state => state.inspectCluster,
         selectExclude: state => state.selectExclude,
         levelSet: state => state.levelSet,
-        significantRoots: state => state.significantRoots
+        significantRoots: state => state.significantRoots,
+        temporaryClusterName: state => state.temporaryClusterName,
+        heatmap: state => state.heatmap
     }
 })

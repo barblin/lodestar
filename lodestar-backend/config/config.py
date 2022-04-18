@@ -10,13 +10,18 @@ p_scaling = 1
 max_knn = 70
 max_neighbors = 100
 beta = 0.99
-knn_cluster_graph = 50
+knn_cluster_graph = 30
 knn_hypotest = 20
+levels = 44
 
 
 alpha_values = [0.05,
-                0.01,
-                0.001]
+                0.025,
+                0.0123,
+                0.00625,
+                0.003125,
+                0.0015625,
+                0.00078125]
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -25,12 +30,13 @@ resource_dir = dir_path + '/../resources/'
 level_dir = '/levels/'
 session_dir = '/sessions/'
 export_dir = '/export/'
+import_dir = '/import/'
 alpha_dir = '/alphas/'
 
 # COLUMNS
-COL_LABEL = "labels"
-COL_CUSTOM_LABEL = "custom_label"
-COL_CUSTOM_LABEL_NAME = "custom_label_name"
+COL_LABEL = 'labels'
+COL_CUSTOM_LABEL = 'custom_label'
+COL_CUSTOM_LABEL_NAME = 'custom_label_name'
 
 
 def get_alpha_array():
@@ -51,3 +57,7 @@ def session_location(alpha):
 
 def export_location():
     return resource_dir + export_dir
+
+
+def import_location():
+    return resource_dir + import_dir

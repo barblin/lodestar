@@ -111,14 +111,6 @@ export default {
           .attr("transform",
               "translate(" + margin.left + "," + margin.top + ")");
 
-      svg.append("text")
-          .attr("class", "x label")
-          .attr("text-anchor", "end")
-          .attr("font-size", 11)
-          .attr("x", width)
-          .attr("y", 10)
-          .text(label)
-
       var x = d3.scaleLinear()
           .domain([min, max])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
           .range([0, width]);
