@@ -185,7 +185,7 @@ class SigMA(ClusterPreparation):
         self.cluster_neighbors()
         edges, columns = self.cluster_borders.nonzero()
         # sort the saddle point dens in reverse order
-        sorted_by_density = np.argsort(self.cluster_borders[edges, columns])[::-1]
+        sorted_by_density = np.argsort(self.cluster_borders[edges, columns])
         # Loop through saddle points and merge clusters
         for e, c in zip(edges[sorted_by_density], columns[sorted_by_density]):
             e_parent = uf_find(e, parents)
