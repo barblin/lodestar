@@ -8,10 +8,10 @@
     | Size: {{ numeralFormat($store.getters.currentCluster.size) }} | Level:
   {{ numeralFormat($store.getters.currentCluster.level) }}</span>
   <select id="selectXDetail">
-    <option value="" disabled selected>Magnitude</option>
+    <option value="" disabled selected>{{$store.getters.hrdSelection.x}}</option>
   </select>
   <select id="selectYDetail">
-    <option value="" disabled selected>Spectral Class</option>
+    <option value="" disabled selected>{{$store.getters.hrdSelection.y}}</option>
   </select>
   <div :id="PANE_NAME"></div>
   <div id="spinner" v-if="$store.getters.loadingAny">
@@ -24,7 +24,7 @@ import * as d3 from "d3";
 import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import ViewHeader from "../../nav/ViewHeader.vue";
 import {updateHrd} from "../../../services/datasource";
-import {col_map} from "../../../services/colors";
+import {col_map} from "../../../config/colors";
 
 const PANE_NAME = "details"
 
@@ -73,6 +73,7 @@ export default {
           .data(allColumns)
           .enter()
           .append('option')
+          .attr("class", "deletableOpt")
           .text(function (d) {
             return d;
           }) // text showed in the menu
@@ -85,6 +86,7 @@ export default {
           .data(allColumns)
           .enter()
           .append('option')
+          .attr("class", "deletableOpt")
           .text(function (d) {
             return d;
           }) // text showed in the menu
@@ -201,7 +203,7 @@ input {
 }
 
 select {
-  width: 46%;
+  width: 35%;
   margin-right: 10px;
   margin-left: 10px;
 }

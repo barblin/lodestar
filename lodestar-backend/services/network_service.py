@@ -62,7 +62,7 @@ def recalculate_levels(filename, data_axes, alpha):
     node_level_clusters = {}
     for cli in ssp_clusters.keys():
         node_level_clusters[cli] = [int(ssp_clusters[cli].level_id),
-                                    int(ssp_clusters[cli].nb_points),
+                                    int(len(ssp_clusters[cli].index_arr)),
                                     int(ssp_clusters[cli].mode)]
         for child in ssp_clusters[cli].child_list:
             g_ssp.add_edge(cli, child)

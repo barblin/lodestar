@@ -10,6 +10,7 @@ export let views = {
     HISTOGRAMS: "histograms",
     HEAT_MAP: "heat_map",
     STABILITY: "stability",
+    SELECTOR: "selector"
 }
 
 export function percentChange(solution, screen) {

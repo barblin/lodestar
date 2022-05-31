@@ -19,8 +19,10 @@ import {
     faVectorSquare,
     faCheckSquare,
     faBackward,
+    faForward,
     faFloppyDisk,
-    faArrowsUpDown
+    faArrowsUpDown,
+    faArrowRotateRight
 } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 import VueNextSelect from 'vue-next-select';
@@ -43,6 +45,8 @@ library.add(faCheckSquare);
 library.add(faBackward);
 library.add(faFloppyDisk);
 library.add(faArrowsUpDown);
+library.add(faForward);
+library.add(faArrowRotateRight);
 
 const app = createApp(App)
 

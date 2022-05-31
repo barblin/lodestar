@@ -1,9 +1,10 @@
 <template>
   <span>
-  <label class="feature-label">Select from available resources</label>
+  <label class="feature-label">Select from available resources or <a href="/resources">add new resource</a> </label>
   <vue-select v-model="selection" placeholder="Select source file"
               :closeOnSelect="true"
               :searchable="true"
+              :clearOnSelect="true"
               :options="$store.getters.resources"
               class="nav-el"></vue-select>
   </span>
@@ -11,19 +12,12 @@
   <!--<input class="radial" type="checkbox" id="checkbox" v-model="plotRadial">
   <label class="radial rad-label" for="checkbox">Include radial velocity</label>-->
   <br>
-  <span>
-    <label class="feature-label">Select alpha value</label>
-    <vue-select v-model="alpha"
-                :closeOnSelect="true"
-                :selected="$store.getters.alphas[alpha]"
-                :placeholder="$store.getters.alphas[alpha]"
-                :options="$store.getters.alphas" class="nav-el"></vue-select>
-  </span>
   <span v-if="includeFirstSpaceDimension()">
     <label class="feature-label">First space</label>
     <vue-select v-model="s1"
                 :searchable="true"
                 :closeOnSelect="true"
+                :clearOnSelect="true"
                 :selected="$store.getters.resourceHeaders[s1]"
                 :placeholder="$store.getters.resourceHeaders[s1]"
                 :options="$store.getters.resourceHeaders" class="nav-el"></vue-select>
@@ -33,6 +27,7 @@
     <vue-select v-model="s2"
                 :closeOnSelect="true"
                 :searchable="true"
+                :clearOnSelect="true"
                 :empty-model-value="$store.getters.resourceHeaders[s2]"
                 :placeholder="$store.getters.resourceHeaders[s2]"
                 :options="$store.getters.resourceHeaders" class="nav-el"></vue-select>
@@ -42,6 +37,7 @@
     <vue-select v-model="s3"
                 :closeOnSelect="true"
                 :searchable="true"
+                :clearOnSelect="true"
                 :empty-model-value="$store.getters.resourceHeaders[s3]"
                 :placeholder="$store.getters.resourceHeaders[s3]"
                 :options="$store.getters.resourceHeaders" class="nav-el"></vue-select>
@@ -51,6 +47,7 @@
     <vue-select v-model="v1"
                 :closeOnSelect="true"
                 :searchable="true"
+                :clearOnSelect="true"
                 :empty-model-value="$store.getters.resourceHeaders[v1]"
                 :placeholder="$store.getters.resourceHeaders[v1]"
                 :options="$store.getters.resourceHeaders" class="nav-el"></vue-select>
@@ -60,6 +57,7 @@
     <vue-select v-model="v2"
                 :closeOnSelect="true"
                 :searchable="true"
+                :clearOnSelect="true"
                 :empty-model-value="$store.getters.resourceHeaders[v2]"
                 :placeholder="$store.getters.resourceHeaders[v2]"
                 :options="$store.getters.resourceHeaders" class="nav-el"></vue-select>
@@ -67,8 +65,9 @@
   <span v-if="includeThirdVelocityDimension()">
       <label class="feature-label">Radial velocity</label>
     <vue-select v-model="v3"
-                :closeOnSelect="true"
                 :searchable="true"
+                :closeOnSelect="true"
+                :clearOnSelect="true"
                 :empty-model-value="$store.getters.resourceHeaders[v3]"
                 :placeholder="$store.getters.resourceHeaders[v3]"
                 :options="$store.getters.resourceHeaders" class="nav-el"></vue-select>
@@ -76,8 +75,9 @@
   <span v-if="includeThirdVelocityDimension()">
       <label class="feature-label">Radial velocity error</label>
     <vue-select v-model="rad_error"
-                :closeOnSelect="true"
                 :searchable="true"
+                :closeOnSelect="true"
+                :clearOnSelect="true"
                 :empty-model-value="$store.getters.resourceHeaders[rad_error]"
                 :placeholder="$store.getters.resourceHeaders[rad_error]"
                 :options="$store.getters.resourceHeaders" class="nav-el"></vue-select>
@@ -118,30 +118,6 @@ export default {
     selection: function (selection) {
       this.$store.commit('updateCurrentResource', selection)
       updateResourceHeaders(this.$store.getters.currentResource);
-
-      if (includeFirstSpaceDimension()) {
-        this.s1 = this.$store.getters.currentColumnSelection.s1;
-      }
-
-      if (includeSecondSpaceDimension()) {
-        this.s2 = this.$store.getters.currentColumnSelection.s2;
-      }
-
-      if (includeThirdSpaceDimension()) {
-        this.s3 = this.$store.getters.currentColumnSelection.s3;
-      }
-
-      if (includeFirstVelocityDimension()) {
-        this.v1 = this.$store.getters.currentColumnSelection.v1;
-      }
-
-      if (includeSecondVelocityDimension()) {
-        this.v2 = this.$store.getters.currentColumnSelection.v2;
-      }
-
-      if (includeThirdVelocityDimension()) {
-        this.v3 = this.$store.getters.currentColumnSelection.v3;
-      }
     },
     s1: function (sel) {
       let selection = this.getSelection()

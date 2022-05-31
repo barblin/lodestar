@@ -10,22 +10,20 @@
 import * as d3 from "d3";
 import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import ViewHeader from "../nav/ViewHeader.vue";
-import {modes} from "../../services/modes"
 import {getSignificantRoots, updateAllLabels, updateCurrentLabels} from "../../services/datasource";
 import {percentChange} from "../../services/views";
 import {createLevelLabels} from "../../services/d3-tools";
+import {inspect} from "../../services/cluster";
+import {highlight, selected_el} from "../../config/colors";
 
 const PANE_NAME = "network_pane"
 
-let circles = []
 let rects = []
-let rect = {
-  opacity: 0.2
-}
+let rect = undefined
 
 export default {
   name: "DensityExplorer",
-  props: ['networkData', 'parent', 'filterForCluster'],
+  props: ['networkData', 'parent', 'filterForCluster', 'exclusion'],
   data: function () {
     return {
       PANE_NAME: PANE_NAME,
@@ -33,7 +31,13 @@ export default {
       heightFactor: 1,
       yScale: {},
       svg: {},
-      tooltip: {}
+      tooltip: {},
+      dragtooltip: {},
+      currentOffset: 0,
+      isDown: false,
+      zoom: null,
+      currentScale: 1,
+      currentHeight: 0
     }
   },
   components: {
@@ -43,23 +47,31 @@ export default {
   mounted() {
     if (this.$store.getters.networkData) {
       this.redraw(this.$store.getters.networkData)
-    }
-  },
-  computed: {
-    networkData: function (d) {
-      this.redraw(d)
+      this.dragtooltip = this.createDragTooltip();
     }
   },
   watch: {
     networkData: function () {
       this.redraw(this.$store.getters.networkData)
     },
-    parent: function () {
-      this.redraw(this.$store.getters.networkData)
+    exclusion: function (data){
+      this.isDown = false;
+
+      if(data){
+        this.svg.on(".zoom", null)
+        this.svg.on("mouseup", this.mouseup)
+      } else {
+        this.svg.call(this.zoom);
+        this.svg.on("mouseup", null)
+      }
     }
   },
   methods: {
     redraw(network) {
+      if (network.nodes == undefined) {
+        return
+      }
+
       d3.select("#" + PANE_NAME).selectAll("svg").remove();
 
       let parent = document.getElementById(this.parent)
@@ -75,7 +87,6 @@ export default {
       for (const [node, location] of Object.entries(network.pos)) {
         heights.add(location[1])
       }
-
 
       let max_x = network.max_x;
       let min_x = 0;
@@ -120,9 +131,11 @@ export default {
           .append("svg")
           .attr("width", width + margin.left + margin.right)
           .attr("height", height + margin.top)
+          .on("mouseover", this.mouseover)
+          .on("mouseout", this.mouseout)
+          .on("mousemove", this.mousemove)
           .on("mousedown", this.mousedown)
-          .on("mouseup", this.mouseup);
-
+          .on("mouseup", this.mouseup)
 
       let level = 0;
       let heightDict = {};
@@ -133,26 +146,30 @@ export default {
 
       let edges = this.createEdges(network, remainingEdges);
       this.tooltip = this.createTooltip();
-      circles = this.createNodes(remainingNodes, network, this.$store, this.tooltip);
+      let circles = this.createNodes(remainingNodes, network, this.tooltip, height / 2, this.dragtooltip);
       let levelLines = this.createLevelLines(parent, heightDict)
       let levelButton = this.createLevelButtons(heightDict, this.$store)
       let levelLabels = createLevelLabels(this.svg, Object.entries(heightDict), -13)
       let heightFactor = this.heightFactor;
 
       let store = this.$store;
-      let zoom = this.createZoom(store, network, edges, circles, levelLines, levelButton, levelLabels, this.yScale, heightFactor)
+      this.zoom = this.createZoom(store, network, edges, circles, levelLines, levelButton, levelLabels, this.yScale, heightFactor)
       this.svg.append('text')
           .attr('font-family', 'FontAwesome')
-          .text(function(d) { return '\uf118' });
+          .text(function (d) {
+            return '\uf118'
+          });
 
-      this.svg.call(zoom)
-
+      this.svg.call(this.zoom);
+      this.svg.call(this.zoom.transform, d3.zoomIdentity.translate(0, this.currentOffset));
+      this.svg.on("dblclick.zoom", null)
     },
-    createNodes(nodes, network, store, tooltip) {
+    createNodes(nodes, network, tooltip, half_height) {
       let context = this;
       let transformed_network = Object.entries(network)
       let cluster_level_info = Object.entries(transformed_network[2][1])
 
+      let store = this.$store;
       return this.svg.append("g")
           .selectAll("circle")
           .data(nodes)
@@ -167,39 +184,72 @@ export default {
             if (label == store.getters.currentCluster.label &&
                 level == store.getters.currentCluster.level &&
                 this.filterForCluster) {
-              return '#ccac00'
+              return highlight
             }
 
             return store.getters.levelSet[level][label].color
           })
           .attr("stroke", "none")
           .attr("cx", (d) => this.correctedWidth(d[1][0]))
-          .attr("cy", (d) => this.yScale(this.correctedHeight(d[1][1])))
-          .attr("r", 6)
-          .on("click", function (d) {
-            if (context.filterForCluster) {
-              let node = Array.from(cluster_level_info[d.target.__data__[0]][1])
-              let level = node[0], label = node[2]
+          .attr("cy", (d) => {
+            let cur_height = this.yScale(this.correctedHeight(d[1][1]))
+            let node_index = d[0]
+            let node = Object.entries(cluster_level_info[node_index][1])
+            let level = node[0][1]
 
-              d3.selectAll(".clusters").attr("fill", String(store.getters.levelSet[level][label].color));
-              d3.select(this).style("cursor", "default").attr("fill", '#ccac00');
+            if (level == store.getters.level) {
+              context.currentOffset = -cur_height + half_height
             }
 
-            context.selectCluster(Array.from(cluster_level_info[d.target.__data__[0]][1]))
+            return cur_height
+          })
+          .attr("r", 6)
+          .on("click", function (d) {
+            if (!store.getters.loadingAny) {
+              let node = Array.from(cluster_level_info[d.target.__data__[0]][1])
+              let label = node[2]
+              d3.select(this).style("cursor", "default").attr("fill", highlight);
+
+              if (label != store.getters.highlightCluster) {
+                store.commit('updateHighlightCluster', label)
+              } else {
+                store.commit('updateHighlightCluster', null)
+              }
+            }
+          })
+          .on("dblclick", function (d) {
+            if (!store.getters.loadingAny) {
+              if (context.filterForCluster) {
+                let node = Array.from(cluster_level_info[d.target.__data__[0]][1])
+                let level = node[0], label = node[2]
+
+                d3.selectAll('.levelButtons').style("stroke", "rgba(105,179,162,0.80)")
+                d3.selectAll('#l' + String(level)).style("stroke", selected_el);
+                d3.selectAll(".clusters").attr("fill", String(store.getters.levelSet[level][label].color));
+                d3.select(this).style("cursor", "default").attr("fill", highlight);
+              }
+              store.commit('updateHighlightCluster', null)
+
+              context.selectCluster(Array.from(cluster_level_info[d.target.__data__[0]][1]))
+            }
           })
           .on("mouseover", function (d) {
-            d3.select(this).style("cursor", "pointer").attr("fill", '#ccac00');
+            d3.select(this).style("cursor", "pointer").attr("fill", highlight);
             let node = Array.from(cluster_level_info[d.target.__data__[0]][1])
             let level = node[0], label = node[2]
 
             store.commit('updateCurrentClusterLabel', label)
             let name = store.getters.levelSet[level][label].name
+            let size = store.getters.levelSet[level][label].size
+
 
             tooltip
-                .html(name)
+                .html("Cluster: " + name + " /  Size: " + size + "<br>Click to highlight / Dblclick to inspect")
                 .style("position", "absolute")
+                .style("font-size", "11px")
                 .style("top", "0%")
-                .style("left", "45%")
+                .style("left", "25%");
+
 
             tooltip.style("opacity", 1)
           })
@@ -207,7 +257,10 @@ export default {
             let node = Array.from(cluster_level_info[d.target.__data__[0]][1])
             let level = node[0], label = node[2]
 
-            d3.select(this).style("cursor", "default").attr("fill", String(store.getters.levelSet[level][label].color));
+            if (label != store.getters.currentCluster.label ||
+                level != store.getters.currentCluster.level) {
+              d3.select(this).style("cursor", "default").attr("fill", String(store.getters.levelSet[level][label].color));
+            }
             tooltip.style("opacity", 0)
           })
     },
@@ -251,10 +304,13 @@ export default {
             let currentLevel = String(d[1]);
 
             if (storedLevel == currentLevel) {
-              return "rgba(0,255,0,0.67)";
+              return highlight;
             } else {
               return "rgba(105,179,162,0.80)";
             }
+          })
+          .attr("id", (d) => {
+            return 'l' + String(d[1]);
           })
           .style("stroke-width", 15)
           .attr("x1", 7)
@@ -267,7 +323,7 @@ export default {
 
             if (storedLevel != currentLevel) {
               d3.select(this).style("cursor", "pointer");
-              d3.select(this).style('stroke', '#ccac00');
+              d3.select(this).style('stroke', highlight);
             }
           })
           .on("mouseout", function (d) {
@@ -279,84 +335,116 @@ export default {
             }
           })
           .on("click", function (d) {
-            let storedLevel = String(store.getters.level)
-            let currentLevel = String(d.target.__data__[1])
+            if (!store.getters.loadingAny) {
+              let storedLevel = String(store.getters.level)
+              let currentLevel = String(d.target.__data__[1])
 
-            if (storedLevel != currentLevel) {
-              d3.selectAll('.levelButtons').style("stroke", "rgba(105,179,162,0.80)")
+              if (storedLevel != currentLevel) {
+                d3.selectAll('.levelButtons').style("stroke", "rgba(105,179,162,0.80)")
 
-              store.commit('updateLevel', currentLevel)
-              getSignificantRoots(store.getters.level);
-              updateAllLabels();
-              updateCurrentLabels({
-                level: store.getters.level,
-                alpha: store.getters.alpha
-              })
-              d3.select(this).style("stroke", "rgba(0,255,0,0.67)");
+                store.commit('updateLevel', currentLevel)
+                getSignificantRoots(store.getters.level);
+                updateAllLabels();
+                updateCurrentLabels({
+                  level: store.getters.level,
+                  alpha: store.getters.alpha
+                })
+                d3.select(this).style("stroke", highlight);
+              }
             }
           })
     },
     mousemove(event, d) {
-      var m = d3.pointer(event);
+      if(this.exclusion && this.isDown) {
+        var m = d3.pointer(event);
 
-      rect.attr("width", Math.max(0, m[0] - +rect.attr("x")))
-          .attr("height", Math.max(0, m[1] - +rect.attr("y")));
+
+        rect.attr("width", Math.max(0, m[0] - +rect.attr("x")))
+        .attr("height", (d) => {
+          d[3] = Math.max(0, m[1] - +rect.attr("y"))
+          return this.yScale(d[3])
+        });
+      }
     },
-    mouseup(event) {
-      this.svg.on("mousemove", null);
-      rects.push(rect)
-
-      circles.forEach(circle => {
-        circle.attr("fill", '#69b3a2')
-        rects.forEach(curRect => {
-          let circBox = circle.node().getBBox();
-          let rectBox = curRect.node().getBBox();
-
-          let minX = rectBox.x
-          let maxX = rectBox.x + rectBox.width
-
-          let minY = rectBox.y
-          let maxY = rectBox.y + rectBox.height
-
-          let color = curRect.attr("fill") == "red" ? "red" : "green"
-          if (minX <= circBox.x && circBox.x <= maxX && minY <= circBox.y && circBox.y <= maxY) {
-            circle.attr("fill", color)
-          }
-        })
-      });
+    mouseover(event, d) {
+      if(this.exclusion){
+        this.svg.style("cursor", "crosshair");
+      } else {
+        this.svg.style("cursor", "default");
+      }
     },
-    dragmove(event, d) {
-      d3.select(this).select('circle')
-          .attr("cy", Math.min(height, Math.max(0, event.y)))
-      d3.select(this).select('line')
-          .attr("y1", Math.min(height, Math.max(0, event.y)))
-          .attr("y2", Math.min(height, Math.max(0, event.y)))
+    mouseout(event, d){
+      this.svg.style("cursor", "default");
+
+      if(rect != null && rect != undefined) {
+        //rect.remove()
+      }
+    },
+    mouseup(event, d) {
+
+      if(this.exclusion && this.isDown && rect != undefined && event.button === 0) {
+        rects.push(rect)
+
+        rect = undefined
+
+        let circles = d3.selectAll('.clusters');
+        /*circles.forEach(circle => {
+          circle.attr("fill", '#69b3a2')
+          rects.forEach(curRect => {
+            let circBox = circle.node().getBBox();
+            let rectBox = curRect.node().getBBox();
+
+            let minX = rectBox.x
+            let maxX = rectBox.x + rectBox.width
+
+            let minY = rectBox.y
+            let maxY = rectBox.y + rectBox.height
+
+            let color = curRect.attr("fill") == "red" ? "red" : "green"
+            if (minX <= circBox.x && circBox.x <= maxX && minY <= circBox.y && circBox.y <= maxY) {
+              circle.attr("fill", color)
+            }
+          })
+        });*/
+      }
+
+      this.isDown = false;
     },
     mousedown(event, d) {
-      var m = d3.pointer(event);
 
-      let color = this.$store.getters.selectInclude ? "lightgreen" : "red"
-      rect = this.svg.append("rect")
-          .attr("x", m[0])
-          .attr("y", m[1])
-          .attr("fill", color)
-          .attr("stroke", "grey")
-          .style("opacity", 0.2)
-          .attr("height", 0)
-          .attr("width", 0)
-          .on("contextmenu", function (event, d) {
-            event.preventDefault();
-            let cur = d3.select(this).remove()
+      this.dragtooltip.remove()
 
-            rects.filter(function (ele) {
-              if (ele != cur) {
-              } else {
-              }
+      if(this.exclusion && event.button === 0) {
+        var m = d3.pointer(event);
 
-              return ele != cur;
-            })
-          });
-      ;
+        let color = this.$store.getters.selectInclude ? "lightgreen" : "red"
+
+        let rect_data = [[m, this.currentScale, m[1] - this.currentHeight, 0]]
+
+        rect = this.svg.append("g").selectAll("rect")
+            .data(rect_data)
+            .enter()
+            .append("rect")
+            .attr("x", (d) => d[0][0])
+            .attr("y", (d) =>  this.yScale(this.correctedHeight(d[0][1])))
+            .attr("fill", color)
+            .attr("class", "exclusions")
+            .attr("stroke", "grey")
+            .style("opacity", 0.2)
+            .attr("height", 0)
+            .attr("width", 0)
+            .on("contextmenu", function (event, d) {
+              event.preventDefault();
+              let cur = d3.select(this).remove()
+
+              rects = rects.filter(function (ele) {
+                return ele === cur;
+              })
+            });
+        ;
+
+        this.isDown = true
+      }
     },
     createTooltip() {
       return d3.select("#" + PANE_NAME)
@@ -372,11 +460,38 @@ export default {
           .style("padding-left", "15px")
           .style("padding-right", "15px")
           .style("line-height", "25px")
+          .style("pointer-events", "none");
+    },
+    createDragTooltip() {
+      return d3.select("#" + PANE_NAME)
+          .append("div")
+          .attr("pointer-events", "none")
+          .style("opacity", 1)
+          .html("<img width='70px' src=\"drag.png\" alt=\"Italian Trulli\"> <br><img style='margin: 0 auto; " +
+              "display: table; padding-bottom: 10px; padding-top:20px;' width='50px' src=\"scrol.png\" alt=\"Italian Trulli\">")
+          .attr("class", "tooltip")
+          .style("background-color", "white")
+          .style("float", "left")
+          .style("position", "absolute")
+          .style("border", "solid")
+          .style("border-width", "1px")
+          .style("border-radius", "5px")
+          .style("padding-left", "15px")
+          .style("padding-right", "15px")
+          .style("line-height", "25px")
+          .style("top", "0%")
+          .style("left", "0%")
+          .style("pointer-events", "none")
+
     },
     createZoom(store, network, edges, circles, levelLines, levelButton, levelLabels, yScale, heightFactor) {
+      let context = this;
       return d3.zoom()
           .on('zoom', function (event) {
-            if (!store.getters.selectExclude) {
+            context.currentHeight = event.transform.y
+            context.currentScale = event.transform.k
+
+            if (!this.exclusion) {
               var new_yScale = event.transform.rescaleY(yScale);
               circles.attr("cy", function (d) {
                 return new_yScale((d[1][1] + 10) * heightFactor)
@@ -402,8 +517,17 @@ export default {
               levelLabels.attr("y", function (d) {
                 return new_yScale(parseInt(d[0]) + 13)
               });
+
+
+              d3.selectAll('.exclusions')
+                  .attr("y", (d) => {
+                    return new_yScale(context.correctedHeight(d[2]))
+                  })
+                  .attr("height", (d) => {
+                    return new_yScale(context.correctedHeight(d[2] + d[3]))
+                  })
             }
-          });
+          })
     },
     trashCallback() {
       rects.forEach(curRect => {
@@ -416,22 +540,8 @@ export default {
     },
     selectCluster(node) {
       this.$store.commit('updateErroredMain', false)
-
       let level = node[0], label = node[2]
-      let cluster = this.$store.getters.levelSet[level][label]
-
-      this.$store.commit('updateCurrentMode', modes.CLUSTER)
-      this.$store.commit('updateCurrentClusterLabel', cluster.label)
-      this.$store.commit('updateCurrentClusterName', cluster.name != null ? cluster.name : cluster.label)
-      this.$store.commit('updateCurrentClusterSize', cluster.size)
-      this.$store.commit('updateCurrentClusterLevel', cluster.level)
-      this.$store.commit('updateLevel', cluster.level)
-
-      updateCurrentLabels({
-        level: cluster.level,
-        current_cluster: cluster.label,
-        alpha: this.$store.getters.alpha
-      })
+      inspect(level, label)
     },
     correctedWidth(width) {
       return (width) * this.widthFactor + 20

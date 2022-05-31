@@ -2,13 +2,12 @@ import {store} from '../store/cluster-state-store'
 import axios from "axios";
 import * as d3 from "d3";
 import {buildAll, buildSpaceBody, buildVelocityBody} from "./dimension-util";
-import {modes} from "./modes";
-import {computeColorLabels, createAllLabelsMap, createAlphaColorMap, createColorMap} from "./colors";
+import {computeColorLabels, createAllLabelsMap, createAlphaColorMap, createColorMap} from "../config/colors";
 import {cloneDeep} from "lodash/lang";
 
 export const host = "http://localhost:5000/api/v1/"
 
-export function updateBatch(){
+export function updateBatch() {
     getCurrentTree();
     getSignificantRoots(store.getters.level);
     updateAllLabels();
@@ -134,7 +133,7 @@ export function updateAllLabels() {
                 createAllLabelsMap(store.getters.alphas, response))
         }, () => {
             store.commit('updateLoadingMain', false);
-            store.commit('updateCurrentMode', modes.ALPHA)
+            store.commit('updateCalculated', true);
         },
         {
             level: store.getters.level
@@ -146,7 +145,8 @@ export function updateNetwork(id) {
     store.commit('updateErroredMain', false)
     store.commit('updateNetworkData', {id: null})
 
-    postData("trees/" + id, resp => {}, () => {
+    postData("trees/" + id, resp => {
+    }, () => {
         getCurrentTree();
         getAllTrees()
     }, buildAll())
@@ -204,19 +204,17 @@ export function updateCurrentCluster() {
     store.commit('updateLoadingVelocity', true)
     store.commit('updateErroredVelocity', false)
 
+    let cluster = store.getters.levelSet[store.getters.currentCluster.level]
+        [store.getters.currentCluster.label]
+
     postData("levels/" + store.getters.level + "/cluster/"
         + store.getters.currentCluster.label, resp => {
-        let data = Array.from(resp.data)
-        store.commit('updateLabels', data)
-        store.commit('updateColorLabels',
-            computeColorLabels(resp.data, store.getters.colorMap,
-                store.getters.noise))
     }, () => {
         store.commit('updateLoadingVelocity', false);
         store.commit('updateLoadingSpace', false);
     }, {
-        custom_label: store.getters.currentCluster.label,
-        custom_label_name: store.getters.currentCluster.name,
+        custom_label: cluster.label,
+        custom_label_name: cluster.name,
         alpha: store.getters.alpha
     })
 }
@@ -234,12 +232,25 @@ export function updateHrd(id) {
         }, store.getters.hrdSelection)
 }
 
+export function updateSelection(id) {
+    //store.commit('updateLoadingHrd', true)
+    //store.commit('updateErroredHrd', false)
+
+    postData("hrd/" + id,
+        resp => {
+            store.commit('updateSelector', resp.data)
+        },
+        () => {
+            //store.commit('updateLoadingHrd', false);
+        }, store.getters.selectorSelection)
+}
+
 export function downloadResource(url) {
-    store.commit('updateLoadingMain', true)
-    store.commit('updateErroredMain', false)
+    store.commit('updateUploadFinished', false)
 
     postData("downloads", resp => {
+        store.commit('updateUploadFinished', true)
     }, () => {
-        store.commit('updateLoadingMain', false)
+
     }, {"url": url})
 }

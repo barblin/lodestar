@@ -9,6 +9,7 @@
 <script>
 import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import * as d3 from "d3";
+import {density_max, highlight} from "../../../config/colors";
 
 const PANE_NAME = "stability_pane"
 
@@ -21,7 +22,8 @@ export default {
   data: function () {
     return {
       PANE_NAME: PANE_NAME,
-      tooltip: {}
+      tooltip: {},
+      svg: {}
     }
   },
   mounted() {
@@ -55,11 +57,11 @@ export default {
 
       d3.select("#" + PANE_NAME).selectAll("svg").remove();
 
-      const margin = {top: 10, right: 10, bottom: 25, left: 25},
+      const margin = {top: 20, right: 10, bottom: 25, left: 25},
           width = parent.clientWidth - margin.left - margin.right,
           height = parent.clientHeight - margin.top - margin.bottom;
 
-      const svg = d3.select("#" + PANE_NAME)
+      this.svg = d3.select("#" + PANE_NAME)
           .append("svg")
           .attr("width", width + margin.left + margin.right)
           .attr("height", height + margin.top + margin.bottom)
@@ -71,15 +73,15 @@ export default {
 
       let array = Array.from(data.domain)
 
-      svg.append("g").append("text")
+      this.svg.append("g").append("text")
           .attr("class", "x label")
           .attr("text-anchor", "end")
           .attr("font-size", 11)
           .attr("x", width - 20)
-          .attr("y", 10)
-          .text("(alpha, delta) combination")
+          .attr("y", -5)
+          .text("(alpha, density) combination")
 
-      svg.append("g")
+      this.svg.append("g")
           .style("transform", function (d) {
             return "rotate(90deg)";
           })
@@ -94,15 +96,12 @@ export default {
       var linearScale = d3.scaleLinear()
           .domain([0, array.length])
           .range([0, width]);
-      svg.append("g")
-          .attr("transform", "translate(0," + height + ")")
-          .call(d3.axisBottom(linearScale));
 
       // Add Y axis
       var y = d3.scaleLinear()
           .domain([0, data.cmax])
           .range([height, 0]);
-      svg.append("g")
+      this.svg.append("g")
           .call(d3.axisLeft(y));
 
       let circles = []
@@ -111,35 +110,35 @@ export default {
       // Add dots
       let store = this.$store;
       let tooltip = this.tooltip
-      svg.append('g')
+      this.svg.append('g')
           .selectAll("dot")
           .data(circles)
           .enter()
           .append("circle")
           .attr("cx", function (d, i) {
-            return linearScale(i);
+            return linearScale(i) + 2.5;
           })
           .attr("cy", function (d) {
-            return y(d.y);
+            return y(d.y) + 3;
           })
           .attr("r", function (d) {
             if (d.alpha == store.getters.alpha &&
                 d.level == store.getters.level) {
               return 5;
             }
-            return 1.5
+            return 2.5
           })
           .style("fill", function (d) {
             if (d.alpha == store.getters.alpha &&
                 d.level == store.getters.level) {
-              return "rgba(0,255,0,0.67)";
+              return highlight;
             }
 
-            return "#155849";
+            return density_max;
           }).on("mouseover", function (d) {
             let name = d.target.__data__.x
 
-            d3.select(this).style("cursor", "pointer").attr("fill", '#ccac00');
+            //d3.select(this).style("cursor", "pointer").attr("fill", highlight);
             tooltip
                 .html(name)
                 .style("position", "absolute")
@@ -152,6 +151,17 @@ export default {
                 d3.select(this).style("cursor", "default").attr("fill", "black");
               tooltip.style("opacity", 0)
           })
+
+      let multiples = []
+      let levels = []
+      let single = width / this.$store.getters.alphas.length
+      for (let i = 0; i < this.$store.getters.alphas.length; i++) {
+        multiples.push([(i + 1) * single, this.$store.getters.alphas[i]])
+        levels.push([(i + 1) * single, "α " + i])
+      }
+
+      this.createLevelLines(parent, multiples, single)
+      this.createLevelLabels(this.svg, levels, single - 20, height + 10)
     },
     createTooltip() {
       return d3.select("#" + PANE_NAME)
@@ -168,6 +178,35 @@ export default {
           .style("padding-right", "15px")
           .style("line-height", "25px")
     },
+    createLevelLines(parent, multiples, single, height) {
+      return this.svg.append('g')
+          .selectAll("line")
+          .data(multiples)
+          .enter()
+          .append('line')
+          .style("stroke-dasharray", ("3, 3"))
+          .style("stroke", "grey")
+          .style("stroke-width", 1)
+          .attr("x1", (d) => d[0] - single)
+          .attr("y1", 0)
+          .attr("x2", (d) => d[0] - single)
+          .attr("y2", parent.clientHeight - 35);
+    },
+    createLevelLabels(svg, widths, full, height) {
+      return svg.append('g')
+          .selectAll("text")
+          .data(widths)
+          .enter()
+          .append("text")
+          .attr("x", (d) => (d[0] - full))
+          .attr("y", height)
+          .attr("dy", ".45em")
+          .attr("font-size", "11px")
+          .attr("pointer-events", "none")
+          .text(function (d) {
+            return d[1]
+          })
+    }
   }
 }
 

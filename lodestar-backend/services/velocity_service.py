@@ -4,37 +4,40 @@ from services.util.util import clean_num
 
 
 def get_velocity(filename, data):
-    columns = [data["v1"], data["v2"]]
-    plot_radial = data["v3"] is not None
+  columns = [data["v1"], data["v2"]]
+  plot_radial = data["v3"] is not None
 
-    solution = []
+  solution = []
 
-    if plot_radial:
-        columns.append(data["v3"])
+  if plot_radial:
+    columns.append(data["v3"])
 
-    x = get_columns_from_dataframe_cluster(data_dict()[filename])
-    x = x[columns]
+  x = get_columns_from_dataframe_cluster(data_dict()[filename])
+  x = x[columns]
 
-    for row in x.iterrows():
-        solution.append(create_entry(row))
+  minx = 10000000
+  maxx = 0
+  miny = 10000000
+  maxy = 0
 
-    return solution
+  for row in x.iterrows():
+    cur_x = clean_num(row[1][0])
+    cur_y = clean_num(row[1][1])
+    cur_z = clean_num(row[1][2])
 
+    if cur_x < minx:
+      minx = cur_x
 
-def create_entry(row):
-    return {'x': clean_num(row[1][0]), 'y': clean_num(row[1][1]),
-            'z': clean_num(row[1][2])}
+    if maxx < cur_x:
+      maxx = cur_x
 
+    if cur_y < miny:
+      miny = cur_y
 
-def get_radial(filename, data):
-    solution = []
-    columns = [data["v3"]]
+    if maxy < cur_y:
+      maxy = cur_y
 
-    x = get_columns_from_dataframe_cluster(data_dict()[filename])
-    x = x[columns]
-    x.dropna()
+    solution.append({'x': cur_x, 'y': cur_y, 'z': cur_z})
 
-    for row in x.iterrows():
-        solution.append(clean_num(row[1][0]))
-
-    return solution
+  return {"solution": solution, "minx": minx, "maxx": maxx, "miny": miny,
+          "maxy": maxy}
