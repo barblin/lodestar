@@ -12,7 +12,10 @@ max_neighbors = 100
 beta = 0.99
 knn_cluster_graph = 30
 knn_hypotest = 20
-levels = 44
+density_lower_limit = 15
+density_upper_limit = 50
+density_step_size = 2
+levels = int((density_upper_limit - density_lower_limit) / density_step_size)
 
 
 alpha_values = [0.05,

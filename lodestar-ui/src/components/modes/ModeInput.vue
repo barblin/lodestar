@@ -6,9 +6,11 @@
 import {modes} from "../../services/modes";
 import TopNav from "../menu/TopNav.vue";
 import {updateAlphas, updateDensityLevels, updateResources} from "../../services/datasource";
+import {store} from "../../store/cluster-state-store";
 
 export default {
   name: "ModeInput",
+  props: ['calculated'],
   data() {
     return {
       modes: modes
@@ -22,6 +24,13 @@ export default {
     updateDensityLevels();
     updateAlphas();
   },
+  watch: {
+    calculated: function (val) {
+      if (val) {
+        this.$store.commit('updateCurrentMode', modes.ALPHA)
+      }
+    },
+  }
 }
 </script>
 

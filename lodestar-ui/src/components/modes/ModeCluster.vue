@@ -1,10 +1,10 @@
 <template>
-  <ViewHeader class="header" :title='"Density Navigation - Use zooming and panning to navigate"' :branch="true" :trash="true"
-              :trash-callback="trashCallback" :alpha="true" :exclude="true" :include="true" :noise="true"
-              :inspect="true" :disease="true" :draw-polygon="true"></ViewHeader>
+  <ViewHeader class="header" :title='""'
+              :branch="false" :trash="false"
+              :trash-callback="trashCallback" :alpha="true" :exclude="false" :include="true" :noise="true"
+              :inspect="true" :disease="false" :draw-polygon="false"></ViewHeader>
   <div :id="views.SPACE" class="space">
     <Space :parent="views.SPACE" :drawScatter="$store.getters.drawSpaceScatter"
-           :drawNet="$store.getters.drawSpaceNet"
            :magnify="$store.getters.inspectCluster"
            :spaceData="$store.getters.spaceData"
            :colorLabels="$store.getters.colorLabels"/>
@@ -12,8 +12,6 @@
   <div :id="views.VELOCITY" class="velocity">
     <Velocity :parent="views.VELOCITY"
               :drawScatter="$store.getters.drawVelocityScatter"
-              :drawNet="$store.getters.drawVelocityNet"
-              :netData="$store.getters.velocityNetworkData"
               :scatData="$store.getters.velocityScatterData"
               :colorLabels="$store.getters.colorLabels"/>
   </div>

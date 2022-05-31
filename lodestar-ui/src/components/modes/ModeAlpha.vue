@@ -1,36 +1,35 @@
 <template>
-  <ViewHeader id="header" class="header" :title='"Density Navigation - Use zooming and panning to navigate"'
-              :branch="true" :trash="true"
-              :trash-callback="trashCallback" :alpha="true" :exclude="true" :include="true" :noise="true"
-              :inspect="true" :disease="true" :draw-polygon="true"></ViewHeader>
+  <ViewHeader id="header" class="header" :title='""'
+              :branch="false" :trash="false"
+              :trash-callback="trashCallback" :alpha="true" :exclude="false" :include="true" :noise="true"
+              :inspect="true" :disease="false" :draw-polygon="false"></ViewHeader>
   <div :id="views.SPACE" class="space">
     <Space :parent="views.SPACE" :drawScatter="$store.getters.drawSpaceScatter"
-           :drawNet="$store.getters.drawSpaceNet"
            :magnify="$store.getters.inspectCluster"
            :spaceData="$store.getters.spaceData"
-           :colorLabels="$store.getters.colorLabels"/>
+           :colorLabels="$store.getters.colorLabels"
+           :highlight="$store.getters.highlightCluster"/>
   </div>
   <div :id="views.VELOCITY" class="velocity">
     <Velocity :parent="views.VELOCITY"
-              :drawScatter="$store.getters.drawVelocityScatter"
-              :drawNet="$store.getters.drawVelocityNet"
-              :netData="$store.getters.velocityNetworkData"
               :scatData="$store.getters.velocityScatterData"
-              :colorLabels="$store.getters.colorLabels"/>
+              :colorLabels="$store.getters.colorLabels"
+              :highlight="$store.getters.highlightCluster"/>
   </div>
   <div :id="views.HRD" class="hrd">
-    <HRD :parent="views.HRD" :plotData="$store.getters.hrd" :selections="$store.getters.resourceHeaders"
-         :color-labels="$store.getters.colorLabels"/>
+    <HRD :plotData="$store.getters.hrd" :color-labels="$store.getters.colorLabels" :parent="views.HRD"
+         :highlight="$store.getters.highlightCluster"/>
+  </div>
+  <div :id="views.SELECTOR" class="selector">
+    <Selector :plotData="$store.getters.selector" :selections="$store.getters.resourceHeaders" :parent="views.SELECTOR"
+         :color-labels="$store.getters.colorLabels" :highlight="$store.getters.highlightCluster"/>
   </div>
   <div :id="views.NETWORK" v-if="!$store.getters.loadingMain" class="network">
     <DensityExplorer :networkData="$store.getters.networkData" :parent="views.NETWORK"
-                     :labels="$store.getters.labels"/>
+                     :labels="$store.getters.labels" :exclusion="$store.getters.selectExclude" />
   </div>
   <div :id="views.ALPHA" class="alpha">
-    <Alpha :parent="views.ALPHA" :significantRoots="$store.getters.significantRoots"
-           :clusterLabel="$store.getters.currentCluster.label"
-           :labels="$store.getters.labels"
-           :allLabels="$store.getters.allLabels"/>
+    <Alpha :parent="views.ALPHA" :allLabels="$store.getters.allLabels"/>
   </div>
   <div :id="views.HEAT_MAP" class="heat-map">
     <HeatMap :parent="views.HEAT_MAP" :heatmap="$store.getters.heatmap" :level="$store.getters.level"
@@ -51,8 +50,9 @@ import ViewHeader from "../nav/ViewHeader.vue";
 import Alpha from "../views/alpha/Alpha.vue";
 import HeatMap from "../views/alpha/HeatMap.vue";
 import Stability from "../views/alpha/Stability.vue";
-import {updateCurrentLabels, updateResourceHeaders, updateResources} from "../../services/datasource";
 import HRD from "../views/detail/HRD.vue";
+import {updateCurrentLabels, updateResourceHeaders, updateResources} from "../../services/datasource";
+import Selector from "../views/detail/Selector.vue";
 
 export default {
   name: "ModeAlpha",
@@ -66,6 +66,7 @@ export default {
     Space,
     Velocity,
     HRD,
+    Selector,
     DensityExplorer,
     Alpha,
     HeatMap,
@@ -101,26 +102,30 @@ export default {
   order: 3;
 }
 
-#network {
+#selector {
   order: 4;
 }
 
-#alpha {
+#network {
   order: 5;
 }
 
-#heat_map {
+#alpha {
   order: 6;
 }
 
-#stability {
+#heat_map {
   order: 7;
+}
+
+#stability {
+  order: 8;
 }
 
 .space {
   position: relative;
   float: left;
-  width: 45%;
+  width: 400px;
   height: 300px;
   border: 1px solid darkslategrey;
   margin-bottom: 5px;
@@ -130,7 +135,7 @@ export default {
 .velocity {
   position: relative;
   float: left;
-  width: 35%;
+  width: 375px;
   height: 300px;
   border: 1px solid darkslategrey;
   margin-bottom: 5px;
@@ -140,12 +145,21 @@ export default {
 .hrd {
   position: relative;
   float: left;
-  width: 18%;
+  width: 375px;
   height: 300px;
+  margin-right: 5px;
   border: 1px solid darkslategrey;
   margin-bottom: 5px;
 }
 
+.selector {
+  position: relative;
+  float: left;
+  width: 375px;
+  height: 300px;
+  border: 1px solid darkslategrey;
+  margin-bottom: 5px;
+}
 
 .network {
   position: relative;
@@ -172,7 +186,8 @@ export default {
   float: left;
   width: 70%;
   height: 250px;
-  margin-top: 5px;
+  margin-top: 8px;
+  margin-left: -3px;
 }
 
 .stability {

@@ -4,7 +4,7 @@
     <span v-if="$store.getters.loadingMain" class="center">
       <RingLoader :size="'200px'" v-if="$store.getters.loadingMain"></RingLoader>
     </span>
-    <ModeInput v-if="$store.getters.currentMode == modes.INPUT"></ModeInput>
+    <ModeInput v-if="$store.getters.currentMode == modes.INPUT" :calculated="$store.getters.calculated"></ModeInput>
     <ModeLevelSet v-if="$store.getters.currentMode == modes.LEVEL_SET"></ModeLevelSet>
     <ModeCluster v-if="$store.getters.currentMode == modes.CLUSTER"></ModeCluster>
     <ModeAlpha v-if="$store.getters.currentMode == modes.ALPHA"></ModeAlpha>

@@ -1,5 +1,5 @@
 <template>
-  <sidebar-menu :menu="menu" @itemClick="onItemClick" :collapsed="collapsed"/>
+  <sidebar-menu :menu="menu" @itemClick="onItemClick" :collapsed="collapsed" :width="'210px'" :hide-toggle="hideToggle"/>
 </template>
 
 <script>
@@ -24,28 +24,30 @@ export default {
         },
         {
           href: '/',
-          title: 'Cluster Explorer',
+          title: 'Run Algorithm',
           icon: 'fa fa-eye'
         },
         {
-          href: '/charts',
-          title: 'How to use?',
+          href: '/tutorial',
+          title: 'Tutorial',
           icon: 'fa fa-chart-area'
         },
         {
           href: '/resources',
-          title: 'Manage resources',
+          title: 'Resources',
           icon: 'fa fa-database'
         }
       ],
-      collapsed: true
+      collapsed: false,
+      hideToggle: true
     }
   },
   methods: {
     onItemClick(event, item) {
       if(item.href = "/resources"){
-        this.$store.commit('updateCurrentMode', modes.INPUT)
         this.$router.push('/resources')
+      } else if(item.href = "/tutorial"){
+        this.$router.push('/tutorial')
       } else {
         updateResources();
         this.$store.commit('updateCurrentMode', modes.INPUT)

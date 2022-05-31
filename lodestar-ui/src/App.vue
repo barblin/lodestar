@@ -21,7 +21,8 @@ body {
 }
 
 .dashboard {
-  margin-left: 70px;
+  margin-left: 220px;
+  margin-right: 20px;
 }
 
 </style>

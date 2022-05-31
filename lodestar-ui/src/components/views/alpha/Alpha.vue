@@ -12,6 +12,7 @@ import * as d3 from "d3";
 import {percentChange} from "../../../services/views";
 import {createLevelLabels} from "../../../services/d3-tools";
 import {updateBatch} from "../../../services/datasource";
+import {highlight} from "../../../config/colors";
 
 const PANE_NAME = "alpha_pane"
 
@@ -19,12 +20,13 @@ let pos_map = {}
 
 export default {
   name: "Alpha",
-  props: ['parent', 'significantRoots', 'clusterLabel', 'labels', 'allLabels'],
+  props: ['parent', 'allLabels'],
   data: function () {
     return {
       PANE_NAME: PANE_NAME,
       svg: {},
       widthFactor: 1,
+      tooltip: {}
     }
   },
   components: {
@@ -34,21 +36,15 @@ export default {
     this.redraw(this.$store.getters.significantRoots)
   },
   watch: {
-    significantRoots: function (data) {
-      this.redraw(data)
-    },
-    clusterLabel: function () {
-      this.redraw(this.$store.getters.significantRoots)
-    },
-    labels: function () {
-      this.redraw(this.$store.getters.significantRoots)
-    },
     allLabels: function () {
       this.redraw(this.$store.getters.significantRoots)
     },
   },
   methods: {
     redraw(significantRoots) {
+      d3.select("#" + PANE_NAME).selectAll(".tooltip").remove();
+
+      this.tooltip = this.createTooltip();
       pos_map = {}
 
       d3.select("#" + PANE_NAME).selectAll("svg").remove();
@@ -97,6 +93,7 @@ export default {
     createLevelButtons(store, multiples, single) {
       let context = this;
 
+      let tooltip = this.tooltip
       return this.svg.append('g')
           .selectAll("line")
           .data(multiples)
@@ -106,7 +103,7 @@ export default {
           .style("stroke", ("3, 3"))
           .style("stroke", (d) => {
             if (String(d[1]) === String(store.getters.alpha)) {
-              return 'rgba(0,255,0,0.67)'
+              return highlight
             } else {
               return "rgba(105,179,162,0.80)"
             }
@@ -121,21 +118,36 @@ export default {
               d3.select(this).style("cursor", "pointer");
               d3.select(this).style('stroke', '#ccac00');
             }
+            tooltip
+                .html("alpha: " + String(d.target.__data__[1]))
+                .style("position", "absolute")
+                .style("top", "0%")
+                .style("left", "35%")
+
+            tooltip.style("opacity", 1)
           })
           .on("mouseout", function (d) {
+            d3.select("#" + PANE_NAME).selectAll(".tooltip").style("opacity", 0);
+
+
             if (!context.storedAlphaEqualsCurrent(d, store)) {
               d3.select(this).style("stroke", "rgba(105,179,162,0.80)");
             }
+            //tooltip.style("opacity", 0)
           })
           .on("click", function (d) {
-            if (!context.storedAlphaEqualsCurrent(d, store)) {
-              d3.selectAll('.alphaButtons').style("stroke", "rgba(105,179,162,0.80)")
+            if (!store.getters.loadingAny) {
+              d3.select("#" + PANE_NAME).selectAll(".tooltip").style("opacity", 0);
+
+              if (!context.storedAlphaEqualsCurrent(d, store)) {
+                d3.selectAll('.alphaButtons').style("stroke", "rgba(105,179,162,0.80)")
 
 
-              store.commit('updateAlpha', d.target.__data__[1])
-              updateBatch()
+                store.commit('updateAlpha', d.target.__data__[1])
+                updateBatch()
 
-              d3.select(this).style("stroke", "rgba(0,255,0,0.67)");
+                d3.select(this).style("stroke", highlight);
+              }
             }
           })
     },
@@ -145,7 +157,15 @@ export default {
       let multiples = []
       let multiplesAlpha = []
 
-      let singleWidth = (parent.clientWidth - 25) / alpha_nodes[0].length
+      let maxLength = 0;
+
+      alpha_nodes.forEach(node => {
+        if (maxLength < node.length) {
+          maxLength = node.length
+        }
+      })
+
+      let singleWidth = (parent.clientWidth - 25) / maxLength
       let singleHeight = height / alphas.length
       let radius = 10
 
@@ -286,7 +306,22 @@ export default {
       let storedAlpha = String(store.getters.alpha)
       let currentAlpha = String(d.target.__data__[1])
       return storedAlpha === currentAlpha;
-    }
+    },
+    createTooltip() {
+      return d3.select("#" + PANE_NAME)
+          .append("div")
+          .style("opacity", 0)
+          .attr("class", "tooltip")
+          .style("background-color", "white")
+          .style("float", "left")
+          .style("position", "relative")
+          .style("border", "solid")
+          .style("border-width", "1px")
+          .style("border-radius", "5px")
+          .style("padding-left", "15px")
+          .style("padding-right", "15px")
+          .style("line-height", "25px")
+    },
   }
 }
 

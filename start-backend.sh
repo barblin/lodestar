@@ -6,7 +6,7 @@ cd lodestar-backend
 source venv/bin/activate
 
 export FLASK_APP=./app.py
-flask run --with-threads
+flask run
 
 deactivate
 cd ..

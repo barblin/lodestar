@@ -14,11 +14,15 @@ export const store = createStore({
             v3: 66,
             rad_error: 67
         },
-        hrdSelection: {
+        selectorSelection: {
             x: "ra",
             y: "dec"
         },
-        level: 44,
+        hrdSelection: {
+            x: "bp_rp",
+            y: "mag_abs_g"
+        },
+        level: 17,
         alpha: 0.05,
         maxLevel: 0,
         noise: false,
@@ -52,6 +56,7 @@ export const store = createStore({
         velocityNetworkData: {},
         networkData: null,
         hrd: {},
+        selector: {},
 
         resources: [],
         resourceHeaders: [],
@@ -67,11 +72,18 @@ export const store = createStore({
         plotRadial: false,
         inspectCluster: false,
         selectExclude: false,
-        heatmap: []
+        heatmap: [],
+
+        calculated: false,
+        uploadFinished: false,
+        highlightCluster: null
     },
     mutations: {
         updateCurrentViewSelection(state, selection) {
             state.currentViewSelection = selection
+        },
+        updatePreviousMode(state, mode) {
+            state.previousMode = mode
         },
         updateCurrentMode(state, mode) {
             state.currentMode = mode
@@ -81,6 +93,12 @@ export const store = createStore({
         },
         updateHrdSelection(state, selection) {
             state.hrdSelection = selection
+        },
+        updateSelector(state, data) {
+            state.selector = data
+        },
+        updateSelectorSelection(state, data) {
+            state.selectorSelection = data
         },
         updateLoadingScatter(state, isLoading) {
             state.loadingScatter = isLoading
@@ -232,12 +250,23 @@ export const store = createStore({
         updateHeatmap(state, data) {
             state.heatmap = data
         },
+        updateCalculated(state, data) {
+            state.calculated = data
+        },
+        updateUploadFinished(state, data) {
+            state.uploadFinished = data
+        },
+        updateHighlightCluster(state, data) {
+            state.highlightCluster = data
+        }
     },
     getters: {
         currentViewSelection: state => state.currentViewSelection,
+        previousMode: state => state.previousMode,
         currentMode: state => state.currentMode,
         currentColumnSelection: state => state.currentColumnSelection,
         hrdSelection: state => state.hrdSelection,
+        selectorSelection: state => state.selectorSelection,
 
         loadingMain: state => state.loadingMain,
         erroredMain: state => state.erroredMain,
@@ -248,13 +277,14 @@ export const store = createStore({
         loadingHrd: state => state.loadingHrd,
         erroredHrd: state => state.erroredHrd,
 
-        loadingAny: state => state.loadingSpace || state.loadingMain || state.loadingVelocity || state.loadingHrd,
+        loadingAny: state => state.loadingSpace || state.loadingMain || state.loadingVelocity,
 
         networkData: state => state.networkData,
         spaceData: state => state.spaceData,
         velocityNetworkData: state => state.velocityNetworkData,
         velocityScatterData: state => state.velocityScatterData,
         hrd: state => state.hrd,
+        selector: state => state.selector,
 
         overallTime: state => state.overallTime,
 
@@ -288,6 +318,11 @@ export const store = createStore({
         levelSet: state => state.levelSet,
         significantRoots: state => state.significantRoots,
         temporaryClusterName: state => state.temporaryClusterName,
-        heatmap: state => state.heatmap
+        heatmap: state => state.heatmap,
+
+        calculated: state => state.calculated,
+        uploadFinished: state => state.uploadFinished,
+
+        highlightCluster: state => state.highlightCluster
     }
 })

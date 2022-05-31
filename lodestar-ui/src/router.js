@@ -1,6 +1,7 @@
-import { createWebHistory, createRouter } from "vue-router";
+import {createRouter, createWebHistory} from "vue-router";
 import Dashboard from "./components/Dashboard.vue";
 import ResourceManager from "./components/ResourceManager.vue";
+import Tutorial from "./components/Tutorial.vue";
 
 const routes = [
     {
@@ -12,6 +13,11 @@ const routes = [
         path: "/resources",
         name: "ResourceManager",
         component: ResourceManager,
+    },
+    {
+        path: "/tutorial",
+        name: "Tutorial",
+        component: Tutorial,
     },
 ];
 

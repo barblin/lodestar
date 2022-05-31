@@ -4,7 +4,7 @@
     <span class="toolbar">
       <div class="tooltip">
         <font-awesome-icon class="tool select-red" v-if="exclude" v-on:click="exclusiveSelect" icon="vector-square"/>
-        <span class="tooltiptext">Exclude select clusters</span>
+        <span class="tooltiptext">Exclude selected clusters</span>
       </div>
       <!--<div class="tooltip">
         <font-awesome-icon class="tool select-green" v-if="include" v-on:click="inclusiveSelect" icon="vector-square"/>
@@ -50,27 +50,32 @@
     </span>
     <span class="nav-bar">
       <div class="tooltip-nav-bar">
-        <font-awesome-icon class="back" v-if="isModeLevelSet() || isModeCluster()" v-on:click="goBack" icon="backward"/>
-        <span class="tooltiptext">Go back</span>
+        <font-awesome-icon class="check" v-if="isModeLevelSet()" v-on:click="goBack" icon="backward"/>
+        <span class="tooltiptext">Go back to alpha and density selection</span>
       </div>
-            <div class="tooltip-nav-bar" v-if="$store.getters.level != null">
+      <div class="tooltip-nav-bar">
+        <font-awesome-icon class="check" v-if="isModeCluster()"
+                           v-on:click="exitAndSaveClusterDetails" icon="backward"/>
+        <span class="tooltiptext">Go back to previous view</span>
+      </div>
+      <div class="tooltip-nav-bar">
+        <font-awesome-icon class="check" v-if="isModeAlpha()"
+                           v-on:click="continueWithSelection" icon="forward"/>
+        <span class="tooltiptext">Continue with current alpha and density selection</span>
+      </div>
+      <div class="tooltip-nav-bar" v-if="$store.getters.level != null && !isModeCluster()">
         <a :href="'http://localhost:5000/api/v1/exports/' + $store.getters.currentResource + '?level='
         + $store.getters.level + '&alpha=' + $store.getters.alpha"
            :download="$store.getters.currentResource + '_labeled.csv'"
         >
           <font-awesome-icon class="export" icon="file-export"/>
         </a>
-        <span class="tooltiptext">Export current state</span>
+        <span class="tooltiptext">Export current alpha and density selection (clustering) to file</span>
       </div>
       <div class="tooltip-nav-bar">
-        <font-awesome-icon class="check" v-if="isModeAlpha()"
-                           v-on:click="continueWithSelection" icon="check-square"/>
-        <span class="tooltiptext">Continue with selection</span>
-      </div>
-      <div class="tooltip-nav-bar">
-        <font-awesome-icon class="check" v-if="isModeCluster()"
-                           v-on:click="exitAndSaveClusterDetails" icon="floppy-disk"/>
-        <span class="tooltiptext">Save cluster and Exit</span>
+        <font-awesome-icon class="rerun"
+                           v-on:click="rerun" icon="arrow-rotate-right"/>
+        <span class="tooltiptext">Restart algorithm run</span>
       </div>
     </span>
   </div>
@@ -79,8 +84,8 @@
 <script>
 
 import {modes} from "../../services/modes";
-import {computeColorLabels} from "../../services/colors";
-import {updateCurrentCluster} from "../../services/datasource";
+import {computeColorLabels} from "../../config/colors";
+import {updateCurrentCluster, updateCurrentLabels} from "../../services/datasource";
 
 export default {
   name: "Header",
@@ -88,15 +93,21 @@ export default {
     'include', 'exclude', 'noise', 'fileExport'],
   methods: {
     updateNet() {
-      this.$emit('updateNet')
-      this.$store.commit('updateInspectCluster', !this.$store.getters.inspectCluster)
+      if (!this.$store.getters.loadingAny) {
+        this.$emit('updateNet')
+        this.$store.commit('updateInspectCluster', !this.$store.getters.inspectCluster)
+      }
     },
     updateScatter() {
-      this.$emit('updateScatter')
-      this.$store.commit('updateInspectCluster', !this.$store.getters.inspectCluster)
+      if (!this.$store.getters.loadingAny) {
+        this.$emit('updateScatter')
+        this.$store.commit('updateInspectCluster', !this.$store.getters.inspectCluster)
+      }
     },
     inspectCluster() {
-      this.$store.commit('updateInspectCluster', !this.$store.getters.inspectCluster)
+      if (!this.$store.getters.loadingAny) {
+        this.$store.commit('updateInspectCluster', !this.$store.getters.inspectCluster)
+      }
     },
     inspectJoins() {
       if (this.isModeAlpha()) {
@@ -118,26 +129,37 @@ export default {
       this.$store.commit('updateSelectInclude', true)
     },*/
     exclusiveSelect() {
-      this.$store.commit('updateSelectExclude', false)
+      this.$store.commit('updateSelectExclude', !this.$store.getters.selectExclude)
     },
     toggleNoise() {
-      this.$store.commit('updateNoise', !this.$store.getters.noise)
-      this.$store.commit('updateColorLabels', computeColorLabels(this.$store.getters.labels,
-          this.$store.getters.colorMap,
-          this.$store.getters.noise))
+      if (!this.$store.getters.loadingAny) {
+        this.$store.commit('updateNoise', !this.$store.getters.noise)
+        this.$store.commit('updateColorLabels', computeColorLabels(this.$store.getters.labels,
+            this.$store.getters.colorMap,
+            this.$store.getters.noise))
+      }
     },
     continueWithSelection() {
-      if (this.isModeAlpha()) {
-        this.$store.commit('updateCurrentMode', modes.LEVEL_SET)
-      } else if (this.isModeLevelSet()) {
-        this.$store.commit('updateCurrentMode', modes.CLUSTER)
+      if (!this.$store.getters.loadingAny) {
+        if (this.isModeAlpha()) {
+          this.$store.commit('updateCurrentMode', modes.LEVEL_SET)
+        } else if (this.isModeLevelSet()) {
+          this.$store.commit('updateCurrentMode', modes.CLUSTER)
+        }
       }
     },
     goBack() {
-      if (this.isModeLevelSet()) {
-        this.$store.commit('updateCurrentMode', modes.ALPHA)
-      } else if (this.isModeCluster()) {
-        this.$store.commit('updateCurrentMode', modes.LEVEL_SET)
+      if (!this.$store.getters.loadingAny) {
+        if (this.isModeLevelSet()) {
+          this.$store.commit('updateCurrentMode', modes.ALPHA)
+        } else if (this.isModeCluster()) {
+          this.exitAndSaveClusterDetails()
+        }
+      }
+    },
+    rerun() {
+      if (!this.$store.getters.loadingAny) {
+        location.reload()
       }
     },
     exitAndSaveClusterDetails() {
@@ -145,9 +167,12 @@ export default {
           [this.$store.getters.currentCluster.label]
       cluster.name = this.$store.getters.temporaryClusterName
       this.$store.commit("addNode", cluster)
-      this.$store.commit('updateCurrentClusterName', this.$store.getters.temporaryClusterName)
-      this.$store.commit('updateCurrentMode', modes.LEVEL_SET)
       updateCurrentCluster()
+      this.$store.commit('updateCurrentMode', this.$store.getters.previousMode)
+      updateCurrentLabels({
+        level: this.$store.getters.level,
+        alpha: this.$store.getters.alpha
+      })
     }
   }
 }
@@ -176,10 +201,8 @@ export default {
 
 .view-header {
   background-color: #d5e7c9;
-  width: 115%;
-  margin-left: -14px;
-  margin-top: -8px;
-  margin-bottom: 5px;
+  width: 102%;
+  margin: -8px -30px 5px -20px;
 }
 
 .view-header-title {
@@ -203,43 +226,44 @@ export default {
   border: solid gray 1px;
   cursor: pointer;
   opacity: 0.5;
-  height: 20px;
-  width: 20px;
+  height: 30px;
+  width: 30px;
 }
 
 .check {
-  margin-right: 5px;
-  margin-top: 4px;
-  margin-bottom: -3px;
-  cursor: pointer;
-  opacity: 1;
-  color: green;
-  height: 25px;
-  width: 25px;
-  float: right;
-}
-
-.back {
   margin-right: 15px;
   margin-top: 4px;
   margin-bottom: -3px;
   cursor: pointer;
   opacity: 1;
-  color: chocolate;
-  height: 25px;
-  width: 25px;
+  color: green;
+  height: 35px;
+  width: 35px;
+  float: right;
+}
+
+.rerun {
+  margin-right: 5px;
+  margin-left: 5px;
+  margin-top: 4px;
+  margin-bottom: -3px;
+  cursor: pointer;
+  opacity: 1;
+  color: green;
+  height: 34px;
+  width: 34px;
   float: right;
 }
 
 .export {
-  margin-right: 10px;
+  margin-right: 5px;
   margin-top: 4px;
   margin-bottom: -3px;
   cursor: pointer;
   opacity: 1;
   color: cornflowerblue;
-  height: 25px;
-  width: 25px;
+  height: 35px;
+  width: 35px;
   float: right;
 }
 
@@ -272,7 +296,7 @@ export default {
   bottom: -30px;
   left: 10px;
   visibility: hidden;
-  width: 200px;
+  width: 500px;
   background-color: gray;
   color: #fff;
   text-align: center;
@@ -296,7 +320,7 @@ export default {
   bottom: -30px;
   right: 10px;
   visibility: hidden;
-  width: 200px;
+  width: 500px;
   background-color: gray;
   color: #fff;
   text-align: center;

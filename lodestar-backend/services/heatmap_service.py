@@ -1,6 +1,6 @@
 import json
 
-from config.config import alpha_values
+from config.config import alpha_values, levels
 from services.data.tree_source import get_tree
 from services.significant_roots_service import collect_roots
 
@@ -69,7 +69,7 @@ def compute_alpha_hist(alpha_map):
   min_value = 1000000
   max_value = 0
 
-  for i in range(0, 45):
+  for i in range(0, levels+1):
     sum = 0
     for a_key in alpha_map.keys():
       sum += alpha_map[a_key][i]
@@ -94,10 +94,10 @@ def get_cluster_for_alpha_and_density():
 
     left_tree = json.loads(get_tree(str(tree)))
 
-    for level in range(0, 45):
+    for level in range(0, levels+1):
       clusters = collect_roots(left_tree["node_level_clusters"], level)
 
-      domain.append("α" + str(i) + "," + "d" + str(level))
+      domain.append("α " + str(i) + "," + "d " + str(level))
 
       num_cluster = len(clusters)
       cluster.append({'num_cluster': num_cluster, 'level': level, 'alpha': alpha_values[i]})
@@ -113,7 +113,7 @@ def calculate_heatmap():
   alpha_trees = {}
 
   for i in range(0, len(alpha_values)):
-    for level in range(0, 45):
+    for level in range(0, levels+1):
       amount = 0
       difference = 0
 
@@ -129,7 +129,7 @@ def calculate_heatmap():
         difference += len(set(current).symmetric_difference(set(bottom)))
         amount += 1
 
-      if (level + 1) < 45:
+      if (level + 1) < levels + 1:
         right = get_clusters(alpha_trees, i, level + 1)
         difference += len(set(current).symmetric_difference(set(right)))
         amount += 1

@@ -10,6 +10,7 @@
 import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import * as d3 from "d3";
 import {updateBatch} from "../../../services/datasource";
+import {density_max, highlight} from "../../../config/colors";
 
 const PANE_NAME = "heat_map_pane"
 
@@ -18,7 +19,8 @@ export default {
   props: ['parent', 'heatmap', 'level', 'alpha'],
   data: function () {
     return {
-      PANE_NAME: PANE_NAME
+      PANE_NAME: PANE_NAME,
+      tooltip: {}
     }
   },
   components: {
@@ -51,8 +53,9 @@ export default {
       }
 
       d3.select("#" + PANE_NAME).selectAll("svg").remove();
+      this.tooltip = this.createTooltip();
 
-      const margin = {top: 50, right: 50, bottom: 17, left: 25},
+      const margin = {top: 50, right: 50, bottom: 19, left: 25},
           width = parent.clientWidth - margin.left - margin.right,
           height = parent.clientHeight - margin.top - margin.bottom;
 
@@ -63,6 +66,15 @@ export default {
           .append("g")
           .attr("transform",
               "translate(" + margin.left + "," + 0 + ")");
+
+      var legend = svg.append('g')
+      legend.append("circle").attr("cx",0).attr("cy", 10).attr("r", 6).style("fill", "white").style("stroke", "black")
+      legend.append("circle").attr("cx",170).attr("cy", 10).attr("r", 6).style("fill", density_max).style("border", "1px solid black")
+      legend.append("text").attr("x", 10).attr("y", 11).text("Much delta (unstable)").style("font-size", "11").attr("alignment-baseline","middle")
+      legend.append("text").attr("x", 180).attr("y", 11).text("Little delta (stable)").style("font-size", "11").attr("alignment-baseline","middle")
+
+      legend.attr("transform",
+          "translate(" + width/2 + "," + 0 + ")")
 
       var myGroups = []
       var myVars = []
@@ -78,7 +90,7 @@ export default {
           .attr("font-size", 11)
           .attr("x", width)
           .attr("y", 15)
-          .text("density delta")
+          .text("Delta in density")
 
       svg.append("text")
           .style("transform", function (d) {
@@ -89,7 +101,7 @@ export default {
           .attr("font-size", 11)
           .attr("x", 125)
           .attr("y", -width - 40)
-          .text("alpha delta")
+          .text("Delta in alpha")
 
 
       var x = d3.scaleBand()
@@ -112,8 +124,9 @@ export default {
 
       var myColor = d3.scalePow()
           .exponent(0.5)
-          .range(["white", "#155849"])
+          .range(["white", density_max])
           .domain([data.max_value, data.min_value])
+
 
       let self = this;
 
@@ -121,6 +134,7 @@ export default {
       self.createDensityHistogram(svg, parent, data.alpha_histo, data.amin, data.amax)
 
       let store = this.$store
+      let tooltip = this.tooltip
       svg.append('g')
           .attr("transform",
               "translate(" + 0 + "," + margin.top + ")")
@@ -141,19 +155,31 @@ export default {
           .style("fill", function (d) {
             if (d.alpha == store.getters.alpha &&
                 d.level == store.getters.level) {
-              return "rgba(0,255,0,0.67)";
+              return highlight;
             }
 
             return myColor(d.value)
           })
           .on("mouseover", function (d) {
               d3.select(this).style("cursor", "pointer");
+            tooltip
+                .html("alpha: " + event.target.__data__.alpha + ", density: " + event.target.__data__.level)
+                .style("position", "absolute")
+                .style("top", "0%")
+                .style("left", "40%")
+
+            tooltip.style("opacity", 1)
+          }).on("mouseout", function (d){
+             tooltip.style("opacity", 0)
           })
           .on("click", function (event) {
-            store.commit('updateAlpha', event.target.__data__.alpha)
-            store.commit('updateLevel', event.target.__data__.level)
+            if(!store.getters.loadingAny) {
+              tooltip.style("opacity", 0)
+              store.commit('updateAlpha', event.target.__data__.alpha)
+              store.commit('updateLevel', event.target.__data__.level)
 
-            updateBatch();
+              updateBatch();
+            }
           })
     },
     createDensityHistogram(svg, parent, data, min, max) {
@@ -182,7 +208,7 @@ export default {
           .attr("height", function (d) {
             return height - y(d);
           })
-          .style("fill", "grey")
+          .style("fill", "#FF7F7F")
     },
     createAlphaHistogram(svg, parent, data, min, max) {
       const margin = {top: parent.clientHeight, right: 0, bottom: -50, left: 0},
@@ -215,8 +241,23 @@ export default {
           .attr("height", function (d) {
             return height - y(d);
           })
-          .style("fill", "grey")
-    }
+          .style("fill", "#FF7F7F")
+    },
+    createTooltip() {
+      return d3.select("#" + PANE_NAME)
+          .append("div")
+          .style("opacity", 0)
+          .attr("class", "tooltip")
+          .style("background-color", "white")
+          .style("float", "left")
+          .style("position", "relative")
+          .style("border", "solid")
+          .style("border-width", "1px")
+          .style("border-radius", "5px")
+          .style("padding-left", "15px")
+          .style("padding-right", "15px")
+          .style("line-height", "25px")
+    },
   }
 }
 
