@@ -12,3 +12,6 @@ numba==0.53.1
 flask==2.0.1
 shapely==1.7.1
 astropy==4.3.post1
+apispec==5.2.1
+flask-apispec==0.10.0
+apispec-webframeworks==0.5.2

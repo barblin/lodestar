@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard">
-    <Dashboard />
+    <router-view></router-view>
   </div>
 </template>
 
@@ -21,7 +21,8 @@ body {
 }
 
 .dashboard {
-  margin-left: 100px;
+  margin-left: 220px;
+  margin-right: 20px;
 }
 
 </style>

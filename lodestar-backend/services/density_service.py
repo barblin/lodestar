@@ -1,71 +1,87 @@
-import numpy as np
+import time
 
-from code.Modality.DensityEstKNN import DensityEstKNN
-from code.Modality.MergeGraph import MergeGraph
-from code.Modality.merge_strategy import MergePaths
-from code.NoiseRemoval.RemoveNoiseTransformed import remove_noise_simple
-from code.ScaleSpace.ScaleSpace import ScaleSpaceTree
-from sklearn.neighbors import NearestNeighbors, KernelDensity
+import numpy as np
+from sklearn.neighbors import NearestNeighbors
+from sklearn.neighbors import kneighbors_graph
+
+from config.config import density_step_size, density_upper_limit, \
+  density_lower_limit
+from core.Modality.DensityEstKNN import DensityEstKNN
+from core.NoiseRemoval.RemoveNoiseTransformed import remove_noise_tomatoext
+from core.ScaleSpace.ScaleSpace import ScaleSpaceTree
+from services.data.level_source import store_for_level
+from services.graph.tomato_ext_service import create_graph
 
 
 def density(df_cluster):
-    return DensityEstKNN(df_cluster.values, max_neighbors=200)
+  return DensityEstKNN(df_cluster.values, max_neighbors=200)
 
 
 def calc_max_dist(df_cluster, kwargs):
-    nn = NearestNeighbors(n_jobs=-1).fit(df_cluster.values)
-    dist, _ = nn.kneighbors(n_neighbors=kwargs['knn_density'],
-                            return_distance=True)
-    return np.median(np.percentile(dist, q=90, axis=1))
+  nn = NearestNeighbors(n_jobs=-1).fit(df_cluster.values)
+  dist, _ = nn.kneighbors(n_neighbors=kwargs['knn_density'],
+                          return_distance=True)
+  return np.median(np.percentile(dist, q=90, axis=1))
 
 
-def remove_nosie(fc, df_cluster, G, lbls, rho, data_idx):
-    modes_final = {}
-    for uid in np.unique(fc):
-        ba = remove_noise_simple(data=df_cluster, cluster_bool_arr=fc == uid, G=G,
-                                 labels=lbls, density=rho)
-        clidx = data_idx[ba]
-        mode_idx = clidx[np.argmax(rho[clidx])]
-        modes_final[mode_idx] = {'index': clidx, 'boolarr': ba}
-    return modes_final
+def scale_space_dense_components(data, columns, df_cluster, alpha):
+  sst = ScaleSpaceTree(data_size=data.shape[0], min_jaccard_sim=0.5)
+  knn_densities_ssp = np.arange(density_lower_limit, density_upper_limit,
+                                density_step_size)
+
+  res, te = create_graph(df_cluster, alpha)
+
+  for i, nb_neighs in enumerate(knn_densities_ssp):
+    st = time.time()
+    print(f'Number of neighbors: {nb_neighs}', end=' ')
+
+    res = te.fit(alpha=alpha)
+    te.update(nb_neighs)
+
+    tb_stored = __for_alpha(sst, df_cluster, data, te, columns, res)
+    store_for_level(tb_stored, str(i), alpha)
+    print(f'- level {i} took {time.time() - st:.2f} sec')
+
+  return sst
 
 
-def merge_paths(df_cluster, G, msfull, rho, lbls, max_dist, kwargs, nb_neighs):
-    # Merge paths
-    mp = MergePaths(data=df_cluster, graph=G, merge_sequence=msfull,
-                    density=rho, labels=lbls, max_dist=max_dist)
-    sig_dip, cldict = mp.fit(alpha=kwargs['alpha'])
-    fc = mp.flat_clustering()
-    print(f'{np.unique(fc).size} cluster found with {nb_neighs} nn density')
-    return fc
+def __for_alpha(sst, df_cluster, data, te, columns, res):
+  data_idx = np.arange(data.shape[0])
+
+  modes = {uid: data_idx[res == uid][np.argmax(te.t.weights_[res == uid])] for
+           uid in np.unique(res)}
+  part = {modes[uid]: data_idx[res == uid] for uid in np.unique(res)}
+  sst.next_scale(partitions=part)
+
+  return __for_res(df_cluster, data, res, te, columns, modes)
 
 
-def scale_space_dense_components(X, df_cluster):
-    de = density(df_cluster)
-    data_idx = np.arange(X.shape[0])
-    sst = ScaleSpaceTree(data_size=X.shape[0], min_jaccard_sim=0.5)
+def __for_res(df_cluster, data, res, te, columns, modes):
+  ajm_knn = kneighbors_graph(df_cluster, n_neighbors=10, include_self=True,
+                             n_jobs=-1)
+  clustering_res = -np.ones(data.shape[0])
 
-    knn_densities_ssp = [30, 50, 70, 90, 110, 130]
+  for uid in np.unique(res):
+    ba, good_cluster = remove_noise_tomatoext(
+        data=df_cluster,
+        cluster_bool_arr=res == uid,
+        te_obj=te,
+        pos_cols=columns[:3],
+        nb_neigh_denstiy=10,
+        data_full=data,
+        ra_col=columns[0], dec_col=columns[1], plx_col=columns[2],
+        pmra_col=columns[3], pmdec_col=columns[4],
+        rv_col=columns[5], rv_err_col=columns[6],
+        uvw_cols=columns[3:6],
+        adjacency_mtrx=ajm_knn,
+        radius=8,
+        min_cluster_size=10
+    )
+    if good_cluster:
+      clustering_res[ba] = modes[uid]
+      print(f'{np.sum(ba)} part of cluster')
+      print(f'{30 * "-"}')
 
-    for nb_neighs in knn_densities_ssp:
-        kwargs = {'knn_density': nb_neighs, 'knn_neighors_graph': 30, 'alpha': 0.05}
-
-        max_dist = calc_max_dist(df_cluster, kwargs)
-
-        rho = de.knn_density(kwargs['knn_density'])
-        # kde = KernelDensity(bandwidth=max_dist/2, atol=1e-6, rtol=1e-5).fit(df_cluster.values)
-        # rho = np.exp(kde.score_samples(df_cluster.values)
-
-        # Morse complex/ascending manifold
-        mer_gr = MergeGraph(kwargs['knn_neighors_graph'])
-        G, lbls, msfull = mer_gr.fit(df_cluster.values, rho)
-
-        fc = merge_paths(df_cluster, G, msfull, rho, lbls, max_dist, kwargs, nb_neighs)
-
-        # Remove noise
-        modes_final = remove_nosie(fc, df_cluster, G, lbls, rho, data_idx)
-        # add partition to the scale space
-        part = {key: value['index'] for key, value in modes_final.items()}
-        sst.next_scale(partitions=part)
-
-    return sst
+  tb_stored = data[columns]
+  tb_stored['labels'] = clustering_res
+  return tb_stored
