@@ -17,7 +17,7 @@ import ModeLevelSet from "./modes/ModeLevelSet.vue";
 import ModeCluster from "./modes/ModeCluster.vue";
 import ModeAlpha from "./modes/ModeAlpha.vue";
 import ModeInput from "./modes/ModeInput.vue";
-import {modes} from "../services/modes";
+import {modes} from "../config/modes";
 import RingLoader from 'vue-spinner/src/RingLoader.vue'
 
 export default {

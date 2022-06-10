@@ -9,7 +9,7 @@
 import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import ViewHeader from "../../nav/ViewHeader.vue";
 import * as d3 from "d3";
-import {col_map, invisible} from "../../../config/colors";
+import {col_map, invisible} from "../../../services/colors";
 
 const PANE_NAME = "histogram"
 

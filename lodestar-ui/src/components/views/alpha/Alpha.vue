@@ -11,8 +11,8 @@ import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import * as d3 from "d3";
 import {percentChange} from "../../../services/views";
 import {createLevelLabels} from "../../../services/d3-tools";
-import {updateBatch} from "../../../services/datasource";
-import {highlight} from "../../../config/colors";
+import {updateBatch} from "../../../services/data/datasource";
+import {highlight} from "../../../services/colors";
 
 const PANE_NAME = "alpha_pane"
 

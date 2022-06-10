@@ -1,32 +1,25 @@
 import {createStore} from 'vuex'
-import {modes} from "../services/modes"
+import {modes} from "../config/modes"
 
 export const store = createStore({
     state: {
         currentViewSelection: null,
         currentResource: "Choose resource file",
         currentColumnSelection: {
-            s1: 5,
-            s2: 7,
-            s3: 9,
-            v1: 12,
-            v2: 14,
-            v3: 66,
-            rad_error: 67
+            s1: 5, s2: 7, s3: 9, v1: 12, v2: 14, v3: 66, rad_error: 67
         },
         selectorSelection: {
-            x: "ra",
-            y: "dec"
+            x: "ra", y: "dec"
         },
         hrdSelection: {
-            x: "bp_rp",
-            y: "mag_abs_g"
+            x: "bp_rp", y: "mag_abs_g"
         },
         level: 17,
         alpha: 0.05,
         maxLevel: 0,
         noise: false,
         labels: [],
+        sortedLabels: [],
         colorLabels: [],
         colorMap: {},
         alphaColorMap: {},
@@ -38,6 +31,7 @@ export const store = createStore({
         densityLevels: [],
         alphas: [],
         significantRoots: [],
+        clusterLookup: {},
 
         loadingScatter: false,
         erroredScatter: false,
@@ -77,190 +71,134 @@ export const store = createStore({
         calculated: false,
         uploadFinished: false,
         highlightCluster: null
-    },
-    mutations: {
+    }, mutations: {
         updateCurrentViewSelection(state, selection) {
             state.currentViewSelection = selection
-        },
-        updatePreviousMode(state, mode) {
+        }, updatePreviousMode(state, mode) {
             state.previousMode = mode
-        },
-        updateCurrentMode(state, mode) {
+        }, updateCurrentMode(state, mode) {
             state.currentMode = mode
-        },
-        updateCurrentColumnSelection(state, selection) {
+        }, updateCurrentColumnSelection(state, selection) {
             state.currentColumnSelection = selection
-        },
-        updateHrdSelection(state, selection) {
+        }, updateHrdSelection(state, selection) {
             state.hrdSelection = selection
-        },
-        updateSelector(state, data) {
+        }, updateSelector(state, data) {
             state.selector = data
-        },
-        updateSelectorSelection(state, data) {
+        }, updateSelectorSelection(state, data) {
             state.selectorSelection = data
-        },
-        updateLoadingScatter(state, isLoading) {
+        }, updateLoadingScatter(state, isLoading) {
             state.loadingScatter = isLoading
-        },
-        updateErroredScatter(state, hadError) {
+        }, updateErroredScatter(state, hadError) {
             state.erroredScatter = hadError
-        },
-        updateLoadingMain(state, isLoading) {
+        }, updateLoadingMain(state, isLoading) {
             state.loadingMain = isLoading
-        },
-        updateErroredMain(state, hadError) {
+        }, updateErroredMain(state, hadError) {
             state.erroredMain = hadError
-        },
-        updateLoadingHrd(state, isLoading) {
+        }, updateLoadingHrd(state, isLoading) {
             state.loadingHrd = isLoading
-        },
-        updateErroredHrd(state, hadError) {
+        }, updateErroredHrd(state, hadError) {
             state.erroredHrd = hadError
-        },
-        updateNetworkData(state, data) {
+        }, updateNetworkData(state, data) {
             state.networkData = data
-        },
-        updateSpace(state, data) {
+        }, updateSpace(state, data) {
             state.spaceData = data
-        },
-        updateLevel(state, level) {
+        }, updateLevel(state, level) {
             state.level = level
-        },
-        updateMaxLevel(state, max) {
+        }, updateMaxLevel(state, max) {
             state.maxLevel = max
-        },
-        updateNoise(state, noise) {
+        }, updateNoise(state, noise) {
             state.noise = noise
-        },
-        updateLabels(state, labels) {
+        }, updateLabels(state, labels) {
             state.labels = labels
-        },
-        updateColorMap(state, map) {
+        }, updateColorMap(state, map) {
             state.colorMap = map
-        },
-        updateAlphaColorMap(state, map) {
+        }, updateAlphaColorMap(state, map) {
             state.alphaColorMap = map
-        },
-        updateAllLabels(state, map) {
+        }, updateAllLabels(state, map) {
             state.allLabels = map
-        },
-        updateColorLabels(state, colorLabels) {
+        }, updateColorLabels(state, colorLabels) {
             state.colorLabels = colorLabels
-        },
-        updateCurrentClusterLevel(state, level) {
+        }, updateCurrentClusterLevel(state, level) {
             state.currentCluster.level = level
-        },
-        updateCurrentClusterLabel(state, label) {
+        }, updateCurrentClusterLabel(state, label) {
             state.currentCluster.label = label
-        },
-        updateCurrentClusterUserLabel(state, label) {
+        }, updateCurrentClusterUserLabel(state, label) {
             state.currentCluster.user_label = label
-        },
-        updateCurrentClusterName(state, name) {
+        }, updateCurrentClusterName(state, name) {
             state.currentCluster.name = name
-        },
-        updateCurrentClusterSize(state, size) {
+        }, updateCurrentClusterSize(state, size) {
             state.currentCluster.size = size
-        },
-        updateVelocityScatter(state, data) {
+        }, updateVelocityScatter(state, data) {
             state.velocityScatterData = data
-        },
-        updateVelocityNetwork(state, data) {
+        }, updateVelocityNetwork(state, data) {
             state.velocityNetworkData = data
-        },
-        overallTime(state, time) {
+        }, overallTime(state, time) {
             state.overallTime = time.toFixed(9)
-        },
-        height(state, height) {
+        }, height(state, height) {
             state.height = height
-        },
-        width(state, width) {
+        }, width(state, width) {
             state.width = width
-        },
-        updateResources(state, data) {
+        }, updateResources(state, data) {
             state.resources = data
-        },
-        updateResourceHeaders(state, data) {
+        }, updateResourceHeaders(state, data) {
             state.resourceHeaders = data
-        },
-        updateCurrentResource(state, data) {
+        }, updateCurrentResource(state, data) {
             state.currentResource = data
-        },
-        updateDrawSpaceNet(state, data) {
+        }, updateDrawSpaceNet(state, data) {
             state.drawSpaceNet = data
-        },
-        updateDrawSpaceScatter(state, data) {
+        }, updateDrawSpaceScatter(state, data) {
             state.drawSpaceScatter = data
-        },
-        updateDrawVelocityNet(state, data) {
+        }, updateDrawVelocityNet(state, data) {
             state.drawVelocityNet = data
-        },
-        updateDrawVelocityScatter(state, data) {
+        }, updateDrawVelocityScatter(state, data) {
             state.drawVelocityScatter = data
-        },
-        updateLoadingSpace(state, isLoading) {
+        }, updateLoadingSpace(state, isLoading) {
             state.loadingSpace = isLoading
-        },
-        updateErroredSpace(state, hadError) {
+        }, updateErroredSpace(state, hadError) {
             state.erroredSpace = hadError
-        },
-        updateLoadingVelocity(state, isLoading) {
+        }, updateLoadingVelocity(state, isLoading) {
             state.loadingVelocity = isLoading
-        },
-        updateErroredVelocity(state, hadError) {
+        }, updateErroredVelocity(state, hadError) {
             state.erroredVelocity = hadError
-        },
-        updatePlotRadial(state, plotRadial) {
+        }, updatePlotRadial(state, plotRadial) {
             state.plotRadial = plotRadial
-        },
-        updateHrd(state, data) {
+        }, updateHrd(state, data) {
             state.hrd = data
-        },
-        updateInspectCluster(state, data) {
+        }, updateInspectCluster(state, data) {
             state.inspectCluster = data
-        },
-        updateSelectExclude(state, data) {
+        }, updateSelectExclude(state, data) {
             state.selectExclude = data
-        },
-        addNode(state, node) {
+        }, addNode(state, node) {
             if (!(node.level in state.levelSet)) {
                 state.levelSet[node.level] = {}
             }
             state.levelSet[node.level][node.label] = node
-        },
-        updateName(state, node) {
+        }, updateName(state, node) {
             state.levelSet[node.level][node.label].name = node.name
-        },
-        updateDensityLevels(state, data) {
+        }, updateDensityLevels(state, data) {
             state.densityLevels = data
-        },
-        updateAlpha(state, data) {
+        }, updateAlpha(state, data) {
             state.alpha = data
-        },
-        updateAlphas(state, data) {
+        }, updateAlphas(state, data) {
             state.alphas = data
-        },
-        updateSignificantRoots(state, data) {
+        }, updateSignificantRoots(state, data) {
             state.significantRoots = data
-        },
-        updateTemporaryClusterName(state, data) {
+        }, updateTemporaryClusterName(state, data) {
             state.temporaryClusterName = data
-        },
-        updateHeatmap(state, data) {
+        }, updateHeatmap(state, data) {
             state.heatmap = data
-        },
-        updateCalculated(state, data) {
+        }, updateCalculated(state, data) {
             state.calculated = data
-        },
-        updateUploadFinished(state, data) {
+        }, updateUploadFinished(state, data) {
             state.uploadFinished = data
-        },
-        updateHighlightCluster(state, data) {
+        }, updateHighlightCluster(state, data) {
             state.highlightCluster = data
+        }, updateSortedLabels(state, data) {
+            state.sortedLabels = data
+        }, updateClusterLookup(state, data){
+            state.clusterLookup = data
         }
-    },
-    getters: {
+    }, getters: {
         currentViewSelection: state => state.currentViewSelection,
         previousMode: state => state.previousMode,
         currentMode: state => state.currentMode,
@@ -323,6 +261,8 @@ export const store = createStore({
         calculated: state => state.calculated,
         uploadFinished: state => state.uploadFinished,
 
-        highlightCluster: state => state.highlightCluster
+        highlightCluster: state => state.highlightCluster,
+        sortedLabels: state => state.sortedLabels,
+        clusterLookup: state => state.clusterLookup
     }
 })

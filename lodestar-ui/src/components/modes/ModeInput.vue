@@ -3,9 +3,9 @@
 </template>
 
 <script>
-import {modes} from "../../services/modes";
+import {modes} from "../../config/modes";
 import TopNav from "../menu/TopNav.vue";
-import {updateAlphas, updateDensityLevels, updateResources} from "../../services/datasource";
+import {updateAlphas, updateDensityLevels, updateResources} from "../../services/data/datasource";
 import {store} from "../../store/cluster-state-store";
 
 export default {

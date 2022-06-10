@@ -9,9 +9,9 @@
 import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import ViewHeader from "../../nav/ViewHeader.vue";
 import * as d3 from "d3";
-import {TWO_DIMENSION_LAYOUT} from "../../../config/plotly_layouts";
+import {TWO_DIMENSION_LAYOUT} from "../../../config/plotly-layouts";
 import {store} from "../../../store/cluster-state-store";
-import {createTwoDimensionalTraces} from "../../../services/trace_service";
+import {createTwoDimensionalTraces} from "../../../services/trace-service";
 
 const PANE_NAME = "hrd"
 

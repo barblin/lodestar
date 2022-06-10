@@ -18,8 +18,8 @@
 </template>
 
 <script>
-import {updateHrd, updateNetwork, updateSelection, updateSpace, updateVelocity} from "../../services/datasource";
-import {modes} from "../../services/modes";
+import {updateHrd, updateNetwork, updateSelection, updateSpace, updateVelocity} from "../../services/data/datasource";
+import {modes} from "../../config/modes";
 import ResourceSelector from "./ResourceSelector.vue";
 import {includeSecondVelocityDimension} from '../../services/dimension-util';
 

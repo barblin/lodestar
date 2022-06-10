@@ -51,7 +51,7 @@ import Alpha from "../views/alpha/Alpha.vue";
 import HeatMap from "../views/alpha/HeatMap.vue";
 import Stability from "../views/alpha/Stability.vue";
 import HRD from "../views/detail/HRD.vue";
-import {updateCurrentLabels, updateResourceHeaders, updateResources} from "../../services/datasource";
+import {updateCurrentLabels, updateResourceHeaders, updateResources} from "../../services/data/datasource";
 import Selector from "../views/detail/Selector.vue";
 
 export default {

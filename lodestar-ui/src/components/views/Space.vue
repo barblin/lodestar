@@ -9,11 +9,11 @@
 <script>
 import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import ViewHeader from "../nav/ViewHeader.vue";
-import {col_map} from "../../config/colors";
+import {col_map} from "../../services/colors";
 import * as d3 from "d3";
 import {inspect} from "../../services/cluster";
-import {createSpaceTraces} from "../../services/trace_service";
-import {THREE_DIMENSION_LAYOUT} from "../../config/plotly_layouts";
+import {createSpaceTraces} from "../../services/trace-service";
+import {THREE_DIMENSION_LAYOUT} from "../../config/plotly-layouts";
 
 const PANE_NAME = "space_pane"
 

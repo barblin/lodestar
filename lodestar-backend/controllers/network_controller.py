@@ -16,9 +16,9 @@ network_controller = Blueprint('network_controller', __name__)
 @network_controller.route('/api/v1/trees/<filename>', methods=['POST'])
 def post_join_trees(filename):
   return Response("", mimetype='application/json')
-  #data_axes = request.get_json()
-  #produce_join_trees(filename, data_axes)
-  #return Response("", mimetype='application/json')
+  data_axes = request.get_json()
+  produce_join_trees(filename, data_axes)
+  return Response("", mimetype='application/json')
 
 
 @doc(tags=['density tree'])
