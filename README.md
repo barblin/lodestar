@@ -1,5 +1,7 @@
 # topoclust
 Is a server / client application used to explore the results of a significance mode clustering algorithms pipeline.
+You can find the available resources in the resource folder. If you want to add a different data set, just place it there and
+start the software, it will detect the new file.
 
 # Install
 
