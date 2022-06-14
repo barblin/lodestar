@@ -16,7 +16,7 @@ cd lodestar-backend
 python3 -m venv venv
 source venv/bin/activate
 sudo python3.7 -m pip install -r ./requirements.txt
-sudo rm -r diptest
+sudo rm -r diptest || true
 git clone https://github.com/alimuldal/diptest.git
 cd diptest
 sudo python3.7 setup.py build_ext -i -f
