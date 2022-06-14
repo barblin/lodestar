@@ -1,8 +1,8 @@
-import {store} from '../store/cluster-state-store'
+import {store} from '../../store/cluster-state-store'
 import axios from "axios";
 import * as d3 from "d3";
-import {buildAll, buildSpaceBody, buildVelocityBody} from "./dimension-util";
-import {computeColorLabels, createAllLabelsMap, createAlphaColorMap, createColorMap} from "../config/colors";
+import {buildAll, buildSpaceBody, buildVelocityBody} from "../dimension-util";
+import {computeColorLabels, createAllLabelsMap, createAlphaColorMap, createColorMap} from "../colors";
 import {cloneDeep} from "lodash/lang";
 
 export const host = "http://localhost:5000/api/v1/"

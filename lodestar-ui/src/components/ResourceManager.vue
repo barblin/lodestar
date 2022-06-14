@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import {downloadResource} from "../services/datasource";
+import {downloadResource} from "../services/data/datasource";
 import SideNav from "./menu/SideNav.vue";
 import {store} from "../store/cluster-state-store";
 

@@ -85,7 +85,7 @@
 </template>
 
 <script>
-import {updateResourceHeaders} from "../../services/datasource";
+import {updateResourceHeaders} from "../../services/data/datasource";
 import {
   includeFirstSpaceDimension,
   includeFirstVelocityDimension,

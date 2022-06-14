@@ -6,8 +6,8 @@
 import {SidebarMenu} from 'vue-sidebar-menu'
 import '@fortawesome/fontawesome-free/css/all.css'
 import 'vue-sidebar-menu/dist/vue-sidebar-menu.css'
-import {updateResources} from "../../services/datasource";
-import {modes} from "../../services/modes";
+import {updateResources} from "../../services/data/datasource";
+import {modes} from "../../config/modes";
 
 export default {
   components: {

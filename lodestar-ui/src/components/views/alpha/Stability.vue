@@ -9,7 +9,7 @@
 <script>
 import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import * as d3 from "d3";
-import {density_max, highlight} from "../../../config/colors";
+import {density_max, highlight} from "../../../services/colors";
 
 const PANE_NAME = "stability_pane"
 

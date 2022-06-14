@@ -60,6 +60,7 @@ def recalculate_levels(filename, data_axes, alpha):
     g_ssp.add_nodes_from(ssp_clusters.keys())
 
     node_level_clusters = {}
+    max_nodes = 0
     for cli in ssp_clusters.keys():
         node_level_clusters[cli] = [int(ssp_clusters[cli].level_id),
                                     int(len(ssp_clusters[cli].index_arr)),
@@ -83,4 +84,4 @@ def recalculate_levels(filename, data_axes, alpha):
     nodes = list(g_ssp.nodes)
 
     return NetworkResponse(dict(pos), nodes, node_level_clusters,
-                           edges, max_x, max_y)
+                           edges, max_x, max_y, max_nodes)

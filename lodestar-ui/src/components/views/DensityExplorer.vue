@@ -10,11 +10,12 @@
 import * as d3 from "d3";
 import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import ViewHeader from "../nav/ViewHeader.vue";
-import {getSignificantRoots, updateAllLabels, updateCurrentLabels} from "../../services/datasource";
+import {getSignificantRoots, updateAllLabels, updateCurrentLabels} from "../../services/data/datasource";
 import {percentChange} from "../../services/views";
 import {createLevelLabels} from "../../services/d3-tools";
 import {inspect} from "../../services/cluster";
-import {highlight, selected_el} from "../../config/colors";
+import {highlight, selected_el} from "../../services/colors";
+import {correctedHeight, positionMapOf} from "../../services/layout/positions";
 
 const PANE_NAME = "network_pane"
 
@@ -54,10 +55,10 @@ export default {
     networkData: function () {
       this.redraw(this.$store.getters.networkData)
     },
-    exclusion: function (data){
+    exclusion: function (data) {
       this.isDown = false;
 
-      if(data){
+      if (data) {
         this.svg.on(".zoom", null)
         this.svg.on("mouseup", this.mouseup)
       } else {
@@ -144,9 +145,14 @@ export default {
         level += 1
       }
 
+      let transformed_network = Object.entries(network)
+      let clusterLevelInfo = Object.entries(transformed_network[2][1])
+
+      let positionMap = positionMapOf(remainingNodes, width, clusterLevelInfo)
+
       let edges = this.createEdges(network, remainingEdges);
       this.tooltip = this.createTooltip();
-      let circles = this.createNodes(remainingNodes, network, this.tooltip, height / 2, this.dragtooltip);
+      let circles = this.createNodes(remainingNodes, network, this.tooltip, height / 2, this.dragtooltip, positionMap, clusterLevelInfo);
       let levelLines = this.createLevelLines(parent, heightDict)
       let levelButton = this.createLevelButtons(heightDict, this.$store)
       let levelLabels = createLevelLabels(this.svg, Object.entries(heightDict), -13)
@@ -164,10 +170,9 @@ export default {
       this.svg.call(this.zoom.transform, d3.zoomIdentity.translate(0, this.currentOffset));
       this.svg.on("dblclick.zoom", null)
     },
-    createNodes(nodes, network, tooltip, half_height) {
+    createNodes(nodes, network, tooltip, half_height, positionMap, clusterLevelInfo) {
       let context = this;
-      let transformed_network = Object.entries(network)
-      let cluster_level_info = Object.entries(transformed_network[2][1])
+
 
       let store = this.$store;
       return this.svg.append("g")
@@ -178,7 +183,7 @@ export default {
           .attr("class", "clusters")
           .attr("fill", (d) => {
             let node_index = d[0]
-            let node = Object.entries(cluster_level_info[node_index][1])
+            let node = Object.entries(clusterLevelInfo[node_index][1])
             let level = node[0][1], label = node[2][1]
 
             if (label == store.getters.currentCluster.label &&
@@ -190,11 +195,20 @@ export default {
             return store.getters.levelSet[level][label].color
           })
           .attr("stroke", "none")
-          .attr("cx", (d) => this.correctedWidth(d[1][0]))
-          .attr("cy", (d) => {
-            let cur_height = this.yScale(this.correctedHeight(d[1][1]))
+          .attr("cx", (d) => {
             let node_index = d[0]
-            let node = Object.entries(cluster_level_info[node_index][1])
+            let node = Object.entries(clusterLevelInfo[node_index][1])
+            let level = node[0][1], label = node[2][1]
+
+            if (positionMap[level][label] == undefined)
+              return 0
+
+            return positionMap[level][label].posX
+          })
+          .attr("cy", (d) => {
+            let cur_height = this.yScale(correctedHeight(d[1][1], this.heightFactor))
+            let node_index = d[0]
+            let node = Object.entries(clusterLevelInfo[node_index][1])
             let level = node[0][1]
 
             if (level == store.getters.level) {
@@ -206,7 +220,7 @@ export default {
           .attr("r", 6)
           .on("click", function (d) {
             if (!store.getters.loadingAny) {
-              let node = Array.from(cluster_level_info[d.target.__data__[0]][1])
+              let node = Array.from(clusterLevelInfo[d.target.__data__[0]][1])
               let label = node[2]
               d3.select(this).style("cursor", "default").attr("fill", highlight);
 
@@ -220,7 +234,7 @@ export default {
           .on("dblclick", function (d) {
             if (!store.getters.loadingAny) {
               if (context.filterForCluster) {
-                let node = Array.from(cluster_level_info[d.target.__data__[0]][1])
+                let node = Array.from(clusterLevelInfo[d.target.__data__[0]][1])
                 let level = node[0], label = node[2]
 
                 d3.selectAll('.levelButtons').style("stroke", "rgba(105,179,162,0.80)")
@@ -230,12 +244,12 @@ export default {
               }
               store.commit('updateHighlightCluster', null)
 
-              context.selectCluster(Array.from(cluster_level_info[d.target.__data__[0]][1]))
+              context.selectCluster(Array.from(clusterLevelInfo[d.target.__data__[0]][1]))
             }
           })
           .on("mouseover", function (d) {
             d3.select(this).style("cursor", "pointer").attr("fill", highlight);
-            let node = Array.from(cluster_level_info[d.target.__data__[0]][1])
+            let node = Array.from(clusterLevelInfo[d.target.__data__[0]][1])
             let level = node[0], label = node[2]
 
             store.commit('updateCurrentClusterLabel', label)
@@ -254,7 +268,7 @@ export default {
             tooltip.style("opacity", 1)
           })
           .on("mouseout", function (d) {
-            let node = Array.from(cluster_level_info[d.target.__data__[0]][1])
+            let node = Array.from(clusterLevelInfo[d.target.__data__[0]][1])
             let level = node[0], label = node[2]
 
             if (label != store.getters.currentCluster.label ||
@@ -272,10 +286,26 @@ export default {
           .append('line')
           .style("stroke", "black")
           .style("stroke-width", 2)
-          .attr("x1", (d) => this.correctedWidth(network.pos[d[0]][0]))
-          .attr("y1", (d) => this.yScale(this.correctedHeight(network.pos[d[0]][1])))
-          .attr("x2", (d) => this.correctedWidth(network.pos[d[1]][0]))
-          .attr("y2", (d) => this.yScale(this.correctedHeight(network.pos[d[1]][1])));
+          .attr("x1", (d) => {
+            {
+              if (this.$store.getters.clusterLookup[d[0]] == undefined) {
+                return 0
+              }
+
+              return this.$store.getters.clusterLookup[d[0]].posX
+            }
+          })
+          .attr("y1", (d) => this.yScale(correctedHeight(network.pos[d[0]][1], this.heightFactor)))
+          .attr("x2", (d) => {
+            {
+              if (this.$store.getters.clusterLookup[d[1]] == undefined) {
+                return 0
+              }
+
+              return this.$store.getters.clusterLookup[d[1]].posX
+            }
+          })
+          .attr("y2", (d) => this.yScale(correctedHeight(network.pos[d[1]][1], this.heightFactor)));
     },
     createLevelLines(parent, heights) {
       return this.svg.append('g')
@@ -355,34 +385,34 @@ export default {
           })
     },
     mousemove(event, d) {
-      if(this.exclusion && this.isDown) {
+      if (this.exclusion && this.isDown) {
         var m = d3.pointer(event);
 
 
         rect.attr("width", Math.max(0, m[0] - +rect.attr("x")))
-        .attr("height", (d) => {
-          d[3] = Math.max(0, m[1] - +rect.attr("y"))
-          return this.yScale(d[3])
-        });
+            .attr("height", (d) => {
+              d[3] = Math.max(0, m[1] - +rect.attr("y"))
+              return this.yScale(d[3])
+            });
       }
     },
     mouseover(event, d) {
-      if(this.exclusion){
+      if (this.exclusion) {
         this.svg.style("cursor", "crosshair");
       } else {
         this.svg.style("cursor", "default");
       }
     },
-    mouseout(event, d){
+    mouseout(event, d) {
       this.svg.style("cursor", "default");
 
-      if(rect != null && rect != undefined) {
+      if (rect != null && rect != undefined) {
         //rect.remove()
       }
     },
     mouseup(event, d) {
 
-      if(this.exclusion && this.isDown && rect != undefined && event.button === 0) {
+      if (this.exclusion && this.isDown && rect != undefined && event.button === 0) {
         rects.push(rect)
 
         rect = undefined
@@ -414,7 +444,7 @@ export default {
 
       this.dragtooltip.remove()
 
-      if(this.exclusion && event.button === 0) {
+      if (this.exclusion && event.button === 0) {
         var m = d3.pointer(event);
 
         let color = this.$store.getters.selectInclude ? "lightgreen" : "red"
@@ -426,7 +456,7 @@ export default {
             .enter()
             .append("rect")
             .attr("x", (d) => d[0][0])
-            .attr("y", (d) =>  this.yScale(this.correctedHeight(d[0][1])))
+            .attr("y", (d) => this.yScale(correctedHeight(d[0][1], this.heightFactor)))
             .attr("fill", color)
             .attr("class", "exclusions")
             .attr("stroke", "grey")
@@ -521,10 +551,10 @@ export default {
 
               d3.selectAll('.exclusions')
                   .attr("y", (d) => {
-                    return new_yScale(context.correctedHeight(d[2]))
+                    return new_yScale(correctedHeight(d[2], context.heightFactor))
                   })
                   .attr("height", (d) => {
-                    return new_yScale(context.correctedHeight(d[2] + d[3]))
+                    return new_yScale(correctedHeight(d[2] + d[3], context.heightFactor))
                   })
             }
           })
@@ -542,13 +572,7 @@ export default {
       this.$store.commit('updateErroredMain', false)
       let level = node[0], label = node[2]
       inspect(level, label)
-    },
-    correctedWidth(width) {
-      return (width) * this.widthFactor + 20
-    },
-    correctedHeight(height) {
-      return (height) * this.heightFactor + 10
-    },
+    }
   }
 }
 

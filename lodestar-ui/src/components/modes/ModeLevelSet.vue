@@ -33,7 +33,7 @@ import Velocity from "../views/Velocity.vue";
 import ViewHeader from "../nav/ViewHeader.vue";
 import HRD from "../views/detail/HRD.vue";
 import DensityExplorer from "../views/DensityExplorer.vue";
-import {updateCurrentLabels} from "../../services/datasource";
+import {updateCurrentLabels} from "../../services/data/datasource";
 
 export default {
   name: "ModeLevelSet",

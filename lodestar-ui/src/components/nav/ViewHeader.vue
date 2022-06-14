@@ -83,9 +83,9 @@
 
 <script>
 
-import {modes} from "../../services/modes";
-import {computeColorLabels} from "../../config/colors";
-import {updateCurrentCluster, updateCurrentLabels} from "../../services/datasource";
+import {modes} from "../../config/modes";
+import {computeColorLabels} from "../../services/colors";
+import {updateCurrentCluster, updateCurrentLabels} from "../../services/data/datasource";
 
 export default {
   name: "Header",

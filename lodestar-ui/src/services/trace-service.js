@@ -1,4 +1,4 @@
-import {highlight, invisible} from "../config/colors";
+import {highlight, invisible} from "./colors";
 import {store} from '../store/cluster-state-store'
 import {symbol_map} from "../config/symbols";
 

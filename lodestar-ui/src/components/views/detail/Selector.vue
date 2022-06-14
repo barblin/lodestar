@@ -21,10 +21,10 @@
 import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import ViewHeader from "../../nav/ViewHeader.vue";
 import * as d3 from "d3";
-import {updateSelection} from "../../../services/datasource";
+import {updateSelection} from "../../../services/data/datasource";
 import {inspect} from "../../../services/cluster";
-import {createTwoDimensionalTraces} from "../../../services/trace_service";
-import {TWO_DIMENSION_LAYOUT} from "../../../config/plotly_layouts";
+import {createTwoDimensionalTraces} from "../../../services/trace-service";
+import {TWO_DIMENSION_LAYOUT} from "../../../config/plotly-layouts";
 import {store} from "../../../store/cluster-state-store";
 
 const PANE_NAME = "selector"

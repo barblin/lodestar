@@ -12,8 +12,8 @@ import ViewHeader from "../nav/ViewHeader.vue";
 import * as d3 from "d3";
 import {includeThirdVelocityDimension} from "../../services/dimension-util";
 import {inspect} from "../../services/cluster";
-import {createTwoDimensionalTraces} from "../../services/trace_service";
-import {TWO_DIMENSION_LAYOUT} from "../../config/plotly_layouts";
+import {createTwoDimensionalTraces} from "../../services/trace-service";
+import {TWO_DIMENSION_LAYOUT} from "../../config/plotly-layouts";
 import {store} from "../../store/cluster-state-store";
 
 const PANE_NAME = "velocity_pane"

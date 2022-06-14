@@ -1,4 +1,5 @@
-import {sortByFrequency, frequencyFromNodes} from "../services/frequencies.js"
+import {sortByFrequency, frequencyFromNodes} from "./frequencies.js"
+import {store} from '../store/cluster-state-store'
 
 export let invisible = 'rgba(162,162,162,0)'
 
@@ -58,6 +59,7 @@ export function createColorMap(nodes){
         }
     }
 
+    store.commit("updateSortedLabels", labels)
     return colorMap
 }
 

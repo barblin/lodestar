@@ -23,8 +23,8 @@
 import * as d3 from "d3";
 import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import ViewHeader from "../../nav/ViewHeader.vue";
-import {updateHrd} from "../../../services/datasource";
-import {col_map} from "../../../config/colors";
+import {updateHrd} from "../../../services/data/datasource";
+import {col_map} from "../../../services/colors";
 
 const PANE_NAME = "details"
 

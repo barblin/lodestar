@@ -1,5 +1,5 @@
-import {modes} from "./modes";
-import {updateCurrentLabels} from "./datasource";
+import {modes} from "../config/modes";
+import {updateCurrentLabels} from "./data/datasource";
 import {store} from "../store/cluster-state-store";
 
 export function inspect (level, label){

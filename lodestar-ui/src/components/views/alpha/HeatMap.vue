@@ -9,8 +9,8 @@
 <script>
 import ScaleLoader from 'vue-spinner/src/ScaleLoader.vue'
 import * as d3 from "d3";
-import {updateBatch} from "../../../services/datasource";
-import {density_max, highlight} from "../../../config/colors";
+import {updateBatch} from "../../../services/data/datasource";
+import {density_max, highlight} from "../../../services/colors";
 
 const PANE_NAME = "heat_map_pane"
 

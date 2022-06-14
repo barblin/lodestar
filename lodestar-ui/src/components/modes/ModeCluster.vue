@@ -37,7 +37,7 @@ import DensityExplorer from "../views/DensityExplorer.vue";
 import ClusterDetails from "../views/cluster/ClusterDetails.vue";
 import Histogram from "../views/detail/Histogram.vue";
 import ViewHeader from "../nav/ViewHeader.vue";
-import {updateResources} from "../../services/datasource";
+import {updateResources} from "../../services/data/datasource";
 import {store} from "../../store/cluster-state-store";
 
 export default {
