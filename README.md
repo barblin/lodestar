@@ -35,7 +35,7 @@ Supported resource file types:
 - comma-separated values, text/csv (.csv)
 
 ## Development mode
-If you would like to add a resource to work with during development, you can simply place that file into
+If you are working with the development mode and you would like to add a resource for clustering, you can simply place that file into
 ```shell
 lodestar-backend/resources/import
 ```
