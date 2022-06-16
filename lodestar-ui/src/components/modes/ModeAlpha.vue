@@ -16,7 +16,7 @@
               :colorLabels="$store.getters.colorLabels"
               :highlight="$store.getters.highlightCluster"/>
   </div>
-  <div :id="views.HRD" class="hrd">
+  <div  v-if="!$store.getters.erroredHrd" :id="views.HRD" class="hrd">
     <HRD :plotData="$store.getters.hrd" :color-labels="$store.getters.colorLabels" :parent="views.HRD"
          :highlight="$store.getters.highlightCluster"/>
   </div>

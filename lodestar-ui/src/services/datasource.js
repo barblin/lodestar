@@ -30,11 +30,11 @@ function fetchData(endpoint, callback, onFinally) {
 
 const headers = {}
 
-function postData(endpoint, callback, onFinally, data) {
+function postData(endpoint, callback, onFinally, data, commitMsg = 'updateErroredScatter') {
     axios.post(host + endpoint, data, {headers: headers, method: "post"})
         .then(callback)
         .catch(error => {
-            store.commit('updateErroredScatter', true)
+            store.commit(commitMsg, true)
             console.error(error);
         })
         .finally(onFinally);
@@ -229,7 +229,7 @@ export function updateHrd(id) {
         },
         () => {
             store.commit('updateLoadingHrd', false);
-        }, store.getters.hrdSelection)
+        }, store.getters.hrdSelection, 'updateErroredHrd')
 }
 
 export function updateSelection(id) {
