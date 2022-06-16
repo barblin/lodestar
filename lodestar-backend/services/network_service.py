@@ -8,7 +8,7 @@ from config.config import get_alpha_array, alpha_values
 from services.data.datasource import data_dict
 from services.data.df_service import prepare_columns, select_dataframe, \
     get_columns_from_dataframe_cluster
-from services.data.tree_source import store_for_alpha, get_tree
+from services.data.tree_source import store_for_alpha, get_tree, clear_cache
 from services.density_service import scale_space_dense_components
 from services.significant_roots_service import collect_roots
 
@@ -43,10 +43,10 @@ def get_significant_roots(data):
 
 
 def produce_join_trees(filename, data_axes):
+    clear_cache()
     for alpha in get_alpha_array():
         response = recalculate_levels(filename, data_axes, alpha)
-        json = response.jsonify()
-        store_for_alpha(json, alpha)
+        store_for_alpha(response.jsonify(), alpha)
 
 
 def recalculate_levels(filename, data_axes, alpha):

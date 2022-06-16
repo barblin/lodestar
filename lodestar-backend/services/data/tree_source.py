@@ -1,9 +1,15 @@
 import json
 from pathlib import Path
 
-from config.config import alpha_location
+from config.config import alpha_location, get_alpha_array
+import shutil
 
 alpha_pre = "alpha_"
+
+
+def clear_cache():
+    for alpha in get_alpha_array():
+        shutil.rmtree(alpha_location(alpha))
 
 
 def store_for_alpha(tree, alpha):
