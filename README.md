@@ -1,5 +1,8 @@
 # topoclust
 Is a server / client application used to explore the results of a significance mode clustering algorithms pipeline.
+This application is designed to help astronomers find potential clusters within large amounts of data by offering a visualization of the solution space produced by the significance mode clustering.
+
+Below you will find simple instructions to work with this application.
 
 # Install
 
